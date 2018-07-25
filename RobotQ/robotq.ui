@@ -1,29 +1,52 @@
-<UI version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>RobotQClass</class>
- <widget class="QMainWindow" name="RobotQClass" >
-  <property name="objectName" >
-   <string notr="true">RobotQClass</string>
-  </property>
-  <property name="geometry" >
+ <widget class="QMainWindow" name="RobotQClass">
+  <property name="geometry">
    <rect>
-	<x>0</x>
-	<y>0</y>
-	<width>600</width>
-	<height>400</height>
+    <x>0</x>
+    <y>0</y>
+    <width>572</width>
+    <height>400</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>RobotQ</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <property name="windowTitle">
+   <string>小M机器人语音功能</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="robotq.qrc">
+    <normaloff>:/RobotQ/Resources/HIT_Robot_ico.ico</normaloff>:/RobotQ/Resources/HIT_Robot_ico.ico</iconset>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="robotq.qrc">:/RobotQ/Resources/BG_ASR.jpg</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources>
-   <include location="robotq.qrc"/>
+  <include location="robotq.qrc"/>
  </resources>
  <connections/>
-</UI>
+</ui>

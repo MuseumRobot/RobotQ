@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="RobotQ">
-    </qresource>
+  <qresource prefix="RobotQ">
+    <file>Resources/BG_ASR.jpg</file>
+    <file>Resources/HIT_Robot_ico.ico</file>
+  </qresource>
 </RCC>

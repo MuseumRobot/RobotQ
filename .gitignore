@@ -1,16 +1,18 @@
 # C++ objects and libs
-*.slo
-*.lo
-*.o
+Debug/
 *.a
-*.la
-*.lai
-*.so
+*.cd
 *.dll
 *.dylib
-*.sdf
-*.suo
+*.la
+*.lai
+*.lo
+*.o
 *.opensdf
+*.sdf
+*.slo
+*.so
+*.suo
 
 # Qt-es
 object_script.*.Release
@@ -44,3 +46,5 @@ target_wrapper.*
 
 # QtCreator CMake
 CMakeLists.txt.user*
+
+*.ipch
