@@ -1,8 +1,8 @@
 # C++ objects and libs
 Debug/
+RobotQ/Release/
 *.a
 *.cd
-*.dll
 *.dylib
 *.la
 *.lai
@@ -47,4 +47,3 @@ target_wrapper.*
 
 # QtCreator CMake
 CMakeLists.txt.user*
-
