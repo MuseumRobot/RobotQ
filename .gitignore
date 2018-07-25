@@ -7,6 +7,7 @@ Debug/
 *.la
 *.lai
 *.lo
+*.ipch
 *.o
 *.opensdf
 *.sdf
@@ -47,4 +48,3 @@ target_wrapper.*
 # QtCreator CMake
 CMakeLists.txt.user*
 
-*.ipch
