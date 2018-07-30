@@ -1,0 +1,246 @@
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [HCI_SYS][HciAuth::Init] ______ StartLog Success ______
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [HCI_SYS][HciAuth::Init] ParseConfig Success
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [HCI_SYS][HciAuth::Init] eUdidType:-1
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::ShareDNSHandle] libcurl version:libcurl/7.37.0 zlib/1.2.8 c-ares/1.11.0
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::Load]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][hci_get_udid]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][get_win_mac_address]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][get_win_mac_address]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][hci_get_udid]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CUserInfo::ReBuild] update udid type:0 udid:000c29bd07a81f8bfbff000306a9
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::WriteUserInfo]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::WriteUserInfo]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::Load]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCount]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [jtcommon][FileReader::Load] open file (D:\RobotQ\RobotQ\testdata/HCI_LICENSE) failed and errno=2
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) WARNING [HCI_SYS][HciAuth::ReadMaxSessionCount] failed to open file D:\RobotQ\RobotQ\testdata/HCI_LICENSE
+
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCount]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCountBatch]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [jtcommon][FileReader::Load] open file (D:\RobotQ\RobotQ\testdata/HCI_LICENSE_BATCH) failed and errno=2
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) WARNING [HCI_SYS][HciAuth::ReadMaxSessionCountBatch] failed to open file D:\RobotQ\RobotQ\testdata/HCI_LICENSE_BATCH
+
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCountBatch]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [HCI_SYS][HciAuth::Init] max_session_count:2
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [jtcommon][FileReader::Load] open file (D:\RobotQ\RobotQ\testdata/HCI_AUTH) failed and errno=2
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) WARNING [jtcommon][CBasicAuth::LoadFromFile] failed to open basic_auth file D:\RobotQ\RobotQ\testdata/HCI_AUTH
+
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [jtcommon][FileReader::Load] open file (D:\RobotQ\RobotQ\testdata/HCI_AUTH_FOREVER) failed and errno=2
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) WARNING [jtcommon][CBasicAuth::LoadFromFile] failed to open basic_auth file D:\RobotQ\RobotQ\testdata/HCI_AUTH_FOREVER
+
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [jtcommon][FileReader::Load] open file (D:\RobotQ\RobotQ\testdata/HCI_BASIC_AUTH) failed and errno=2
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) WARNING [jtcommon][CBasicAuth::LoadFromFile] failed to open basic_auth file D:\RobotQ\RobotQ\testdata/HCI_BASIC_AUTH
+
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Leave
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) INFO    [jtcommon][FileReader::Load] open file (D:\RobotQ\RobotQ\testdata/HCI_APP_FILE) failed and errno=2
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::CheckAuth]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::CurlHttp] CurlHttp ctor, addr = 0x46f548
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CheckAuthAction::DoProcess]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CheckAuthAction::CheckAuth]Enter
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::CurlInit] curl easy init, handle = 0x183160
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] http url:api.hcicloud.com:8888/CheckAuth
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-app-key:e45d546a
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-udid:0:000c29bd07a81f8bfbff000306a9
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-sdk-version:8.0.28788
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-tid:
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-eid:
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-userid:
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-call-type:0
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-request-date:2018-07-31 00:48:01
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] header:x-session-key:d7a0312d932ac09f41ee392dc8daf1b5
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::Post] curl slist init, list = 0x18cfc8
+2018-07-31 00:48:01 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi init, handle = 0x18c8f0
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::MultiPerfrom] ACCESS_TIME:{"tkn":"curlhttp","idx":-1,"chc":200,"cds":0,"ccn":47,"cpt":47,"cst":156,"cnt":156,"cuz":374,"cdz":2858,"snt":148,"ngx":0,"svc":55,"spl":148,"spc":148,"stc":0}
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi clean up, handle = 0x18c8f0
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl easy clean up, handle = 0x183160
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl slist free all, list = 0x18cfc8
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CheckAuthAction::CheckAuth] http response xml[<?xml version="1.0"?>
+<response_info><res_code>0</res_code><res_message>Auth Success</res_message><tx_server_address_type>production</tx_server_address_type><tx_txd>0</tx_txd><tx_eid>0</tx_eid><tx_need_push>2</tx_need_push><auth_len>3024</auth_len></response_info>
+ýó°tëüw½OÕå-”@ˆ¼.ñ<ÑkÚ×‘)—C†ül/–¼Æ8±D‚*EF_kÅ“0˜CXbL¥j|ä/÷{Ì×m\­¡K¤ûý´½àÖò4—üÿ2«˜:…&oŸ?¢oâ)dçƒgM2ü÷}CŒ¡á¦e8Jp5ÃmaªYCV/{Èrz*#W‹HNˆS*V{VÀwq"IJIgAKf»ù¨m3~j²çpj[Ž¥”ø¯”œ¾Š\ƒÃTÕãù‚V
+âd¯P|	p#¥©³C@ø¦{_V/Í# €ŠL0­gô!<…˜CXbL¥j|ä/÷{Ì×m\­¡K¤ûý´½àÖò\{==¼ˆJÇu7hÍ×ÃRqÐ¼g–9õAÏ
+¦e_ÁùD?¥Äçˆ­m•TÍd!ŒŽ¶nvÛ_1ŒxèX4a<(©}Ý‘áÜ×˜CXbL¥j|ä/÷{Ì×	‹Qè\/‹O¢?ã„ðk+LzÐïÀÄF>òëûñeü÷µ‹æž1¼lIÉÁ<Š7)VÙ¿Ýì\o”‹Sš˜C{¿X¨ofjú0zÔí|€]
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CBasicAuth::LoadFromBuff] sKay_first[0:000c29bd07a81f8bfbff000306a9#8fbe5da16df50732dbccff4d4bcfef79#e45d546a]
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::Storage]Enter
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::WriteUserInfo]Enter
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::WriteUserInfo]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CUserInfo::Storage]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::UpdateCloudAuth]Enter
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::UpdateCloudAuth]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CheckAuthAction::CheckAuth]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][CheckAuthAction::DoProcess]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) INFO    [HCI_SYS][HciAuth::CheckAuth] SUCCESS
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::~CurlHttp] CurlHttp dtor, addr = 0x46f548
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::CheckAuth]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [jtcommon][CurlHttp::CurlHttp] CurlHttp ctor, addr = 0x1655c0
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][UploadDataInterFace::StartUpload]Enter
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) INFO    [jtcommon][FileReader::Load] open file (D:\RobotQ\RobotQ\testdata/USER_CUSTOM_HIS) failed and errno=2
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][UploadDataInterFace::StartUpload]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) INFO    [HCI_SYS][HciAuth::Init] SUCCESS
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][HciAuth::Init]Leave
+2018-07-31 00:48:02 RobotQ.exe( 4620: 7268) DEBUG   [HCI_SYS][UploadDataInterFace::UploadThreadFunc]Enter
+2018-07-31 00:48:02 RobotQ.exe( 4620: 8712) DEBUG   [HCI_SYS][hci_init]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::Init] ______ StartLog Success ______
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::Init] ParseConfig Success
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::Init] eUdidType:-1
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::ShareDNSHandle] libcurl version:libcurl/7.37.0 zlib/1.2.8 c-ares/1.11.0
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CUserInfo::Load]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CUserInfo::ReadUserInfo]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CUserInfo::SplitUdidString]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CUserInfo::SplitUdidString]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CUserInfo::ReadUserInfo] get udid from userinfo type:0 udid:000c29bd07a81f8bfbff000306a9
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_get_udid_by_type]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][get_win_mac_address]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][get_win_mac_address]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_get_udid_by_type]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CUserInfo::ReadUserInfo]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CUserInfo::Load]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCount]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) INFO    [jtcommon][FileReader::Load] open file (.\testdata/HCI_LICENSE) failed and errno=2
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) WARNING [HCI_SYS][HciAuth::ReadMaxSessionCount] failed to open file .\testdata/HCI_LICENSE
+
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCount]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCountBatch]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) INFO    [jtcommon][FileReader::Load] open file (.\testdata/HCI_LICENSE_BATCH) failed and errno=2
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) WARNING [HCI_SYS][HciAuth::ReadMaxSessionCountBatch] failed to open file .\testdata/HCI_LICENSE_BATCH
+
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HciAuth::ReadMaxSessionCountBatch]Leave
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::Init] max_session_count:2
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Enter
+2018-07-31 00:54:59 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CBasicAuth::LoadFromBuff] sKay_first[0:000c29bd07a81f8bfbff000306a9#8fbe5da16df50732dbccff4d4bcfef79#e45d546a]
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][CBasicAuth::LoadFromFile]Leave
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) INFO    [jtcommon][FileReader::Load] open file (.\testdata/HCI_APP_FILE) failed and errno=2
+2018-07-31 00:55:00 RobotQ.exe( 6576: 3796) DEBUG   [HCI_SYS][HciAuth::CheckAuthThreadFunc]Enter
+2018-07-31 00:55:00 RobotQ.exe( 6576: 3796) DEBUG   [HCI_SYS][CBasicAuth::IsExpire]Enter
+2018-07-31 00:55:00 RobotQ.exe( 6576: 3796) DEBUG   [HCI_SYS][CBasicAuth::IsExpire]Leave
+2018-07-31 00:55:00 RobotQ.exe( 6576: 3796) DEBUG   [jtcommon][CUserInfo::IsNeedRegister] FALSE
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::CurlHttp] CurlHttp ctor, addr = 0x3950c0
+2018-07-31 00:55:00 RobotQ.exe( 6576: 7224) DEBUG   [HCI_SYS][HciAuth::TxSettingThreadFunc]Enter
+2018-07-31 00:55:00 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::CurlHttp] CurlHttp ctor, addr = 0x39d7a0
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][UploadDataInterFace::StartUpload]Enter
+2018-07-31 00:55:00 RobotQ.exe( 6576: 7224) INFO    [jtcommon][FileReader::Load] open file (.\testdata/HCI_TX_SETTING) failed and errno=2
+2018-07-31 00:55:00 RobotQ.exe( 6576: 7224) ERROR   [HCI_SYS][TxSetting::LoadFromFile] HCI_TX_SETTING IsValid false
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) INFO    [jtcommon][FileReader::Load] open file (.\testdata/USER_CUSTOM_HIS) failed and errno=2
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][UploadDataInterFace::StartUpload]Leave
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::Init] SUCCESS
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HciAuth::Init]Leave
+2018-07-31 00:55:00 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_init]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_get_auth_expire_time]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::GetAuthExpireTime] SUCCESS
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_get_auth_expire_time]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_get_capability_list]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::GetCapabilityListByType] SUCCESS
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_get_capability_list]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_free_capability_list]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::ReleaseCapabilityList] SUCCESS
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_free_capability_list]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][hci_asr_recorder_init]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::_jetcl_recorder_device]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::_jetcl_recorder_device]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_asr_recoder_engine::Init] recoder init config:initCapkeys=asr.cloud.freetalk,dataPath=.\testdata
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::Init]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::Init]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR][hci_asr_init]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HCI_GetMaxSessionCount] max session count:2
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][SdkInterface::ApplyServiceUrl]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::CurlHttp] CurlHttp ctor, addr = 0x31f090
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7132) DEBUG   [HCI_SYS][UploadDataInterFace::UploadThreadFunc]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::CurlHttp] CurlHttp ctor, addr = 0x34dfaf8
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::CurlInit] curl easy init, handle = 0xa63160
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::Post] http url:http://conf.open.tianxing.com:13000
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::Post] header:appKey:e45d546a
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::Post] header:nonceStr:2018-07-31 00:55:00
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::Post] header:sessionKey:e8415b170b0b848ad41158f5ada9c76b
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::Post] curl slist init, list = 0xa61150
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::CurlInit] curl easy init, handle = 0x2849218
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] http url:api.hcicloud.com:8888/ApplyServiceUrl
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-task-config:
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-app-key:e45d546a
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-udid:0:000c29bd07a81f8bfbff000306a9
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-sdk-version:8.0.28788
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-tid:0
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-eid:0
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-userid:
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-call-type:0
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-request-date:2018-07-31 00:55:17
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] header:x-session-key:9188b0190fb1ffa67d5e7748d3667ea1
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::Post] curl slist init, list = 0xa60f48
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::CurlInit] curl easy init, handle = 0x285abf8
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::Post] http url:http://conf.open.tianxing.com:10000
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::Post] header:appKey:e45d546a
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::Post] header:nonceStr:2018-07-31 00:55:17
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::Post] header:sessionKey:9188b0190fb1ffa67d5e7748d3667ea1
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::Post] curl slist init, list = 0xa6c010
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi init, handle = 0xa60dd0
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi init, handle = 0x2885e70
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi init, handle = 0x28a2c10
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::MultiPerfrom] ACCESS_TIME:{"tkn":"curlhttp","idx":-1,"chc":200,"cds":16,"ccn":62,"cpt":62,"cst":94,"cnt":94,"cuz":135,"cdz":175,"snt":106,"ngx":0,"svc":0,"spl":106,"spc":106,"stc":0}
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi clean up, handle = 0xa60dd0
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl easy clean up, handle = 0xa63160
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl slist free all, list = 0xa61150
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) WARNING [HCI_SYS][TxSetting::LoadFromString] get json(data) failed
+2018-07-31 00:55:17 RobotQ.exe( 6576: 7224) DEBUG   [HCI_SYS][TxSetting::LoadFromNet] response({"timestamp": 1532969700009, "cmdid": 5041, "apiVersion": "V1.0", "error": {"message": "\u672c\u5e94\u7528\u6ca1\u6709\u8fd9\u6761\u534f\u8bae\u7684\u6388\u6743", "code": 56}})
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::MultiPerfrom] ACCESS_TIME:{"tkn":"curlhttp","idx":-1,"chc":200,"cds":0,"ccn":47,"cpt":47,"cst":125,"cnt":125,"cuz":0,"cdz":208,"snt":126,"ngx":0,"svc":0,"spl":126,"spc":126,"stc":0}
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi clean up, handle = 0x2885e70
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl easy clean up, handle = 0x2849218
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl slist free all, list = 0xa60f48
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CommitRequestProcessor::DoProcess] Post 's http Parse :(<?xml version="1.0" ?><response_info><res_code>0</res_code><res_message>success</res_message><abilities><ability><capkey>asr.cloud.freetalk</capkey><service_url>http://119.254.116.51:8880/asr</service_url></ability><ability><capkey>asr.cloud.dialog</capkey><service_url>http://119.254.116.51:8880/asr</service_url></ability><ability><capkey>tts.cloud.shenxu</capkey><service_url>http://119.254.116.51:8880/tts</service_url></ability><ability><capkey>nlu.cloud</capkey><service_url>http://119.254.116.51:8880/nlu</service_url></ability></abilities></response_info>)
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HciAuth::ApplyServiceUrlFunc] UpdateAbilityMapThreadFunc return(0).
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::~CurlHttp] CurlHttp dtor, addr = 0x31f090
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][SdkInterface::ApplyServiceUrl]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][IDllInterface::Load]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [hci_asr_cloud][HciAsrInit]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [hci_asr_cloud][HciAsrInit]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][IDllInterface::Load]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) INFO    [jtcommon][AsrSdk::Init] SUCCESS
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR][hci_asr_init]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_asr_recoder_engine::Init] Close Thread Init...
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::Init]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::Reset]Enter
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::Reset]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::Init]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_asr_recoder_engine::Init] Close Thread Init
+2018-07-31 00:55:17 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][hci_asr_recorder_init]Leave
+2018-07-31 00:55:17 RobotQ.exe( 6576: 9080) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::RecordThread]Enter
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::MultiPerfrom] ACCESS_TIME:{"tkn":"curlhttp","idx":-1,"chc":200,"cds":16,"ccn":62,"cpt":156,"cst":203,"cnt":203,"cuz":195,"cdz":217,"snt":201,"ngx":0,"svc":0,"spl":201,"spc":201,"stc":0}
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::CurlPerform] curl multi clean up, handle = 0x28a2c10
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl easy clean up, handle = 0x285abf8
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::CurlCleanup_i] curl slist free all, list = 0xa6c010
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [HCI_SYS][CUserInfo::Storage]Enter
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [HCI_SYS][CUserInfo::WriteUserInfo]Enter
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [HCI_SYS][CUserInfo::WriteUserInfo]Leave
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [HCI_SYS][CUserInfo::Storage]Leave
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [HCI_SYS][HciAuth::TxGetIdThreadFunc] get txid = 287084375
+2018-07-31 00:55:18 RobotQ.exe( 6576: 8064) DEBUG   [jtcommon][CurlHttp::~CurlHttp] CurlHttp dtor, addr = 0x34dfaf8
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][hci_asr_recorder_release]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::Close]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::Close]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::Release]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 9080) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::RecordThread]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_thread::Release]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR][hci_asr_release]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][IDllInterface::UnLoad]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [hci_asr_cloud][HciAsrRelease]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [hci_asr_cloud][HciAsrRelease]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][IDllInterface::UnLoad]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) INFO    [jtcommon][AsrSdk::Release] SUCCESS
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR][AsrSdk::~AsrSdk]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR][AsrSdk::~AsrSdk]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR][hci_asr_release]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::~_jetcl_recorder_device]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::Close]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::Close]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][_jetcl_recorder_device::~_jetcl_recorder_device]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_ASR_RECORDER][hci_asr_recorder_release]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][hci_release]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [HCI_SYS][HciAuth::Release]Enter
+2018-07-31 00:55:23 RobotQ.exe( 6576: 7224) DEBUG   [HCI_SYS][HciAuth::TxSettingThreadFunc]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 3796) DEBUG   [HCI_SYS][HciAuth::CheckAuthThreadFunc]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 7132) DEBUG   [HCI_SYS][UploadDataInterFace::UploadThreadFunc] UploadDataInterFace leave.
+2018-07-31 00:55:23 RobotQ.exe( 6576: 7132) DEBUG   [HCI_SYS][UploadDataInterFace::UploadThreadFunc]Leave
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) DEBUG   [jtcommon][CurlHttp::~CurlHttp] CurlHttp dtor, addr = 0x3950c0
+2018-07-31 00:55:23 RobotQ.exe( 6576: 8824) INFO    [HCI_SYS][HciAuth::StopLog] ______ StopLog ______

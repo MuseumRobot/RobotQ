@@ -50,6 +50,18 @@
     <ClCompile Include="GeneratedFiles\qrc_robotq.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="common\AccountInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common\CommonTool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common\FileReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="robotq.h">
@@ -65,6 +77,27 @@
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_robotq.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common\AccountInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CommonTool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common\FileReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_asr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_asr_recorder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_sys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -49,9 +49,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;QtCored4.lib;QtGuid4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>hci_sys.lib;hci_asr_recorder.lib;qtmaind.lib;QtCored4.lib;QtGuid4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,6 +72,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="common\AccountInfo.cpp" />
+    <ClCompile Include="common\CommonTool.cpp" />
+    <ClCompile Include="common\FileReader.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_robotq.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -86,6 +89,10 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="robotq.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="robotq.h">
@@ -113,7 +120,14 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common\AccountInfo.h" />
+    <ClInclude Include="common\CommonTool.h" />
+    <ClInclude Include="common\FileReader.h" />
     <ClInclude Include="GeneratedFiles\ui_robotq.h" />
+    <ClInclude Include="include\hci_asr.h" />
+    <ClInclude Include="include\hci_asr_recorder.h" />
+    <ClInclude Include="include\hci_sys.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="robotq.qrc">
