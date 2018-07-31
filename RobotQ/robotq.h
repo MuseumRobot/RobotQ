@@ -6,11 +6,15 @@
 #include <stdlib.h>
 #include <time.h>
 #include "ui_robotq.h"
+#include "stdafx.h"
+#include "common/AccountInfo.h"
+#include "common/CommonTool.h"
 #include "common/FileReader.h"
 #include "include/hci_asr_recorder.h"
 #include <string>
 #include <QMessageBox>
 #include <QString>
+
 using std::string;
 
 
@@ -36,15 +40,19 @@ public:
 	bool Uninit(void);
 	clock_t m_startClock;
 
+signals:
+	void sendRecorderAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage);
 private slots:
 	int OnStartClicked(bool checked);
 	int OnEndClicked(bool checked);
+	void OnShowStatus(RECORDER_EVENT eRecorderEvent, QString strMessage);
 
 private:Ui::RobotQClass ui;
 
 private:
 	void EchoGrammarData(const string &grammarFile);
-
+	bool CheckAndUpdataAuth();
+	void GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecogMode &mode);
 	static void HCIAPI RecordEventChange(RECORDER_EVENT eRecorderEvent, void *pUsrParam);
 
 	static void HCIAPI RecorderRecogFinish(
@@ -69,9 +77,9 @@ private:
 		);
 
 public:
-	//void AppendMessage(CString &strMsg);
+	void AppendMessage(QString strMsg);
 	void RecorderRecording(unsigned char * pVoiceData, unsigned int uiVoiceLen);
-	void PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, const QString & strMessage);
+	void PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage);
 
 private:
 	AsrRecogType m_RecogType;

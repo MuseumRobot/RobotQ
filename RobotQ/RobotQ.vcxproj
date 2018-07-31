@@ -123,6 +123,7 @@
     <ClInclude Include="common\AccountInfo.h" />
     <ClInclude Include="common\CommonTool.h" />
     <ClInclude Include="common\FileReader.h" />
+    <ClInclude Include="common\GBK.h" />
     <ClInclude Include="GeneratedFiles\ui_robotq.h" />
     <ClInclude Include="include\hci_asr.h" />
     <ClInclude Include="include\hci_asr_recorder.h" />
