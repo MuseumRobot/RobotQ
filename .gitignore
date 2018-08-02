@@ -1,6 +1,6 @@
 # C++ objects and libs
 Debug/
-RobotQ/Release/
+Release/
 *.a
 *.cd
 *.dylib
