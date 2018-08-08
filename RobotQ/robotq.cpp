@@ -1,25 +1,26 @@
 #include "robotq.h"
 
+//静态全局变量
+QString RobotQ::GLOBAL_strMessage;
+RECORDER_EVENT RobotQ::GLOBAL_eRecorderEvent;
+bool RobotQ::GLOBAL_CommandValid;
 
 RobotQ::RobotQ(QWidget *parent, Qt::WFlags flags):QMainWindow(parent, flags){
 	ui.setupUi(this);
 	connect(ui.btnStart,SIGNAL(clicked(bool)),this,SLOT(OnStartClicked(bool)));
 	connect(ui.btnEnd,SIGNAL(clicked(bool)),this,SLOT(OnEndClicked(bool)));
-	connect(this,SIGNAL(sendRecorderAndMsg(RECORDER_EVENT,QString)),this,SLOT(OnShowStatus(RECORDER_EVENT,QString)),Qt::AutoConnection);
 	Init();
+	m_timerId=startTimer(500);	//计时器查询识别状态
 }
 RobotQ::~RobotQ(){
 	Uninit();
 }
-
 int RobotQ::OnStartClicked(bool checked){
-
 	RECORDER_ERR_CODE eRet = RECORDER_ERR_NONE;
 	ui.btnStart->setEnabled(false);
 	ui.btnEnd->setEnabled(true);
 	// 清空状态记录
 	ui.textStatus->setPlainText("Start");
-
 	AccountInfo *account_info = AccountInfo::GetInstance();
 	string startConfig = "";
 	startConfig += "capkey=" + account_info->cap_key();
@@ -30,7 +31,6 @@ int RobotQ::OnStartClicked(bool checked){
 		sprintf(chTmp,",grammarid=%d",m_GrammarId);
 		startConfig += chTmp; 
 	}
-
 	eRet = hci_asr_recorder_start(startConfig.c_str(),"");
 	if (RECORDER_ERR_NONE != eRet){
 		QString strErrMessage;
@@ -43,18 +43,31 @@ int RobotQ::OnStartClicked(bool checked){
 	return 0;
 }
 int RobotQ::OnEndClicked(bool checked){
-	ui.textStatus->setPlainText("End");
-
+	AppendMessage("停止聆听End");
+	RECORDER_ERR_CODE eRet = hci_asr_recorder_cancel();
+	if (RECORDER_ERR_NONE != eRet){
+		QString strErrMessage;
+		strErrMessage.sprintf( "终止录音失败,错误码%d", eRet );
+		QMessageBox msgBox;
+		msgBox.setText(strErrMessage);
+		msgBox.exec();
+		return 1;
+	}
+	ui.btnEnd->setEnabled(false);
+	ui.btnStart->setEnabled(true);
 	return 0;
 }
-
-
-
+void RobotQ::timerEvent(QTimerEvent *event){
+	if(event->timerId()==m_timerId&&GLOBAL_CommandValid==TRUE){
+		OnShowStatus(GLOBAL_eRecorderEvent,GLOBAL_strMessage);
+		GLOBAL_CommandValid = FALSE;
+	}
+}
 bool RobotQ::Init(){	
+	GLOBAL_CommandValid = FALSE;	//初始化执行步骤不附加到显示框中
 	m_recordingFlag = FALSE;
 	m_recordingFileName = "recording.pcm";
 	m_recordingFile = NULL;
-
 	// 获取AccountInfo单例
 	AccountInfo *account_info = AccountInfo::GetInstance();
 	// 账号信息读取
@@ -67,7 +80,6 @@ bool RobotQ::Init(){
 		msgBox.exec();
 		return false;
 	}
-
 	// SYS初始化
 	HCI_ERR_CODE errCode = HCI_ERR_NONE;
 	// 配置串是由"字段=值"的形式给出的一个字符串，多个字段之间以','隔开。字段名不分大小写。
@@ -89,8 +101,6 @@ bool RobotQ::Init(){
 		return false;
 	}
 	printf( "hci_init success\n" );
-
-
 	// 检测授权,必要时到云端下载授权。此处需要注意的是，这个函数只是通过检测授权是否过期来判断是否需要进行
 	// 获取授权操作，如果在开发调试过程中，授权账号中新增了灵云sdk的能力，请到hci_init传入的authPath路径中
 	// 删除HCI_AUTH文件。否则无法获取新的授权文件，从而无法使用新增的灵云能力。
@@ -103,14 +113,10 @@ bool RobotQ::Init(){
 		msgBox.exec();
 		return false;
 	}
-
-	// capkey属性获取
 	m_RecogType = kRecogTypeUnkown;
 	m_RecogMode = kRecogModeUnkown;
 	GetCapkeyProperty(account_info->cap_key(),m_RecogType,m_RecogMode);
-
 	if( m_RecogType == kRecogTypeCloud && m_RecogMode == kRecogModeGrammar ){
-		// 云端语法暂时不支持实时识别
 		hci_release();
 		QString str;
 		str.sprintf("Recorder not support cloud grammar, init failed\n");
@@ -134,13 +140,8 @@ bool RobotQ::Init(){
 	call_back.pfnRecording		= RobotQ::RecorderRecordingCallback;
 	call_back.pfnRecogProcess   = RobotQ::RecorderRecogProcess;
 
-
 	string initConfig = "initCapkeys=" + account_info->cap_key();	
 	initConfig        += ",dataPath=" + account_info->data_path();
-	//string initConfig = "dataPath=" + account_info->data_path();
-	//initConfig      += ",encode=speex";
-	//initConfig		+= ",initCapkeys=asr.local.grammar";			      //初始化本地引擎
-
 	eRet = hci_asr_recorder_init( initConfig.c_str(), &call_back);
 	if (eRet != RECORDER_ERR_NONE){
 		hci_release();
@@ -173,7 +174,6 @@ bool RobotQ::Init(){
 			// m_GrammarId = 2;
 		}
 	}
-
 	return true;
 }
 
@@ -187,14 +187,12 @@ void RobotQ::EchoGrammarData(const string &grammarFile){
 		msgBox.exec();
 		return;
 	}
-
 	unsigned char szBom[3];
 	fread( szBom, 3, 1, fp );
 	// 若有bom头，则清除，没有则当前位置回到头部
 	if( !( szBom[0] == 0xef && szBom[1] == 0xbb && szBom[2] == 0xbf ) ){
 		fseek( fp, 0, SEEK_SET );
 	}
-
 	QString grammarData = "";
 	char szData[1024] = {0};
 	while( fgets( szData, 1024, fp ) != NULL ){
@@ -204,15 +202,12 @@ void RobotQ::EchoGrammarData(const string &grammarFile){
 		HciExampleComon::FreeConvertResult( pszGBK );
 		grammarData += "\r\n";
 	}
-
 	fclose( fp );
-	//SetDlgItemText( IDC_EDIT_WORDLIST, grammarData );
 	return;
 }
 
 bool RobotQ::Uninit(void){
-	HCI_ERR_CODE eRet = HCI_ERR_NONE;	
-	// 如果是本地语法识别，则需要释放语法资源
+	HCI_ERR_CODE eRet = HCI_ERR_NONE;
 	if( m_RecogType == kRecogTypeLocal && m_RecogMode == kRecogModeGrammar ){
 		hci_asr_recorder_unload_grammar( m_GrammarId );
 	}
@@ -222,9 +217,7 @@ bool RobotQ::Uninit(void){
 		return false;
 	}
 	eRet = hci_release();
-
 	AccountInfo::ReleaseInstance();
-
 	return eRet == HCI_ERR_NONE;
 }
 
@@ -248,10 +241,7 @@ struct{
 	{"RECORDER_EVENT_RECOGNIZE_PROCESS",    "识别中间状态"}
 };
 
-void HCIAPI RobotQ::RecorderRecogProcess(
-	RECORDER_EVENT eRecorderEvent,
-	ASR_RECOG_RESULT *psAsrRecogResult,
-	void *pUsrParam){
+void HCIAPI RobotQ::RecorderRecogProcess(RECORDER_EVENT eRecorderEvent,ASR_RECOG_RESULT *psAsrRecogResult,void *pUsrParam){
 		RobotQ *dlg=(RobotQ *)pUsrParam;
 		QString strMessage = "";
 		QString add;
@@ -259,6 +249,7 @@ void HCIAPI RobotQ::RecorderRecogProcess(
 			unsigned char* pucUTF8 = NULL;
 			HciExampleComon::UTF8ToGBK( (unsigned char*)psAsrRecogResult->psResultItemList[0].pszResult, &pucUTF8 );
 			add.sprintf( "识别中间结果: %s", pucUTF8 );
+			add=QString::fromLocal8Bit(add.toStdString().c_str());
 			strMessage+=add;
 			HciExampleComon::FreeConvertResult( pucUTF8 );
 			pucUTF8 = NULL;
@@ -266,7 +257,6 @@ void HCIAPI RobotQ::RecorderRecogProcess(
 			strMessage.append( "*****无识别结果*****" );
 		}
 		dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);	
-		    
 }
 void HCIAPI RobotQ::RecordEventChange(RECORDER_EVENT eRecorderEvent, void *pUsrParam){
 	RobotQ *dlg=(RobotQ *)pUsrParam;
@@ -279,14 +269,10 @@ void HCIAPI RobotQ::RecordEventChange(RECORDER_EVENT eRecorderEvent, void *pUsrP
 			dlg->m_recordingFile = NULL;
 		}
 	}
-
 	QString strMessage(g_sStatus[eRecorderEvent].pszComment);
 	dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
 }
-void HCIAPI RobotQ::RecorderErr(
-	RECORDER_EVENT eRecorderEvent,
-	HCI_ERR_CODE eErrorCode,
-	void *pUsrParam){
+void HCIAPI RobotQ::RecorderErr(RECORDER_EVENT eRecorderEvent,HCI_ERR_CODE eErrorCode,void *pUsrParam){
 		RobotQ *dlg=(RobotQ *)pUsrParam;
 		QString strMessage = "";
 		QString add;
@@ -294,21 +280,11 @@ void HCIAPI RobotQ::RecorderErr(
 		strMessage+=add;
 		dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
 }
-
-void HCIAPI RobotQ::RecorderRecordingCallback(
-	unsigned char * pVoiceData,
-	unsigned int uiVoiceLen,
-	void * pUsrParam
-	){
+void HCIAPI RobotQ::RecorderRecordingCallback(unsigned char * pVoiceData,unsigned int uiVoiceLen,void * pUsrParam){
 		RobotQ *dlg=(RobotQ *)pUsrParam;
 		dlg->RecorderRecording(pVoiceData, uiVoiceLen);
 }
-
-
-void HCIAPI RobotQ::RecorderRecogFinish(
-	RECORDER_EVENT eRecorderEvent,
-	ASR_RECOG_RESULT *psAsrRecogResult,
-	void *pUsrParam){
+void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_RESULT *psAsrRecogResult,void *pUsrParam){
 		RobotQ *dlg=(RobotQ *)pUsrParam;
 		QString strMessage = "";
 		if(eRecorderEvent == RECORDER_EVENT_RECOGNIZE_COMPLETE){
@@ -320,20 +296,20 @@ void HCIAPI RobotQ::RecorderRecogFinish(
 
 			dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
 		}
-
 		strMessage = "";
 		if( psAsrRecogResult->uiResultItemCount > 0 ){
 			unsigned char* pucUTF8 = NULL;
 			HciExampleComon::UTF8ToGBK( (unsigned char*)psAsrRecogResult->psResultItemList[0].pszResult, &pucUTF8 );
 			QString add;
-			add.sprintf( "识别结果: %s", pucUTF8 );
+			string str=(char*)pucUTF8;
+			add=QString::fromStdString(str);
+			strMessage+="识别结果:";
 			strMessage+=add;
 			HciExampleComon::FreeConvertResult( pucUTF8 );
 			pucUTF8 = NULL;
 		}else{
 			strMessage.append( "*****无识别结果*****" );
 		}
-
 		dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
 }
 
@@ -361,8 +337,8 @@ void RobotQ::OnShowStatus(RECORDER_EVENT eRecorderEvent, QString strMessage){
 		break;
 		// 识别结束
 	case RECORDER_EVENT_RECOGNIZE_COMPLETE:
-		ui.btnStart->setEnabled(true);
-		ui.btnEnd->setEnabled(false);
+		ui.btnStart->setEnabled(false);
+		ui.btnEnd->setEnabled(true);
 		break;
 		// 其他状态，包括未听到声音或者发生错误等，则恢复按钮可用
 	default:
@@ -414,8 +390,9 @@ void RobotQ::RecorderRecording(unsigned char * pVoiceData, unsigned int uiVoiceL
 }
 
 void RobotQ::PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage){
-	//此处传递了录音事件和信息，不知道干嘛用的，如果是必要的，那我得想办法用SIGNAL&SLOT机制实现
-	emit sendRecorderAndMsg(eRecorderEvent,strMessage);
+	GLOBAL_CommandValid=TRUE;
+	GLOBAL_eRecorderEvent=eRecorderEvent;
+	GLOBAL_strMessage=strMessage;
 }
 
 bool RobotQ::CheckAndUpdataAuth(){
