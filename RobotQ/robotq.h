@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <QString>
 #include <QTime>
+#include <QDebug>
 
 using std::string;
 

@@ -89,8 +89,7 @@ bool RobotQ::Init(){
 	init_config += ",cloudUrl=" + account_info->cloud_url();         //ÁéÔÆÔÆ·şÎñµÄ½Ó¿ÚµØÖ·
 	init_config += ",authpath=" + account_info->auth_path();         //ÊÚÈ¨ÎÄ¼şËùÔÚÂ·¾¶£¬±£Ö¤¿ÉĞ´
 	//init_config += ",logfilepath=" + account_info->logfile_path();   //ÈÕÖ¾µÄÂ·¾¶£¨¿ÉÒÔ²»ÒªÈÕÖ¾£©
-	init_config += ",logfilesize=1024000,loglevel=5";
-	// ÆäËûÅäÖÃÊ¹ÓÃÄ¬ÈÏÖµ£¬²»ÔÙÌí¼Ó£¬Èç¹ûÏëÉèÖÃ¿ÉÒÔ²Î¿¼¿ª·¢ÊÖ²á
+	init_config += ",logfilesize=1024000,loglevel=5";	// ÆäËûÅäÖÃÊ¹ÓÃÄ¬ÈÏÖµ£¬²»ÔÙÌí¼Ó£¬Èç¹ûÏëÉèÖÃ¿ÉÒÔ²Î¿¼¿ª·¢ÊÖ²á
 	errCode = hci_init( init_config.c_str() );
 	if( errCode != HCI_ERR_NONE ){
 		QString str;
@@ -100,7 +99,7 @@ bool RobotQ::Init(){
 		msgBox.exec();
 		return false;
 	}
-	printf( "hci_init success\n" );
+	qDebug()<<"hci_init success";
 	// ¼ì²âÊÚÈ¨,±ØÒªÊ±µ½ÔÆ¶ËÏÂÔØÊÚÈ¨¡£´Ë´¦ĞèÒª×¢ÒâµÄÊÇ£¬Õâ¸öº¯ÊıÖ»ÊÇÍ¨¹ı¼ì²âÊÚÈ¨ÊÇ·ñ¹ıÆÚÀ´ÅĞ¶ÏÊÇ·ñĞèÒª½øĞĞ
 	// »ñÈ¡ÊÚÈ¨²Ù×÷£¬Èç¹ûÔÚ¿ª·¢µ÷ÊÔ¹ı³ÌÖĞ£¬ÊÚÈ¨ÕËºÅÖĞĞÂÔöÁËÁéÔÆsdkµÄÄÜÁ¦£¬Çëµ½hci_init´«ÈëµÄauthPathÂ·¾¶ÖĞ
 	// É¾³ıHCI_AUTHÎÄ¼ş¡£·ñÔòÎŞ·¨»ñÈ¡ĞÂµÄÊÚÈ¨ÎÄ¼ş£¬´Ó¶øÎŞ·¨Ê¹ÓÃĞÂÔöµÄÁéÔÆÄÜÁ¦¡£
@@ -176,7 +175,6 @@ bool RobotQ::Init(){
 	}
 	return true;
 }
-
 void RobotQ::EchoGrammarData(const string &grammarFile){
 	FILE* fp = fopen( grammarFile.c_str(), "rt" );
 	if( fp == NULL ){
@@ -205,7 +203,6 @@ void RobotQ::EchoGrammarData(const string &grammarFile){
 	fclose( fp );
 	return;
 }
-
 bool RobotQ::Uninit(void){
 	HCI_ERR_CODE eRet = HCI_ERR_NONE;
 	if( m_RecogType == kRecogTypeLocal && m_RecogMode == kRecogModeGrammar ){
@@ -286,7 +283,7 @@ void HCIAPI RobotQ::RecorderRecordingCallback(unsigned char * pVoiceData,unsigne
 }
 void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_RESULT *psAsrRecogResult,void *pUsrParam){
 		RobotQ *dlg=(RobotQ *)pUsrParam;
-		QString strMessage = "";
+		QString strMessage = ""; 
 		if(eRecorderEvent == RECORDER_EVENT_RECOGNIZE_COMPLETE){
 			char buff[32];
 			clock_t endClock = clock();
@@ -315,8 +312,7 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 
 //×Ô¶¨Òå²Ûº¯Êı
 void RobotQ::OnShowStatus(RECORDER_EVENT eRecorderEvent, QString strMessage){
-	AppendMessage(strMessage);
-
+	AppendMessage(strMessage);	//ÔÚÎÄ±¾¿òÖĞ¸½¼ÓÏÔÊ¾ĞÅÏ¢
 	RECORDER_EVENT eEvent = eRecorderEvent;
 	switch( eEvent ){
 		// ÈôÊÇ¿ªÊ¼Â¼Òô¡¢Ìıµ½ÉùÒô»òÕß¿ªÊ¼Ê¶±ğ£¬ÔòÊ¹°´Å¥²»¿ÉÓÃ
@@ -351,11 +347,9 @@ void RobotQ::OnShowStatus(RECORDER_EVENT eRecorderEvent, QString strMessage){
 }
 
 //×Ô¶¨Òå¹¤¾ßº¯Êı
-
 void RobotQ::AppendMessage(QString strMsg){	//AppendMessageº¯ÊıÄ¿µÄÊÇ½«ĞÂ¼ÓµÄÎÄ×Ö²¹³äÌîĞ´µ½×´Ì¬ÎÄ±¾¿òÖĞ(´«0³¤¶È×Ö·ûÔòÇå¿Õ)
 	QString strMessage = "";
 	strMessage=ui.textStatus->toPlainText();
-
 	int nMessageLenMax = 1024;		//×´Ì¬ÎÄ±¾¿ò×î´ó³ĞÊÜ1024¸ö×Ö·û
 	if(strMessage.length() > nMessageLenMax){
 		strMessage = strMessage.left(nMessageLenMax);	//Èç¹ûÊµ¼Ê×Ö·û³¤¶È³¬¹ıÔ¤Éè×î´óÖµ£¬Ôò½ØÈ¡×îĞÂ²¿·ÖÓèÒÔÏÔÊ¾£¬¾ÉµÄÉáÆú
@@ -368,7 +362,6 @@ void RobotQ::AppendMessage(QString strMsg){	//AppendMessageº¯ÊıÄ¿µÄÊÇ½«ĞÂ¼ÓµÄÎÄ×
 	}
 	ui.textStatus->setPlainText(strNewMessage);
 }
-
 void RobotQ::RecorderRecording(unsigned char * pVoiceData, unsigned int uiVoiceLen){
 	if(m_recordingFlag == FALSE){
 		if(m_recordingFile != NULL){
@@ -377,24 +370,20 @@ void RobotQ::RecorderRecording(unsigned char * pVoiceData, unsigned int uiVoiceL
 		}
 		return;
 	}
-
 	if(m_recordingFile == NULL){
 		m_recordingFile = fopen( m_recordingFileName.toStdString().c_str(), "wb" );
 		if( m_recordingFile == NULL ){
 			return;
 		}
 	}
-
 	fwrite(pVoiceData, sizeof(unsigned char), uiVoiceLen, m_recordingFile);
 	fflush(m_recordingFile);	//¸üĞÂ»º³åÇø£¬½«»º³åÇøÊı¾İÇ¿ÖÆĞ´ÈëÎÄ¼ş
 }
-
 void RobotQ::PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage){
 	GLOBAL_CommandValid=TRUE;
 	GLOBAL_eRecorderEvent=eRecorderEvent;
 	GLOBAL_strMessage=strMessage;
 }
-
 bool RobotQ::CheckAndUpdataAuth(){
 	//»ñÈ¡¹ıÆÚÊ±¼ä
 	int64 nExpireTime;
@@ -404,38 +393,31 @@ bool RobotQ::CheckAndUpdataAuth(){
 		//»ñÈ¡³É¹¦ÔòÅĞ¶ÏÊÇ·ñ¹ıÆÚ
 		if( nExpireTime > nCurTime ){
 			//Ã»ÓĞ¹ıÆÚ
-			printf( "auth can use continue\n" );
+			qDebug()<<"auth can use continue";
 			return true;
 		}
 	}
-
 	//»ñÈ¡¹ıÆÚÊ±¼äÊ§°Ü»òÒÑ¾­¹ıÆÚ
 	//ÊÖ¶¯µ÷ÓÃ¸üĞÂÊÚÈ¨
 	errCode = hci_check_auth();
-	if( errCode == HCI_ERR_NONE ){
-		//¸üĞÂ³É¹¦
-		printf( "check auth success \n" );
+	if( errCode == HCI_ERR_NONE ){	//¸üĞÂ³É¹¦
+		qDebug()<<"check auth success";
 		return true;
 	}
-	else{
-		//¸üĞÂÊ§°Ü
-		printf( "check auth return (%d:%s)\n", errCode ,hci_get_error_info(errCode));
+	else{	//¸üĞÂÊ§°Ü
+		qDebug()<<"check auth return("<<errCode<<":"<<hci_get_error_info(errCode)<<")";
 		return false;
 	}
 }
-
 //»ñÈ¡capkeyÊôĞÔ
 void RobotQ::GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecogMode &mode){
 	HCI_ERR_CODE errCode = HCI_ERR_NONE;
 	CAPABILITY_ITEM *pItem = NULL;
-
 	// Ã¶¾ÙËùÓĞµÄasrÄÜÁ¦
 	CAPABILITY_LIST list = {0};
-	if ((errCode = hci_get_capability_list("asr", &list))!= HCI_ERR_NONE){
-		// Ã»ÓĞÕÒµ½ÏàÓ¦µÄÄÜÁ¦¡£
+	if ((errCode = hci_get_capability_list("asr", &list))!= HCI_ERR_NONE){		// Ã»ÓĞÕÒµ½ÏàÓ¦µÄÄÜÁ¦¡£
 		return;
 	}
-
 	// »ñÈ¡asrÄÜÁ¦ÅäÖÃĞÅÏ¢¡£
 	for (int i = 0; i < list.uiItemCount; i++){
 		if (list.pItemList[i].pszCapKey != NULL && stricmp(list.pItemList[i].pszCapKey, cap_key.c_str()) == 0){
@@ -443,20 +425,16 @@ void RobotQ::GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecog
 			break;
 		}
 	}
-
 	// Ã»ÓĞ»ñÈ¡ÏàÓ¦ÄÜÁ¦ÅäÖÃ£¬·µ»Ø¡£
 	if (pItem == NULL || pItem->pszCapKey == NULL){
 		hci_free_capability_list(&list);
 		return;
 	}
-
-
 	if (strstr(pItem->pszCapKey, "cloud") != NULL){
 		type = kRecogTypeCloud;
 	}else{
 		type = kRecogTypeLocal;
 	}  
-
 	if (strstr(pItem->pszCapKey, "freetalk") != NULL){
 		mode = kRecogModeFreetalk;
 	}else if (strstr(pItem->pszCapKey, "grammar") != NULL){
@@ -464,8 +442,6 @@ void RobotQ::GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecog
 	}else{
 		mode = kRecogModeUnkown;
 	}
-
 	hci_free_capability_list(&list);
-
 	return;
-};
+}
