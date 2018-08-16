@@ -4,22 +4,8 @@
 #define MSG_REFRESH_TIME 500		//消息更新到主界面上的时间间隔
 #define IS_RECORDER_CONTINUE TRUE	//是否连续录音
 
-#include <QtGui/QMainWindow>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include "ui_robotq.h"
 #include "stdafx.h"
-#include "common/AccountInfo.h"
-#include "common/CommonTool.h"
-#include "common/FileReader.h"
-#include "include/hci_asr_recorder.h"
-#include <string>
-#include <QMessageBox>
-#include <QString>
-#include <QTime>
-#include <QDebug>
-#include <Windows.h>
 
 using std::string;
 
@@ -61,7 +47,6 @@ private:
 	bool CheckAndUpdataAuth();
 	void GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecogMode &mode);
 	static void HCIAPI RecordEventChange(RECORDER_EVENT eRecorderEvent, void *pUsrParam);
-
 	static void HCIAPI RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_RESULT *psAsrRecogResult,void *pUsrParam);
 	static void HCIAPI RecorderRecogProcess(RECORDER_EVENT eRecorderEvent,ASR_RECOG_RESULT *psAsrRecogResult,void *pUsrParam);
 	static void HCIAPI RecorderErr(RECORDER_EVENT eRecorderEvent,HCI_ERR_CODE eErrorCode,void *pUsrParam);

@@ -43,7 +43,6 @@ int RobotQ::OnStartClicked(bool checked){
 	return 0;
 }
 int RobotQ::OnEndClicked(bool checked){
-	//AppendMessage("停止聆听");
 	RECORDER_ERR_CODE eRet = hci_asr_recorder_cancel();
 	if (RECORDER_ERR_NONE != eRet){
 		QString strErrMessage;
@@ -288,7 +287,7 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			char buff[32];
 			clock_t endClock = clock();
 			QString add;
-			add.sprintf("识别时间:%d", (int)endClock - (int)dlg->m_startClock);
+			add.sprintf("识别时间:%dms", (int)endClock - (int)dlg->m_startClock);
 			strMessage+=add;
 			dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
 		}
