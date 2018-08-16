@@ -1,6 +1,9 @@
 #ifndef ROBOTQ_H
 #define ROBOTQ_H
 
+#define MSG_REFRESH_TIME 500		//消息更新到主界面上的时间间隔
+#define IS_RECORDER_CONTINUE TRUE	//是否连续录音
+
 #include <QtGui/QMainWindow>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +19,7 @@
 #include <QString>
 #include <QTime>
 #include <QDebug>
+#include <Windows.h>
 
 using std::string;
 
