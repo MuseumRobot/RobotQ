@@ -10,7 +10,7 @@ RobotQ::RobotQ(QWidget *parent, Qt::WFlags flags):QMainWindow(parent, flags){
 	connect(ui.btnStart,SIGNAL(clicked(bool)),this,SLOT(OnStartClicked(bool)));
 	connect(ui.btnEnd,SIGNAL(clicked(bool)),this,SLOT(OnEndClicked(bool)));
 	Init();
-	m_timerId=startTimer(500);	//计时器查询识别状态
+	m_timerId=startTimer(MSG_REFRESH_TIME);	//计时器查询识别状态
 }
 RobotQ::~RobotQ(){
 	Uninit();
@@ -19,13 +19,13 @@ int RobotQ::OnStartClicked(bool checked){
 	RECORDER_ERR_CODE eRet = RECORDER_ERR_NONE;
 	ui.btnStart->setEnabled(false);
 	ui.btnEnd->setEnabled(true);
-	// 清空状态记录
-	ui.textStatus->setPlainText("Start");
+	//ui.textStatus->setPlainText("");	// 清空状态记录
 	AccountInfo *account_info = AccountInfo::GetInstance();
 	string startConfig = "";
 	startConfig += "capkey=" + account_info->cap_key();
 	startConfig += ",audioformat=pcm16k16bit";
-	startConfig += ",continuous=yes";	//连续录音
+	if(IS_RECORDER_CONTINUE)	//是否连续录音
+		startConfig += ",continuous=yes";	
 	if ( m_RecogMode == kRecogModeGrammar ){
 		char chTmp[32] = {0};
 		sprintf(chTmp,",grammarid=%d",m_GrammarId);
@@ -43,7 +43,7 @@ int RobotQ::OnStartClicked(bool checked){
 	return 0;
 }
 int RobotQ::OnEndClicked(bool checked){
-	AppendMessage("停止聆听End");
+	//AppendMessage("停止聆听");
 	RECORDER_ERR_CODE eRet = hci_asr_recorder_cancel();
 	if (RECORDER_ERR_NONE != eRet){
 		QString strErrMessage;
@@ -290,7 +290,6 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			QString add;
 			add.sprintf("识别时间:%d", (int)endClock - (int)dlg->m_startClock);
 			strMessage+=add;
-
 			dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
 		}
 		strMessage = "";
@@ -333,8 +332,10 @@ void RobotQ::OnShowStatus(RECORDER_EVENT eRecorderEvent, QString strMessage){
 		break;
 		// 识别结束
 	case RECORDER_EVENT_RECOGNIZE_COMPLETE:
-		ui.btnStart->setEnabled(false);
-		ui.btnEnd->setEnabled(true);
+		if(IS_RECORDER_CONTINUE==FALSE){
+			ui.btnStart->setEnabled(true);
+			ui.btnEnd->setEnabled(false);
+		}
 		break;
 		// 其他状态，包括未听到声音或者发生错误等，则恢复按钮可用
 	default:
@@ -383,6 +384,7 @@ void RobotQ::PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strM
 	GLOBAL_CommandValid=TRUE;
 	GLOBAL_eRecorderEvent=eRecorderEvent;
 	GLOBAL_strMessage=strMessage;
+	Sleep(MSG_REFRESH_TIME);	//发送一段新消息时睡一个周期以便计时器能不遗漏信息
 }
 bool RobotQ::CheckAndUpdataAuth(){
 	//获取过期时间
