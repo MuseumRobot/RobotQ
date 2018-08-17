@@ -111,7 +111,7 @@ bool RobotQ::Init(){
 	m_RecogType = kRecogTypeUnkown;
 	m_RecogMode = kRecogModeUnkown;
 	GetCapkeyProperty(account_info->cap_key(),m_RecogType,m_RecogMode);
-
+	//asr_recorder初始化
 	RECORDER_ERR_CODE eRet = RECORDER_ERR_UNKNOWN;
 	RECORDER_CALLBACK_PARAM call_back;
 	memset( &call_back, 0, sizeof(RECORDER_CALLBACK_PARAM) );
@@ -125,7 +125,6 @@ bool RobotQ::Init(){
 	call_back.pfnError			= RobotQ::RecorderErr;
 	call_back.pfnRecording		= RobotQ::RecorderRecordingCallback;
 	call_back.pfnRecogProcess   = RobotQ::RecorderRecogProcess;
-
 	string initConfig = "initCapkeys=" + account_info->cap_key();	
 	initConfig        += ",dataPath=" + account_info->data_path();
 	eRet = hci_asr_recorder_init( initConfig.c_str(), &call_back);
@@ -138,6 +137,27 @@ bool RobotQ::Init(){
 		msgBox.exec();
 		return false;
 	}
+	//tts_player初始化
+	PLAYER_CALLBACK_PARAM cb;
+	cb.pvStateChangeUsrParam			= this;
+	cb.pvProgressChangeUsrParam			= this;
+	cb.pvPlayerErrorUsrParam			= this;
+	cb.pfnProgressChange			= RobotQ::CB_ProgressChange;
+	cb.pfnStateChange				= RobotQ::CB_EventChange;
+	cb.pfnPlayerError				= RobotQ::CB_SdkErr;
+
+	PLAYER_ERR_CODE eReti = PLAYER_ERR_NONE;
+	string initConfigtts = "InitCapkeys=tts.cloud.wangjing";
+	initConfigtts += ",dataPath="+account_info->data_path();
+	eReti = hci_tts_player_init( initConfigtts.c_str(), &cb );
+	QString str="你好呀!";
+	unsigned char* pszUTF8 = NULL;
+	HciExampleComon::GBKToUTF8( (unsigned char*)str.toStdString().c_str(), &pszUTF8 );
+	string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
+	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
+
+
+
 	return true;
 }
 
@@ -383,4 +403,45 @@ void RobotQ::GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecog
 	}
 	hci_free_capability_list(&list);
 	return;
+}
+
+void HCIAPI RobotQ::CB_EventChange(_MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_OPT_ _IN_ void * pUsrParam){
+	string strEvent;
+	switch ( ePlayerEvent ){
+	case PLAYER_EVENT_BEGIN:strEvent = "开始播放";break;
+	case PLAYER_EVENT_PAUSE:strEvent = "暂停播放"; break;
+	case PLAYER_EVENT_RESUME:strEvent = "恢复播放";break;
+	case PLAYER_EVENT_PROGRESS:strEvent = "播放进度";break;
+	case PLAYER_EVENT_BUFFERING:strEvent = "播放缓冲";break;
+	case PLAYER_EVENT_END:strEvent = "播放完毕";break;
+	case PLAYER_EVENT_ENGINE_ERROR:strEvent = "引擎出错";break;
+	case PLAYER_EVENT_DEVICE_ERROR:strEvent = "设备出错";break;
+	}
+}
+void HCIAPI RobotQ::CB_ProgressChange (_MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_MUST_ _IN_ int nStart,_MUST_ _IN_ int nStop,_OPT_ _IN_ void * pUsrParam){
+	string strEvent;
+	char szData[256] = {0};
+	switch ( ePlayerEvent ){
+	case PLAYER_EVENT_BEGIN:strEvent = "开始播放";break;
+	case PLAYER_EVENT_PAUSE:strEvent = "暂停播放";break;
+	case PLAYER_EVENT_RESUME:strEvent = "恢复播放";break;
+	case PLAYER_EVENT_PROGRESS:sprintf( szData, "播放进度：起始=%d,终点=%d", nStart, nStop );strEvent = szData;break;
+	case PLAYER_EVENT_BUFFERING:strEvent = "播放缓冲";break;
+	case PLAYER_EVENT_END:strEvent = "播放完毕";break;
+	case PLAYER_EVENT_ENGINE_ERROR:strEvent = "引擎出错";break;
+	case PLAYER_EVENT_DEVICE_ERROR:strEvent = "设备出错";break;
+	}
+}
+void HCIAPI RobotQ::CB_SdkErr( _MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_MUST_ _IN_ HCI_ERR_CODE eErrorCode,_OPT_ _IN_ void * pUsrParam ){
+	string strEvent;
+	switch ( ePlayerEvent ){
+	case PLAYER_EVENT_BEGIN:strEvent = "开始播放";break;
+	case PLAYER_EVENT_PAUSE:strEvent = "暂停播放";break;
+	case PLAYER_EVENT_RESUME:strEvent = "恢复播放";break;
+	case PLAYER_EVENT_PROGRESS:strEvent = "播放进度";break;
+	case PLAYER_EVENT_BUFFERING:strEvent = "播放缓冲";break;
+	case PLAYER_EVENT_END:strEvent = "播放完毕";break;
+	case PLAYER_EVENT_ENGINE_ERROR:strEvent = "引擎出错";break;
+	case PLAYER_EVENT_DEVICE_ERROR:strEvent = "设备出错";break;
+	}
 }

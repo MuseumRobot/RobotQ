@@ -186,7 +186,7 @@ extern "C"
 	*			<td>字符串，如：poi</td>
 	*			<td>无</td>
 	*			<td>识别意图</td>
-	*			<td>仅在dialog识别中有效：<br/>
+	*			<td>仅在dialog识别中有效，使用云端能力时必填。<br/>
 	*				可传入多个领域，以分号分隔。<br/>
 	*				例如：intention=weather;call，  相应的添加资源文件：weather_xxxx，call_xxxx<br/>
 	*				有效配置详见：@ref nlu_intention</td>

@@ -6,7 +6,7 @@
 #ifndef __HCI_ASR_RECORDER_HEADER__
 #define __HCI_ASR_RECORDER_HEADER__
 #include "hci_sys.h"
-#include "hci_asr.h"
+#include "hci_asr.h"	//不得不引用
 
 #ifdef __cplusplus
 extern "C"

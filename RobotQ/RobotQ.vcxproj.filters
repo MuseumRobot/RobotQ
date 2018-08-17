@@ -33,6 +33,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\HCI">
+      <UniqueIdentifier>{9b00b43c-c0e9-4c93-8436-b6b9c50446d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -78,29 +81,35 @@
     <ClInclude Include="GeneratedFiles\ui_robotq.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="common\AccountInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\CommonTool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common\FileReader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\hci_asr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\hci_asr_recorder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\hci_sys.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="common\AccountInfo.h">
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CommonTool.h">
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
+    <ClInclude Include="common\FileReader.h">
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
     <ClInclude Include="common\GBK.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_asr.h">
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_asr_recorder.h">
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_sys.h">
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_tts.h">
+      <Filter>Header Files\HCI</Filter>
+    </ClInclude>
+    <ClInclude Include="include\hci_tts_player.h">
+      <Filter>Header Files\HCI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

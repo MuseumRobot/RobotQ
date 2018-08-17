@@ -20,6 +20,7 @@
 #include "common/CommonTool.h"
 #include "common/FileReader.h"
 #include "include/hci_asr_recorder.h"
+#include "include/hci_tts_player.h"
 
 
 #ifndef _SECURE_ATL

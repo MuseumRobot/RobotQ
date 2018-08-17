@@ -3,7 +3,6 @@
 
 #define MSG_REFRESH_TIME 500		//消息更新到主界面上的时间间隔
 #define IS_RECORDER_CONTINUE TRUE	//是否连续录音
-//#define IS_RECORDER_CONTINUE FALSE
 
 #include "ui_robotq.h"
 #include "stdafx.h"
@@ -52,6 +51,11 @@ private:
 	static void HCIAPI RecorderRecogProcess(RECORDER_EVENT eRecorderEvent,ASR_RECOG_RESULT *psAsrRecogResult,void *pUsrParam);
 	static void HCIAPI RecorderErr(RECORDER_EVENT eRecorderEvent,HCI_ERR_CODE eErrorCode,void *pUsrParam);
 	static void HCIAPI RecorderRecordingCallback(unsigned char * pVoiceData,unsigned int uiVoiceLen,void * pUsrParam);
+
+	static void HCIAPI CB_EventChange(_MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_OPT_ _IN_ void * pUsrParam);
+	static void HCIAPI CB_ProgressChange (_MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_MUST_ _IN_ int nStart,
+										  _MUST_ _IN_ int nStop,_OPT_ _IN_ void * pUsrParam);
+	static void HCIAPI CB_SdkErr( _MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_MUST_ _IN_ HCI_ERR_CODE eErrorCode,_OPT_ _IN_ void * pUsrParam );
 
 public:
 	void AppendMessage(QString strMsg);
