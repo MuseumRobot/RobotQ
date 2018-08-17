@@ -13,4 +13,4 @@ developerKey=8fbe5da16df50732dbccff4d4bcfef79
 cloudUrl=api.hcicloud.com:8888
 
 #应用程序序号
-capKey=asr.cloud.freetalk
+capKey=asr.cloud.dialog

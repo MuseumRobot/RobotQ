@@ -19,17 +19,14 @@ int RobotQ::OnStartClicked(bool checked){
 	RECORDER_ERR_CODE eRet = RECORDER_ERR_NONE;
 	ui.btnStart->setEnabled(false);
 	ui.btnEnd->setEnabled(true);
-	//ui.textStatus->setPlainText("");	// 清空状态记录
 	AccountInfo *account_info = AccountInfo::GetInstance();
 	string startConfig = "";
 	startConfig += "capkey=" + account_info->cap_key();
 	startConfig += ",audioformat=pcm16k16bit";
 	if(IS_RECORDER_CONTINUE)	//是否连续录音
 		startConfig += ",continuous=yes";	
-	if ( m_RecogMode == kRecogModeGrammar ){
-		char chTmp[32] = {0};
-		sprintf(chTmp,",grammarid=%d",m_GrammarId);
-		startConfig += chTmp; 
+	if ( m_RecogMode == kRecogModeDialog ){
+		startConfig +=",intention=weather;joke;story;baike;calendar;translation;news"; 
 	}
 	eRet = hci_asr_recorder_start(startConfig.c_str(),"");
 	if (RECORDER_ERR_NONE != eRet){
@@ -114,15 +111,6 @@ bool RobotQ::Init(){
 	m_RecogType = kRecogTypeUnkown;
 	m_RecogMode = kRecogModeUnkown;
 	GetCapkeyProperty(account_info->cap_key(),m_RecogType,m_RecogMode);
-	if( m_RecogType == kRecogTypeCloud && m_RecogMode == kRecogModeGrammar ){
-		hci_release();
-		QString str;
-		str.sprintf("Recorder not support cloud grammar, init failed\n");
-		QMessageBox msgBox;
-		msgBox.setText(str);
-		msgBox.exec();
-		return false;
-	}
 
 	RECORDER_ERR_CODE eRet = RECORDER_ERR_UNKNOWN;
 	RECORDER_CALLBACK_PARAM call_back;
@@ -150,63 +138,11 @@ bool RobotQ::Init(){
 		msgBox.exec();
 		return false;
 	}
-	m_GrammarId = -1;
-	if (m_RecogMode == kRecogModeGrammar){
-		string grammarFile = account_info->test_data_path() + "/stock_10001.gram";
-		if (m_RecogType == kRecogTypeLocal){
-			string strLoadGrammarConfig = "grammarType=jsgf,isFile=yes,capkey=" + account_info->cap_key();
-			eRet = hci_asr_recorder_load_grammar(strLoadGrammarConfig.c_str() , grammarFile.c_str(), &m_GrammarId );
-			if( eRet != RECORDER_ERR_NONE ){
-				hci_asr_recorder_release();
-				hci_release();
-				QString str;
-				str.sprintf("载入语法文件失败，错误码%d",eRet);
-				QMessageBox msgBox;
-				msgBox.setText(str);
-				msgBox.exec();
-				return false;
-			}
-			EchoGrammarData(grammarFile);
-		}else{
-			// 如果是云端语法识别，需要开发者通过开发者社区自行上传语法文件，并获得可以使用的ID。
-			// m_GrammarId = 2;
-		}
-	}
 	return true;
 }
-void RobotQ::EchoGrammarData(const string &grammarFile){
-	FILE* fp = fopen( grammarFile.c_str(), "rt" );
-	if( fp == NULL ){
-		QString str;
-		str.sprintf("打开语法文件%s失败",grammarFile.c_str());
-		QMessageBox msgBox;
-		msgBox.setText(str);
-		msgBox.exec();
-		return;
-	}
-	unsigned char szBom[3];
-	fread( szBom, 3, 1, fp );
-	// 若有bom头，则清除，没有则当前位置回到头部
-	if( !( szBom[0] == 0xef && szBom[1] == 0xbb && szBom[2] == 0xbf ) ){
-		fseek( fp, 0, SEEK_SET );
-	}
-	QString grammarData = "";
-	char szData[1024] = {0};
-	while( fgets( szData, 1024, fp ) != NULL ){
-		unsigned char* pszGBK = NULL;
-		HciExampleComon::UTF8ToGBK( (unsigned char*)szData, &pszGBK);
-		grammarData += (char*)pszGBK;
-		HciExampleComon::FreeConvertResult( pszGBK );
-		grammarData += "\r\n";
-	}
-	fclose( fp );
-	return;
-}
+
 bool RobotQ::Uninit(void){
 	HCI_ERR_CODE eRet = HCI_ERR_NONE;
-	if( m_RecogType == kRecogTypeLocal && m_RecogMode == kRecogModeGrammar ){
-		hci_asr_recorder_unload_grammar( m_GrammarId );
-	}
 	RECORDER_ERR_CODE eRecRet;
 	eRecRet = hci_asr_recorder_release();
 	if(eRecRet != RECORDER_ERR_NONE){
@@ -440,6 +376,8 @@ void RobotQ::GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecog
 		mode = kRecogModeFreetalk;
 	}else if (strstr(pItem->pszCapKey, "grammar") != NULL){
 		mode = kRecogModeGrammar;
+	}else if(strstr(pItem->pszCapKey, "dialog")!= NULL){
+		mode = kRecogModeDialog;
 	}else{
 		mode = kRecogModeUnkown;
 	}
