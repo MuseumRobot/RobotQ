@@ -245,7 +245,8 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			QString add;
 			add.sprintf("识别时间:%dms", (int)endClock - (int)dlg->m_startClock);
 			strMessage+=add;
-			dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
+			if(psAsrRecogResult->uiResultItemCount>0)
+				dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
 		}
 		strMessage = "";
 		if( psAsrRecogResult->uiResultItemCount > 0 ){
@@ -257,7 +258,11 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			strMessage+="识别结果:";
 			strMessage+=add;
 			HciExampleComon::FreeConvertResult( pucUTF8 );
-			pucUTF8 = NULL;
+
+			unsigned char* pszUTF8 = NULL;
+			HciExampleComon::GBKToUTF8( (unsigned char*)strMessage.toStdString().c_str(), &pszUTF8 );
+			string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
+			PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
 		}else{
 			strMessage.append( "*****无识别结果*****" );
 		}

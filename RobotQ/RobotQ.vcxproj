@@ -76,6 +76,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cJSON.cpp" />
     <ClCompile Include="common\AccountInfo.cpp" />
     <ClCompile Include="common\CommonTool.cpp" />
     <ClCompile Include="common\FileReader.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="common\FileReader.h" />
     <ClInclude Include="common\GBK.h" />
     <ClInclude Include="GeneratedFiles\ui_robotq.h" />
+    <ClInclude Include="include\cJSON.h" />
     <ClInclude Include="include\hci_asr.h" />
     <ClInclude Include="include\hci_asr_recorder.h" />
     <ClInclude Include="include\hci_sys.h" />

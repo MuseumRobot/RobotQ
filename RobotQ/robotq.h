@@ -1,7 +1,7 @@
 #ifndef ROBOTQ_H
 #define ROBOTQ_H
 
-#define MSG_REFRESH_TIME 500		//消息更新到主界面上的时间间隔
+#define MSG_REFRESH_TIME 200		//消息更新到主界面上的时间间隔
 #define IS_RECORDER_CONTINUE TRUE	//是否连续录音
 
 #include "ui_robotq.h"
