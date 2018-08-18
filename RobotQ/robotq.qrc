@@ -3,4 +3,7 @@
     <file>Resources/BG_ASR.jpg</file>
     <file>Resources/HIT_Robot_ico.ico</file>
   </qresource>
+  <qresource prefix="DashBoard">
+    <file>Resources/resizeApi.png</file>
+  </qresource>
 </RCC>
