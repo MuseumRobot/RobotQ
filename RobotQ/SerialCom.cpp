@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "SerialCom.h"
+#include "include/SerialCom.h"
 #include <afxwin.h>
 #include <conio.h> //调用控制台
 
