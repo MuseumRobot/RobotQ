@@ -22,17 +22,20 @@ typedef enum _tag_AsrRecogMode{
 	kRecogModeDialog = 2,
 }AsrRecogMode;
 
-class RobotQ : public QMainWindow{
+class RobotQ : public QDialog{
 	Q_OBJECT
 
 public:
 	RobotQ(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~RobotQ();
+	bool isRobotQSpeakReady;
 
 private slots:
 	int OnStartClicked();
 	int OnEndClicked();
 	int OnQueryClicked();
+public slots:
+	int OnStopSpeak();
 private:
 	bool Init();
 	bool Uninit(void);
@@ -63,6 +66,8 @@ public:
 	void RecorderRecording(unsigned char * pVoiceData, unsigned int uiVoiceLen);
 	void PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage);
 	virtual void timerEvent(QTimerEvent *event);
+	static void RobotQSpeak(QString str);
+
 private:
 	AsrRecogType m_RecogType;
 	AsrRecogMode m_RecogMode;

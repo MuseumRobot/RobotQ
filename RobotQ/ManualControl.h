@@ -11,7 +11,7 @@ public:
 	ManualControl(QWidget *parent = 0);
 	~ManualControl();
 
-private:
+public:
 	Ui::ManualControl ui;
 };
 

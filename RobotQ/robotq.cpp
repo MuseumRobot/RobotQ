@@ -5,11 +5,12 @@ QString RobotQ::GLOBAL_strMessage;
 RECORDER_EVENT RobotQ::GLOBAL_eRecorderEvent;
 bool RobotQ::GLOBAL_CommandValid;
 
-RobotQ::RobotQ(QWidget *parent, Qt::WFlags flags):QMainWindow(parent, flags){
+RobotQ::RobotQ(QWidget *parent, Qt::WFlags flags):QDialog(parent, flags){
 	ui.setupUi(this);
 	connect(ui.btnStart,SIGNAL(clicked()),this,SLOT(OnStartClicked()));
 	connect(ui.btnEnd,SIGNAL(clicked()),this,SLOT(OnEndClicked()));
 	connect(ui.btnQuery,SIGNAL(clicked()),this,SLOT(OnQueryClicked()));
+	connect(ui.btnStopspeak,SIGNAL(clicked()),this,SLOT(OnStopSpeak()));
 	Init();
 	m_timerId=startTimer(MSG_REFRESH_TIME);	//计时器查询识别状态
 }
@@ -54,6 +55,10 @@ int RobotQ::OnEndClicked(){
 	ui.btnStart->setEnabled(true);
 	return 0;
 }
+int RobotQ::OnStopSpeak(){
+	hci_tts_player_stop();
+	return 0;
+}
 int RobotQ::OnQueryClicked(){
 	QString str="你好呀你好呀你好呀你好呀你好呀你好呀你好呀你好呀!";
 	unsigned char* pszUTF8 = NULL;
@@ -71,6 +76,7 @@ void RobotQ::timerEvent(QTimerEvent *event){
 bool RobotQ::Init(){	
 	GLOBAL_CommandValid = FALSE;	//初始化执行步骤不附加到显示框中
 	m_recordingFlag = FALSE;
+	isRobotQSpeakReady = FALSE;
 	m_recordingFileName = "recording.pcm";
 	m_recordingFile = NULL;
 	// 获取AccountInfo单例
@@ -159,14 +165,13 @@ bool RobotQ::Init(){
 	string initConfigtts = "InitCapkeys=tts.cloud.wangjing";
 	initConfigtts += ",dataPath="+account_info->data_path();
 	eReti = hci_tts_player_init( initConfigtts.c_str(), &cb );
-	QString str="你好呀!";
-	unsigned char* pszUTF8 = NULL;
-	HciExampleComon::GBKToUTF8( (unsigned char*)str.toStdString().c_str(), &pszUTF8 );
-	string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
-	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
-
-
-
+	if(eReti==RECORDER_ERR_NONE){
+		isRobotQSpeakReady = TRUE;
+		QString str="你好呀!";
+		RobotQSpeak(str);
+	}else{
+		return false;
+	}
 	return true;
 }
 
@@ -458,4 +463,10 @@ void HCIAPI RobotQ::CB_SdkErr( _MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_MUST_ _IN_
 	case PLAYER_EVENT_ENGINE_ERROR:strEvent = "引擎出错";break;
 	case PLAYER_EVENT_DEVICE_ERROR:strEvent = "设备出错";break;
 	}
+}
+void RobotQ::RobotQSpeak(QString str){
+	unsigned char* pszUTF8 = NULL;
+	HciExampleComon::GBKToUTF8( (unsigned char*)str.toStdString().c_str(), &pszUTF8 );
+	string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
+	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
 }

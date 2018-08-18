@@ -30,6 +30,12 @@ private:
 private slots:
 	int OnBtnRobotQ();
 	int OnBtnManualControl();
+	int On_MC_BtnForward();
+	int On_MC_BtnBackward();
+	int On_MC_BtnTurnleft();
+	int On_MC_BtnTurnright();
+	int On_MC_BtnStopmove();
+	int On_MC_BtnRobotQSpeak();
 };
 
 #endif // MAINGUI_H

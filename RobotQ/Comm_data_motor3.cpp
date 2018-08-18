@@ -44,6 +44,9 @@ CMotor::CMotor(void){
 	m_nFrameLen = 0;        //存储数据包的长度
 	m_bFrameStart = false;  //数据包接收开始标志位，TRUE为已开始接收，FLASE为没有开始
 	m_right=false;
+
+	m_speedslowchang=0.0;
+	m_wlowchang=0.0;
 }
 
 
@@ -232,40 +235,30 @@ bool CMotor::stop(){
 	return true;
 }
 
-void CMotor::VectorMove(double inAngle, float inLV, float inPSpeed){
-	//左右前后移动控制，三个参数分别代表机器人坐标系与全局坐标系在水平方向的夹角，机器人运动的线速度，机器人运动的角速度
-		float linear_velocity = inLV;
-		float angular_velocity = inPSpeed;
-		if (fabs(linear_velocity)<=0.05&&fabs(angular_velocity)<=0.05){
-			move_lsp=0;
-			move_rsp=0;
-			move_zsp=0;
-		}
-		else if (fabs(angular_velocity)<0.05){
-			move_lsp=linear_velocity;
-			move_rsp=linear_velocity;
-		}
-		else{
-				move_lsp = (int) linear_velocity;
-				move_rsp = (int) (linear_velocity + angular_velocity * 10);
-		}
-		if (move_lsp > 20){
-			move_rsp -= move_lsp - 20;
-			move_lsp = 20;
-		}
-		if (move_rsp > 20){
-			move_lsp -= move_rsp - 20;
-			move_rsp = 20;
-		}
-		if (move_lsp<0 && move_rsp<0){
-			if (move_lsp< -5){
-				move_lsp = -5;
-			}
-			if (move_rsp < -5){
-				move_rsp = -5;
-			}
-		}
-		gomotor(move_lsp,move_rsp,(move_lsp-move_rsp));
+void CMotor::VectorMove(float inLV, float inPSpeed){	
+	//两个参数代表机器人运动的线速度，机器人运动的角速度
+	float Vx,Vy;
+	if(m_speedslowchang-inLV>800||m_speedslowchang-inLV<-800){
+		inLV=inLV/3+2*m_speedslowchang/3;
+	}
+	m_speedslowchang=inLV;
+
+	if(m_wlowchang-inPSpeed>1.0||m_wlowchang-inPSpeed<-1.0){
+		inPSpeed=inPSpeed/3+2*m_wlowchang/3;
+	}
+	m_wlowchang=inPSpeed;
+
+	float Radius_robot =     200.0;  // robot radius: 18cm
+	float Wheel_radius = 50.00; ////mm
+	double R_theta;
+	R_theta=0.0;
+	Vx = inLV * cos(R_theta);
+	Vy = inLV * sin(R_theta);	
+	move_lsp = int((sin(PIf/3 + R_theta) * (Vx) - cos(PIf/3 + R_theta) * (Vy) - Radius_robot * (inPSpeed))/Wheel_radius) ; 		
+    move_zsp = int((-sin(R_theta) * (Vx) + cos(R_theta) * (Vy) -Radius_robot * (inPSpeed))/Wheel_radius) ;		
+    move_rsp = int((-sin(PIf/3 - R_theta) * (Vx) - cos(PIf/3 - R_theta) * (Vy) - Radius_robot * (inPSpeed))/Wheel_radius); 
+	gomotor(-move_lsp,-move_rsp,-move_zsp);//com345:负(如果方向全部相反一般是这里的问题)
+
 }
 
 int CMotor::m_CalAngle(int angle1, int angle2){

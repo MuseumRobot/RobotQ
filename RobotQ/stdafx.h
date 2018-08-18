@@ -13,6 +13,7 @@
 #include <QString>
 #include <QTime>
 #include <QDebug>
+#include <QDialog>
 #include <QtTest/Qtest>
 #include "targetver.h"
 #include "common/GBK.h"
