@@ -21,7 +21,6 @@ MainGUI::~MainGUI(){
 bool MainGUI::Init(){
 	isMotorOpen = false;
 	// 电机串口初始化
-	CMotor motor;
 	if(motor.open_com_motor(COMM_MOTOR)) 
 		isMotorOpen = true;
 	else
@@ -57,7 +56,7 @@ int MainGUI::On_MC_BtnTurnright(){
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){
-
+	motor.stop();
 	return 0;
 }
 int MainGUI::On_MC_BtnRobotQSpeak(){
