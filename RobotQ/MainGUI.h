@@ -23,8 +23,9 @@ private:
 	Ui::MainGUI ui;
 	RobotQ* m_RobotQ;
 	ManualControl* m_ManualControl;
-	//CMotor motor;
+	CMotor motor;
 	bool Init();
+	bool isMotorOpen;	//电机端口是否开启
 
 private slots:
 	int OnBtnRobotQ();

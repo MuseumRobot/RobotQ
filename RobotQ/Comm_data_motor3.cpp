@@ -234,29 +234,6 @@ bool CMotor::stop(){
 
 void CMotor::VectorMove(double inAngle, float inLV, float inPSpeed){
 	//左右前后移动控制，三个参数分别代表机器人坐标系与全局坐标系在水平方向的夹角，机器人运动的线速度，机器人运动的角速度
-//	int motor[3];	//后 左前 右前，
-//	motor[2] =-(int(sin((double(m_CalAngle((int)-inAngle,+180)))*3.14/180)*inLV)-inPSpeed);	
-//	motor[0] =-(int(sin((double(m_CalAngle((int)-inAngle,60)))*3.14/180)*inLV)-inPSpeed);	
-//	motor[1] =-(int(sin((double(m_CalAngle((int)-inAngle,-60)))*3.14/180)*inLV)-inPSpeed);	////各轮线速度
-////	SetFourMotorsSpeed(motor[0],motor[1],motor[2],0);
-//	gomotor(motor[1],motor[0],motor[2]);
-
-		//move_lsp=0;
-		//move_rsp=0;
-		
-		//if (linear_velocity>0&&angular_velocity>0) Go_status=0;
-		//if (linear_velocity>0&&angular_velocity<0) Go_status=1;
-		//if (linear_velocity<0&&angular_velocity>0) Go_status=2;
-		//if (linear_velocity<0&&angular_velocity<0) Go_status=3;
-		
-	//	if (Go_status_old!=Go_status) //本次状态与上次状态不同，则发送停止命令，返回false，需要再次发送命令达成目的
-	//	{	
-	//		move_rsp=0;
-	//		move_lsp=0;
-	//		gomotor(move_lsp,move_rsp);
-	//		Go_status_old=Go_status;
-	////		return false;
-	//	}
 		float linear_velocity = inLV;
 		float angular_velocity = inPSpeed;
 		if (fabs(linear_velocity)<=0.05&&fabs(angular_velocity)<=0.05){
@@ -269,19 +246,8 @@ void CMotor::VectorMove(double inAngle, float inLV, float inPSpeed){
 			move_rsp=linear_velocity;
 		}
 		else{
-			/*move_rsp=(int)(2*linear_velocity+Drobot_wheel_spacing/10*angular_velocity)/2;				
-			move_lsp=(int)(2*linear_velocity-Drobot_wheel_spacing/10*angular_velocity)/2;*/
-			/*if (angular_velocity > 0)
-			{*/
 				move_lsp = (int) linear_velocity;
 				move_rsp = (int) (linear_velocity + angular_velocity * 10);
-			/*}*/
-
-		/*	if (angular_velocity < 0)
-			{
-				move_lsp = (int) linear_velocity;
-				move_rsp = (int) (linear_velocity + angular_velocity * Drobot_wheel_spacing);
-			}*/
 		}
 		if (move_lsp > 20){
 			move_rsp -= move_lsp - 20;
@@ -291,11 +257,6 @@ void CMotor::VectorMove(double inAngle, float inLV, float inPSpeed){
 			move_lsp -= move_rsp - 20;
 			move_rsp = 20;
 		}
-
-		/*gomotor(move_lsp*0.3,move_rsp*0.3);
-		Sleep(100);
-		gomotor(move_lsp*0.6,move_rsp*0.6);
-		Sleep(100);*/
 		if (move_lsp<0 && move_rsp<0){
 			if (move_lsp< -5){
 				move_lsp = -5;
@@ -305,9 +266,6 @@ void CMotor::VectorMove(double inAngle, float inLV, float inPSpeed){
 			}
 		}
 		gomotor(move_lsp,move_rsp,(move_lsp-move_rsp));
-	///	speed_l = move_lsp;
-	//	speed_r = move_rsp;
-
 }
 
 int CMotor::m_CalAngle(int angle1, int angle2){
