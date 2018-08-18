@@ -353,8 +353,7 @@ void RobotQ::PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strM
 	GLOBAL_CommandValid=TRUE;
 	GLOBAL_eRecorderEvent=eRecorderEvent;
 	GLOBAL_strMessage=strMessage;
-	QTest::qSleep(MSG_REFRESH_TIME);
-	//Sleep(MSG_REFRESH_TIME);	//发送一段新消息时睡一个周期以便计时器能不遗漏信息
+	QTest::qSleep(MSG_REFRESH_TIME);	//发送一段新消息时睡一个周期以便计时器能不遗漏信息
 }
 bool RobotQ::CheckAndUpdataAuth(){
 	//获取过期时间

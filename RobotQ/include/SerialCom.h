@@ -9,7 +9,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 #include <afx.h>
+#include <afxwin.h>
 #include <WinSock2.h>
+#include <QString>
+
+
+using std::string;
 
 //发送指令的缓冲列表成员
 struct CMDBUF 

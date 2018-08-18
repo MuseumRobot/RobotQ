@@ -13,7 +13,7 @@
 #include <QString>
 #include <QTime>
 #include <QDebug>
-#include <QtTest/QTest>
+#include <QtTest/Qtest>
 #include "targetver.h"
 #include "common/GBK.h"
 #include "common/AccountInfo.h"

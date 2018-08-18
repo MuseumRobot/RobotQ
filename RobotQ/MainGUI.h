@@ -6,7 +6,7 @@
 #include "ui_MainGUI.h"
 #include "robotq.h"
 #include "ManualControl.h"
-//#include "include/Comm_data_motor3.h"
+#include "include/Comm_data_motor3.h"
 
 #define COMM_MOTOR 3 //底部电机串口号
 #define COMM_STAR 4//星标定位串口

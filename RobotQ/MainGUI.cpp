@@ -6,22 +6,25 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_ManualControl=new ManualControl(this);
 	connect(ui.btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
 	connect(ui.btnManualControl,SIGNAL(clicked()),this,SLOT(OnBtnManualControl()));
-
+	Init();
 }
 MainGUI::~MainGUI(){
 
 }
 bool MainGUI::Init(){
-	//#ifdef COMM_MOTOR
-	//	// 电机串口初始化
-	//	if(motor.open_com_motor(COMM_MOTOR)){
-	//		//电机数据计算
-	//		pThread_Motor_Comput = AfxBeginThread(ThreadComput_MotorData,NULL);
-	//		int a= 1;
-	//	}else{
-	//		int a=0;
-	//	}
-	//#endif
+	#ifdef COMM_MOTOR
+		// 电机串口初始化
+		CMotor motor;
+		//CWinThread* pThread_Motor_Comput;
+		//UINT ThreadComput_MotorData;
+		if(motor.open_com_motor(COMM_MOTOR)){
+			//电机数据计算
+			//pThread_Motor_Comput = AfxBeginThread(ThreadComput_MotorData,NULL);
+			int a= 1;
+		}else{
+			int a=0;
+		}
+	#endif
 	return 0;
 }
 

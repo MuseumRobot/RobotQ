@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "include/SerialCom.h"
-#include <afxwin.h>
 #include <conio.h> //调用控制台
 
 #ifdef _DEBUG
@@ -196,11 +195,16 @@ BOOL CSerialCom::Create(int inCom) //根据串口号(inCom)打开指定串口
 
 	//建立串口
 	//定义CString 对象，相当于字符数组，MFC中把它封装成一个类了
-	CString strCom;
-	strCom.Format("COM%d",inCom); //生成一个串口号字符串
-	
+	//CString strCom;
+	//strCom.Format("COM%d",inCom); //生成一个串口号字符串
+	QString strCom;
+	strCom.sprintf("COM%d",inCom);
+
+	LPCTSTR strComGG = _T("宽字符");
+	strComGG = ( LPCTSTR ) strCom.toStdString().c_str();
+
 	//用串口号字符串打开串口并返回打开的串口句柄
-	m_hCom=CreateFile(strCom,GENERIC_READ | GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,NULL);
+	m_hCom=CreateFile(strComGG,GENERIC_READ | GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,NULL);
 
 	if (m_hCom==INVALID_HANDLE_VALUE)		//打开串口失败的处理
 	{
@@ -244,8 +248,8 @@ BOOL CSerialCom::Create(int inCom) //根据串口号(inCom)打开指定串口
 
 	IsRuning = TRUE;
 
-	CString info;
-	info.Format("COM %d 打开成功！",inCom);
+	//CString info;
+	//info.Format("COM %d 打开成功！",inCom);
 //	m_PrintToList(info);
 
 	//开启串口接收线程
