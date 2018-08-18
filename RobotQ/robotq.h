@@ -2,7 +2,7 @@
 #define ROBOTQ_H
 
 #define MSG_REFRESH_TIME 200		//消息更新到主界面上的时间间隔
-#define IS_RECORDER_CONTINUE TRUE	//是否连续录音
+#define IS_RECORDER_CONTINUE FALSE	//是否连续录音
 
 #include "ui_robotq.h"
 #include "stdafx.h"
@@ -28,17 +28,18 @@ class RobotQ : public QMainWindow{
 public:
 	RobotQ(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~RobotQ();
+
+private slots:
+	int OnStartClicked();
+	int OnEndClicked();
+	int OnQueryClicked();
+private:
 	bool Init();
 	bool Uninit(void);
 	clock_t m_startClock;
 	static QString GLOBAL_strMessage;
 	static RECORDER_EVENT GLOBAL_eRecorderEvent;
 	static bool GLOBAL_CommandValid;
-
-private slots:
-	int OnStartClicked(bool checked);
-	int OnEndClicked(bool checked);
-private:
 	void OnShowStatus(RECORDER_EVENT eRecorderEvent, QString strMessage);
 
 private:Ui::RobotQClass ui;

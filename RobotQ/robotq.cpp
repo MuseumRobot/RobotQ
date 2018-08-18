@@ -7,15 +7,16 @@ bool RobotQ::GLOBAL_CommandValid;
 
 RobotQ::RobotQ(QWidget *parent, Qt::WFlags flags):QMainWindow(parent, flags){
 	ui.setupUi(this);
-	connect(ui.btnStart,SIGNAL(clicked(bool)),this,SLOT(OnStartClicked(bool)));
-	connect(ui.btnEnd,SIGNAL(clicked(bool)),this,SLOT(OnEndClicked(bool)));
+	connect(ui.btnStart,SIGNAL(clicked()),this,SLOT(OnStartClicked()));
+	connect(ui.btnEnd,SIGNAL(clicked()),this,SLOT(OnEndClicked()));
+	connect(ui.btnQuery,SIGNAL(clicked()),this,SLOT(OnQueryClicked()));
 	Init();
 	m_timerId=startTimer(MSG_REFRESH_TIME);	//计时器查询识别状态
 }
 RobotQ::~RobotQ(){
 	Uninit();
 }
-int RobotQ::OnStartClicked(bool checked){
+int RobotQ::OnStartClicked(){
 	RECORDER_ERR_CODE eRet = RECORDER_ERR_NONE;
 	ui.btnStart->setEnabled(false);
 	ui.btnEnd->setEnabled(true);
@@ -39,7 +40,7 @@ int RobotQ::OnStartClicked(bool checked){
 	}
 	return 0;
 }
-int RobotQ::OnEndClicked(bool checked){
+int RobotQ::OnEndClicked(){
 	RECORDER_ERR_CODE eRet = hci_asr_recorder_cancel();
 	if (RECORDER_ERR_NONE != eRet){
 		QString strErrMessage;
@@ -51,6 +52,14 @@ int RobotQ::OnEndClicked(bool checked){
 	}
 	ui.btnEnd->setEnabled(false);
 	ui.btnStart->setEnabled(true);
+	return 0;
+}
+int RobotQ::OnQueryClicked(){
+	QString str="你好呀你好呀你好呀你好呀你好呀你好呀你好呀你好呀!";
+	unsigned char* pszUTF8 = NULL;
+	HciExampleComon::GBKToUTF8( (unsigned char*)str.toStdString().c_str(), &pszUTF8 );
+	string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
+	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
 	return 0;
 }
 void RobotQ::timerEvent(QTimerEvent *event){
@@ -344,7 +353,8 @@ void RobotQ::PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strM
 	GLOBAL_CommandValid=TRUE;
 	GLOBAL_eRecorderEvent=eRecorderEvent;
 	GLOBAL_strMessage=strMessage;
-	Sleep(MSG_REFRESH_TIME);	//发送一段新消息时睡一个周期以便计时器能不遗漏信息
+	QTest::qSleep(MSG_REFRESH_TIME);
+	//Sleep(MSG_REFRESH_TIME);	//发送一段新消息时睡一个周期以便计时器能不遗漏信息
 }
 bool RobotQ::CheckAndUpdataAuth(){
 	//获取过期时间
