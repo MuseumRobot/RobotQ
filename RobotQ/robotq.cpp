@@ -75,22 +75,12 @@ void RobotQ::timerEvent(QTimerEvent *event){
 }
 bool RobotQ::Init(){	
 	GLOBAL_CommandValid = FALSE;	//³õÊ¼»¯Ö´ĞĞ²½Öè²»¸½¼Óµ½ÏÔÊ¾¿òÖĞ
-	m_recordingFlag = FALSE;
-	isRobotQSpeakReady = FALSE;
-	m_recordingFileName = "recording.pcm";
-	m_recordingFile = NULL;
-	// »ñÈ¡AccountInfoµ¥Àı
-	AccountInfo *account_info = AccountInfo::GetInstance();
-	// ÕËºÅĞÅÏ¢¶ÁÈ¡
-	string account_info_file = "testdata/AccountInfo.txt";
+	isAuthReady = FALSE;
+	isASRReady = FALSE;
+	isTTSReady = FALSE;
+	AccountInfo *account_info = AccountInfo::GetInstance();	// »ñÈ¡AccountInfoµ¥Àı
+	string account_info_file = "testdata/AccountInfo.txt";// ÕËºÅĞÅÏ¢¶ÁÈ¡
 	bool account_success = account_info->LoadFromFile(account_info_file);
-	if (!account_success){
-		QString str=sprintf("AccountInfo read from %s failed\n",account_info_file.c_str());
-		QMessageBox msgBox;
-		msgBox.setText(str);
-		msgBox.exec();
-		return false;
-	}
 	// SYS³õÊ¼»¯
 	HCI_ERR_CODE errCode = HCI_ERR_NONE;
 	// ÅäÖÃ´®ÊÇÓÉ"×Ö¶Î=Öµ"µÄĞÎÊ½¸ø³öµÄÒ»¸ö×Ö·û´®£¬¶à¸ö×Ö¶ÎÖ®¼äÒÔ','¸ô¿ª¡£×Ö¶ÎÃû²»·Ö´óĞ¡Ğ´¡£
@@ -99,28 +89,14 @@ bool RobotQ::Init(){
 	init_config += ",developerKey=" + account_info->developer_key(); //ÁéÔÆ¿ª·¢ÕßÃÜÔ¿
 	init_config += ",cloudUrl=" + account_info->cloud_url();         //ÁéÔÆÔÆ·şÎñµÄ½Ó¿ÚµØÖ·
 	init_config += ",authpath=" + account_info->auth_path();         //ÊÚÈ¨ÎÄ¼şËùÔÚÂ·¾¶£¬±£Ö¤¿ÉĞ´
-	//init_config += ",logfilepath=" + account_info->logfile_path();   //ÈÕÖ¾µÄÂ·¾¶£¨¿ÉÒÔ²»ÒªÈÕÖ¾£©
 	init_config += ",logfilesize=1024000,loglevel=5";	// ÆäËûÅäÖÃÊ¹ÓÃÄ¬ÈÏÖµ£¬²»ÔÙÌí¼Ó£¬Èç¹ûÏëÉèÖÃ¿ÉÒÔ²Î¿¼¿ª·¢ÊÖ²á
 	errCode = hci_init( init_config.c_str() );
-	if( errCode != HCI_ERR_NONE ){
-		QString str;
-		str.sprintf("hci_init return %s\n",  hci_get_error_info(errCode));
-		QMessageBox msgBox;
-		msgBox.setText(str);
-		msgBox.exec();
-		return false;
-	}
-	qDebug()<<"hci_init success";
 	// ¼ì²âÊÚÈ¨,±ØÒªÊ±µ½ÔÆ¶ËÏÂÔØÊÚÈ¨¡£´Ë´¦ĞèÒª×¢ÒâµÄÊÇ£¬Õâ¸öº¯ÊıÖ»ÊÇÍ¨¹ı¼ì²âÊÚÈ¨ÊÇ·ñ¹ıÆÚÀ´ÅĞ¶ÏÊÇ·ñĞèÒª½øĞĞ
 	// »ñÈ¡ÊÚÈ¨²Ù×÷£¬Èç¹ûÔÚ¿ª·¢µ÷ÊÔ¹ı³ÌÖĞ£¬ÊÚÈ¨ÕËºÅÖĞĞÂÔöÁËÁéÔÆsdkµÄÄÜÁ¦£¬Çëµ½hci_init´«ÈëµÄauthPathÂ·¾¶ÖĞ
 	// É¾³ıHCI_AUTHÎÄ¼ş¡£·ñÔòÎŞ·¨»ñÈ¡ĞÂµÄÊÚÈ¨ÎÄ¼ş£¬´Ó¶øÎŞ·¨Ê¹ÓÃĞÂÔöµÄÁéÔÆÄÜÁ¦¡£
-	if (!CheckAndUpdataAuth()){
-		hci_release();
-		QString str;
-		str.sprintf("CheckAndUpdateAuth failed\n");
-		QMessageBox msgBox;
-		msgBox.setText(str);
-		msgBox.exec();
+	if (CheckAndUpdataAuth()){
+		isAuthReady = TRUE;
+	}else{
 		return false;
 	}
 	m_RecogType = kRecogTypeUnkown;
@@ -143,13 +119,9 @@ bool RobotQ::Init(){
 	string initConfig = "initCapkeys=" + account_info->cap_key();	
 	initConfig        += ",dataPath=" + account_info->data_path();
 	eRet = hci_asr_recorder_init( initConfig.c_str(), &call_back);
-	if (eRet != RECORDER_ERR_NONE){
-		hci_release();
-		QString str;
-		str.sprintf("Â¼Òô»ú³õÊ¼»¯Ê§°Ü£¬´íÎóÂë%d\n",eRet);
-		QMessageBox msgBox;
-		msgBox.setText(str);
-		msgBox.exec();
+	if (eRet == RECORDER_ERR_NONE){
+		isASRReady = TRUE;
+	}else{
 		return false;
 	}
 	//tts_player³õÊ¼»¯
@@ -166,7 +138,7 @@ bool RobotQ::Init(){
 	initConfigtts += ",dataPath="+account_info->data_path();
 	eReti = hci_tts_player_init( initConfigtts.c_str(), &cb );
 	if(eReti==RECORDER_ERR_NONE){
-		isRobotQSpeakReady = TRUE;
+		isTTSReady = TRUE;
 		QString str="ÄãºÃÑ½!";
 		RobotQSpeak(str);
 	}else{
@@ -228,12 +200,6 @@ void HCIAPI RobotQ::RecordEventChange(RECORDER_EVENT eRecorderEvent, void *pUsrP
 	RobotQ *dlg=(RobotQ *)pUsrParam;
 	if(eRecorderEvent == RECORDER_EVENT_BEGIN_RECOGNIZE){
 		dlg->m_startClock = clock();
-	}
-	if(eRecorderEvent == RECORDER_EVENT_END_RECORD){
-		if(dlg->m_recordingFile != NULL){
-			fclose(dlg->m_recordingFile);
-			dlg->m_recordingFile = NULL;
-		}
 	}
 	QString strMessage(g_sStatus[eRecorderEvent].pszComment);
 	dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
@@ -338,21 +304,7 @@ void RobotQ::AppendMessage(QString strMsg){	//AppendMessageº¯ÊıÄ¿µÄÊÇ½«ĞÂ¼ÓµÄÎÄ×
 	ui.textStatus->setPlainText(strNewMessage);
 }
 void RobotQ::RecorderRecording(unsigned char * pVoiceData, unsigned int uiVoiceLen){
-	if(m_recordingFlag == FALSE){
-		if(m_recordingFile != NULL){
-			fclose(m_recordingFile);
-			m_recordingFile = NULL;
-		}
-		return;
-	}
-	if(m_recordingFile == NULL){
-		m_recordingFile = fopen( m_recordingFileName.toStdString().c_str(), "wb" );
-		if( m_recordingFile == NULL ){
-			return;
-		}
-	}
-	fwrite(pVoiceData, sizeof(unsigned char), uiVoiceLen, m_recordingFile);
-	fflush(m_recordingFile);	//¸üĞÂ»º³åÇø£¬½«»º³åÇøÊı¾İÇ¿ÖÆĞ´ÈëÎÄ¼ş
+
 }
 void RobotQ::PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage){
 	GLOBAL_CommandValid=TRUE;

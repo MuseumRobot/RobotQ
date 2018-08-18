@@ -24,12 +24,13 @@ typedef enum _tag_AsrRecogMode{
 
 class RobotQ : public QDialog{
 	Q_OBJECT
-
 public:
 	RobotQ(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~RobotQ();
-	bool isRobotQSpeakReady;
-
+	Ui::RobotQClass ui;
+	bool isAuthReady;
+	bool isASRReady;
+	bool isTTSReady;
 private slots:
 	int OnStartClicked();
 	int OnEndClicked();
@@ -44,9 +45,6 @@ private:
 	static RECORDER_EVENT GLOBAL_eRecorderEvent;
 	static bool GLOBAL_CommandValid;
 	void OnShowStatus(RECORDER_EVENT eRecorderEvent, QString strMessage);
-
-private:Ui::RobotQClass ui;
-
 private:
 	bool CheckAndUpdataAuth();
 	void GetCapkeyProperty(const string&cap_key,AsrRecogType & type,AsrRecogMode &mode);
@@ -60,22 +58,15 @@ private:
 	static void HCIAPI CB_ProgressChange (_MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_MUST_ _IN_ int nStart,
 										  _MUST_ _IN_ int nStop,_OPT_ _IN_ void * pUsrParam);
 	static void HCIAPI CB_SdkErr( _MUST_ _IN_ PLAYER_EVENT ePlayerEvent,_MUST_ _IN_ HCI_ERR_CODE eErrorCode,_OPT_ _IN_ void * pUsrParam );
-
 public:
 	void AppendMessage(QString strMsg);
 	void RecorderRecording(unsigned char * pVoiceData, unsigned int uiVoiceLen);
 	void PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage);
 	virtual void timerEvent(QTimerEvent *event);
 	static void RobotQSpeak(QString str);
-
 private:
 	AsrRecogType m_RecogType;
 	AsrRecogMode m_RecogMode;
-
-	bool m_recordingFlag;
-	FILE * m_recordingFile;
-	QString m_recordingFileName;
-
 	int m_timerId;
 };
 
