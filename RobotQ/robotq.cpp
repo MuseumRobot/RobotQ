@@ -238,9 +238,17 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			strMessage+="识别结果:";
 			strMessage+=add;
 			HciExampleComon::FreeConvertResult( pucUTF8 );
-
+			//cJSON提取有效内容
+			char buf[10000] = {NULL};
+			char result[10000]={NULL};
+			char answer[10000]={NULL};
+			strcpy(buf,strMessage.toStdString().c_str());
+			Json_Explain(buf,result,answer);
+			QString QResult(result);
+			QString QAnswer(answer);
+			strMessage="小灵的回答:" + QAnswer  + "\n" + "识别结果:"+ QResult;
 			unsigned char* pszUTF8 = NULL;
-			HciExampleComon::GBKToUTF8( (unsigned char*)strMessage.toStdString().c_str(), &pszUTF8 );
+			HciExampleComon::GBKToUTF8( (unsigned char*)QAnswer.toStdString().c_str(), &pszUTF8 );
 			string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
 			PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
 		}else{
@@ -422,3 +430,23 @@ void RobotQ::RobotQSpeak(QString str){
 	string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
 	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
 }
+int RobotQ::Json_Explain (char buf[],char result[],char answer[]){  
+	int n=strlen(buf);
+	if(n>0){
+		for(int i=0;i<n;i++){
+			if(buf[i]=='u'&&buf[i+1]=='l'&&buf[i+2]=='t'){
+				int j=0;
+				while(buf[i+6+j]!='"')
+					result[j++]=buf[i+6+j];
+			}
+			if(buf[i]=='n'&&buf[i+1]=='t'&&buf[i+2]=='"'){
+				int j=0;
+				while(buf[i+13+j]!='"')
+					answer[j++]=buf[i+13+j];
+				break;
+			}
+
+		}
+	}	
+	return 0;  
+}  

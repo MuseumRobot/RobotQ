@@ -1,8 +1,6 @@
 #ifndef __COMMON_TOOL_H__
 #define __COMMON_TOOL_H__
 
-#include "include/cJSON.h"
-
 namespace HciExampleComon{
     //设置控制台打印颜色
     void SetSpecialConsoleTextAttribute();
@@ -15,9 +13,6 @@ namespace HciExampleComon{
 	int GBKToUTF8(unsigned char * pGBKStr,unsigned char ** pUTF8Str);
     //转码内存释放函数
     void FreeConvertResult(unsigned char * pConvertResult);
-
-	//Jason解析函数
-	int Json_Explain (char buf[],char Dest[],char result[]);
 }
 
 #endif // __FILE_UTIL_H__

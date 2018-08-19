@@ -200,10 +200,6 @@ BOOL CSerialCom::Create(int inCom) //根据串口号(inCom)打开指定串口
 	QString QstrCom;
 	QstrCom.sprintf("COM%d",inCom);
 	strCom=QstrCom.toStdString().c_str();
-
-	//LPCTSTR strComGG = _T("宽字符");
-	//strComGG = ( LPCTSTR ) strCom.toStdString().c_str();
-
 	//用串口号字符串打开串口并返回打开的串口句柄
 	m_hCom=CreateFile(strCom,GENERIC_READ | GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,NULL);
 

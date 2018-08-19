@@ -65,9 +65,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cJSON.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MainGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -160,9 +157,6 @@
       <Filter>Header Files\HCI</Filter>
     </ClInclude>
     <ClInclude Include="include\hci_tts_player.h">
-      <Filter>Header Files\HCI</Filter>
-    </ClInclude>
-    <ClInclude Include="include\cJSON.h">
       <Filter>Header Files\HCI</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_MainGUI.h">

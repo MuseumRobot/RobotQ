@@ -64,6 +64,7 @@ public:
 	void PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage);
 	virtual void timerEvent(QTimerEvent *event);
 	static void RobotQSpeak(QString str);
+	static int Json_Explain (char buf[],char result[],char answer[]);
 private:
 	AsrRecogType m_RecogType;
 	AsrRecogMode m_RecogMode;
