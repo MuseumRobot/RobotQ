@@ -124,6 +124,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UPURG.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="robotq.h">
@@ -178,6 +179,7 @@
     <ClInclude Include="include\hci_tts_player.h" />
     <ClInclude Include="include\SerialCom.h" />
     <ClInclude Include="include\targetver.h" />
+    <ClInclude Include="include\UPURG.h" />
     <ClInclude Include="stdafx.h" />
     <CustomBuild Include="MainGUI.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

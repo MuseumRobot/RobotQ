@@ -41,10 +41,10 @@ public:
 	CString	m_pBaudRate_Get;
 
 	int times;
-	float newID;
-	float sumID;
-	float oldID;
-	float starID ;
+	int newID;
+	int sumID;
+	int oldID;
+	int starID ;
 
 	float starAngel ;
 	float sumAngle;

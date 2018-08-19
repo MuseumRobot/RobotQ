@@ -101,6 +101,9 @@
     <ClCompile Include="Comm_data_star.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UPURG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="robotq.h">
@@ -184,6 +187,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Comm_data_star.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UPURG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

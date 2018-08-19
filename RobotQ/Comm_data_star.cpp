@@ -185,7 +185,6 @@ void Cstar::m_ParseFrame(void){
 					starX = oldX;
 					starY = oldY;
 				}
-				qDebug()<<"StarID:"<<newID<<" X:"<<sumX<<"  Y:"<<sumY;
 				times = 0;
 				sumID = 0.00;
 				sumAngle = 0.00;
@@ -227,7 +226,6 @@ void Cstar::m_ParseFrame(void){
 						starX2 = oldX2;
 						starY2 = oldY2;
 					}
-					qDebug()<<"StarID2:"<<newID2<<" X:"<<sumX2<<"  Y:"<<sumY2;
 					times2 = 0;
 					sumID2 = 0.00;
 					sumAngle2 = 0.00;

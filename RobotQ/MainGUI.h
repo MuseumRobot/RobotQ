@@ -11,6 +11,7 @@
 #include "DashBoard.h"
 #include "include/Comm_data_motor3.h"
 #include "include/Comm_data_star.h"
+#include "include/UPURG.h"
 
 #define COMM_MOTOR 3	//底部电机串口号
 #define COMM_STAR 4		//星标定位串口
@@ -24,8 +25,6 @@ struct StarMark{
 };
 extern struct StarMark MARK[100];
 
-
-
 class MainGUI : public QMainWindow{
 	Q_OBJECT
 
@@ -35,8 +34,8 @@ public:
 	QPointF PosByStar1;		//首选星标得到的机器人世界坐标
 	QPointF PosByStar2;		//备选星标
 	QPointF PosByMotor;		//电机里程计确定的坐标
-	QPointF PosSafe;	//综合考虑电机和星标进而得出可靠的坐标结果
-	QPointF PosGoal;
+	QPointF PosSafe;		//综合考虑电机和星标进而得出可靠的坐标结果
+	QPointF PosGoal;		//目标坐标
 
 private:
 	Ui::MainGUI ui;
@@ -45,8 +44,10 @@ private:
 	DashBoard* m_DashBoard;
 	CMotor motor;
 	Cstar StarGazer;
+	CUPURG m_cURG;
 	bool Init();
 	int m_timerId;		//计数器查询将机器人数据显示在仪表盘中
+	int m_laser_data_postpro[1000];		//激光最远返回值(单位cm)
 	virtual void timerEvent(QTimerEvent *event);
 
 private slots:

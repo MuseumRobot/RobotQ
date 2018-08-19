@@ -103,15 +103,24 @@ MainGUI::~MainGUI(){
 	delete m_DashBoard;
 }
 bool MainGUI::Init(){
-	// 串口初始化
+	// 串口初始化Motor/Star/Urg
 	if(motor.open_com_motor(COMM_MOTOR)){
 		m_DashBoard->ui.ck_Motor->setChecked(true);
 		motor.VectorMove(1200,2);	//启动电机后漂移示意
 	}
-	if (StarGazer.open_com(COMM_STAR)){
+	if(StarGazer.open_com(COMM_STAR)){
 		m_DashBoard->ui.ck_Star->setChecked(true);
 	}
-
+	for(int loop=0;loop<1000;loop++){
+		m_laser_data_postpro[loop] = 50000;
+	}
+	if (m_cURG.Create(COMM_LASER)){
+		m_cURG.SwitchOn();
+		m_cURG.SCIP20();	
+		m_cURG.GetDataByGD(0,768,1);
+		//pThread_Read_Laser=AfxBeginThread(ThreadReadLaser_Data,&Info_laser_data);
+		m_DashBoard->ui.ck_URG->setChecked(true);
+	}
 	//仪表盘数据初始化
 	PosByStar1=QPointF(0.00,0.00);
 	PosByStar2=QPointF(0.00,0.00);
@@ -174,9 +183,9 @@ void MainGUI::timerEvent(QTimerEvent *event){
 			}
 		}
 		QString str;
-		str.sprintf("(%.2f,%.2f)",PosByStar1.x(),PosByStar1.y());
+		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar1.x(),PosByStar1.y(),StarGazer.starID);
 		m_DashBoard->ui.posStar1->setText(str);
-		str.sprintf("(%.2f,%.2f)",PosByStar2.x(),PosByStar2.y());
+		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar2.x(),PosByStar2.y(),StarGazer.starID2);
 		m_DashBoard->ui.posStar2->setText(str);
 		str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
 		m_DashBoard->ui.posMotor->setText(str);
