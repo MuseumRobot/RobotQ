@@ -1,10 +1,86 @@
 #include "MainGUI.h"
 
+struct StarMark MARK[100]={ //LED定位标签数组
+	//每块边长455
+	MARK[0].markID = 624,
+	MARK[0].mark_angle = 0.00,
+	MARK[0].mark_x = -427,
+	MARK[0].mark_y = 10,
+
+
+	MARK[1].markID = 610,
+	MARK[1].mark_angle = 0.00,
+	MARK[1].mark_x = -344,
+	MARK[1].mark_y = 132,
+
+	MARK[2].markID = 594, 
+	MARK[2].mark_angle = 0.00,
+	MARK[2].mark_x = -212,
+	MARK[2].mark_y = 0,
+
+	MARK[3].markID = 608,
+	MARK[3].mark_angle = 0.00,
+	MARK[3].mark_x = -20,
+	MARK[3].mark_y = 30,
+
+	MARK[4].markID = 626,
+	MARK[4].mark_angle = 0.00,
+	MARK[4].mark_x = -195,
+	MARK[4].mark_y = 179,
+
+	MARK[5].markID = 592,
+	MARK[5].mark_angle = 0.00,
+	MARK[5].mark_x = -6,
+	MARK[5].mark_y = 177,
+
+
+	MARK[6].markID = 560,
+	MARK[6].mark_angle = 0.00,
+	MARK[6].mark_x = 160,
+	MARK[6].mark_y = 12,
+
+	MARK[7].markID = 546,
+	MARK[7].mark_angle = 0.00,
+	MARK[7].mark_x = 150,
+	MARK[7].mark_y = 183,
+
+	MARK[8].markID = 578,
+	MARK[8].mark_angle = 0.00,
+	MARK[8].mark_x = 140,
+	MARK[8].mark_y = 377,
+
+	MARK[9].markID = 544,
+	MARK[9].mark_angle = 0.00,
+	MARK[9].mark_x = 309,
+	MARK[9].mark_y = 358,
+
+	MARK[10].markID = 576,
+	MARK[10].mark_angle = 0.00,
+	MARK[10].mark_x = 138,
+	MARK[10].mark_y = 540,
+
+	MARK[11].markID = 16,
+	MARK[11].mark_angle = 0.00,
+	MARK[11].mark_x = 308,
+	MARK[11].mark_y = 168,
+
+	MARK[12].markID = 562,
+	MARK[12].mark_angle = 0.00,
+	MARK[12].mark_x = 311,
+	MARK[12].mark_y = 528,
+
+	MARK[13].markID = 530,
+	MARK[13].mark_angle = 0.00,
+	MARK[13].mark_x = 309,
+	MARK[13].mark_y = 1,
+};
+
 MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	ui.setupUi(this);
 	m_RobotQ=new RobotQ(this);	//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
+	m_timerId=startTimer(1000);		//计数器查询显示机器状态
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
@@ -74,4 +150,9 @@ int MainGUI::On_MC_BtnRobotQSpeak(){
 	str=m_ManualControl->ui.comSpeaklist->currentText();
 	RobotQ::RobotQSpeak(str);
 	return 0;
+}
+void MainGUI::timerEvent(QTimerEvent *event){
+	if(event->timerId()==m_timerId){
+		
+	}
 }

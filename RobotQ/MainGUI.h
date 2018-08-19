@@ -11,9 +11,19 @@
 #include "include/Comm_data_motor3.h"
 #include "include/Comm_data_star.h"
 
-#define COMM_MOTOR 3 //底部电机串口号
-#define COMM_STAR 4//星标定位串口
-#define COMM_LASER 5 //激光传感器串口号
+#define COMM_MOTOR 3	//底部电机串口号
+#define COMM_STAR 4		//星标定位串口
+#define COMM_LASER 5	//激光传感器串口号
+
+struct StarMark{
+	int markID;
+	float mark_angle;
+	float mark_x;
+	float mark_y;
+};
+extern struct StarMark MARK[100];
+
+
 
 class MainGUI : public QMainWindow{
 	Q_OBJECT
@@ -30,6 +40,8 @@ private:
 	CMotor motor;
 	Cstar StarGazer;
 	bool Init();
+	int m_timerId;	//计数器查询将机器人数据显示在仪表盘中
+	virtual void timerEvent(QTimerEvent *event);
 
 private slots:
 	int OnBtnRobotQ();
