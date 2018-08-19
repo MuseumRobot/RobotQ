@@ -46,9 +46,11 @@ private:
 	Cstar StarGazer;
 	CUPURG m_cURG;
 	bool Init();
-	int m_timerId;		//计数器查询将机器人数据显示在仪表盘中
-	int m_laser_data_postpro[1000];		//激光最远返回值(单位cm)
+	int m_timerId;									//计数器查询将机器人数据显示在仪表盘中
+	int m_laser_data_postpro[1000];					//激光最远返回值(单位cm)
+	CWinThread* pThread_Read_Laser;					//读激光数据线程
 	virtual void timerEvent(QTimerEvent *event);
+	UINT ThreadReadLaser_Data(LPVOID lpParam);		//读激光数据函数
 
 private slots:
 	int OnBtnRobotQ();

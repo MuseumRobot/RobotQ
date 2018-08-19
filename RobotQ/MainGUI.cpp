@@ -195,3 +195,32 @@ void MainGUI::timerEvent(QTimerEvent *event){
 		m_DashBoard->ui.posGoal->setText(str);
 	}
 }
+UINT MainGUI::ThreadReadLaser_Data(LPVOID lpParam){
+	//FILE *allout;
+	//allout = fopen("allout2laser.txt","a+");
+	//while (lase_key){
+	//	m_cURG.GetDataByGD(0,768,1);
+	//	WaitForSingleObject(m_cURG.wait_laser,INFINITE);
+
+	//	//	m_cURG.GetDataByGD(0,768,1);//前两个参数决定扫描角度范围（384是正前方的线，288线为90度范围），最后一个参数决定了角度分辨率。获取激光测距起的数据;
+	//	//////////////////////////////////////////
+	//	Info_laser_data.m_Laser_Data_Point=m_nValPoint_temp;
+
+	//	m_Laser_Data_Point_PostPro=m_nValPoint_temp;
+	//	//	pReadThread_postpro->m_Laser_Point=m_nValPoint_temp;
+
+	//	key_laser = !m_cURG.key;
+	//	for (int i=0;i<Info_laser_data.m_Laser_Data_Point;i++){
+	//		Info_laser_data.m_Laser_Data_Value[i]=m_cURG.m_distVal_temp_test[key_laser][i];
+	//		m_laser_data_raw[i]=m_cURG.m_distVal_temp_test[key_laser][i];
+	//		m_laser_data_postpro[i] = m_cURG.m_distVal_temp_test[key_laser][i];
+	//		if(i%10==0){
+	//			fprintf(allout," 0000===%d   \n",m_laser_data_postpro[i]);
+	//		}
+	//	}
+	//	wait_data.SetEvent();
+	//	m_cURG.wait_laser.ResetEvent();
+	//	wait_laserpose.SetEvent();
+	//}
+	return 0;
+}

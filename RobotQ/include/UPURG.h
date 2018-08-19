@@ -9,7 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "SerialCom.h"
+#include "include/SerialCom.h"
+#include <afxmt.h>
 
 extern int m_distVal_temp_temp[1000];
 extern int m_nValPoint_temp;//m_distVal的长度
@@ -43,19 +44,20 @@ protected:
 
 public:
 	int m_DirFlag; 
-	int m_nTurnRightFlag; //转向标志位
-	int m_nTurnLeftFlag;  //转向标志位
+	int m_nTurnRightFlag;	//转向标志位
+	int m_nTurnLeftFlag;	//转向标志位
 
-	int m_nObstacleOnLeft;//最近障碍物在左侧标志
-	int m_nObstacleOnRight;//最近障碍物在右侧标志
-	int m_nDangerDir;     //判断障碍类型依据之一
-	//CEvent wait_laser; //激光线程中断开关
+	int m_nObstacleOnLeft;	//最近障碍物在左侧标志
+	int m_nObstacleOnRight;	//最近障碍物在右侧标志
+	int m_nDangerDir;		//判断障碍类型依据之一
+	CEvent wait_laser;		//激光线程中断开关
 	bool key; //数据存储控制开关,false--m_distVal_temp_test[0]接收;ture--m_distVal_temp_test[1]接收
 
 	
 	void fileter(int * p);
 	
-
+	int m_distVal_temp_temp[1000];
+	int m_nValPoint_temp;//m_distVal的长度
 
 	int *m_distVal_temp;
 	double m_distVal_temp_test[2][1000];
