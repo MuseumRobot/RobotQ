@@ -59,10 +59,10 @@ public:
 	float oldY;
 
 	int times2;
-	float newID2;
-	float sumID2;
-	float oldID2;
-	float starID2;
+	int newID2;
+	int sumID2;
+	int oldID2;
+	int starID2;
 
 	float starAngel2 ;
 	float sumAngle2;

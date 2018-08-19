@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtGui/QApplication>
 #include <QCheckBox>
+#include <QPointF>
 #include "ui_MainGUI.h"
 #include "robotq.h"
 #include "ManualControl.h"
@@ -31,7 +32,12 @@ class MainGUI : public QMainWindow{
 public:
 	MainGUI(QWidget *parent = 0);
 	~MainGUI();
-	
+	QPointF PosByStar1;		//首选星标得到的机器人世界坐标
+	QPointF PosByStar2;		//备选星标
+	QPointF PosByMotor;		//电机里程计确定的坐标
+	QPointF PosSafe;	//综合考虑电机和星标进而得出可靠的坐标结果
+	QPointF PosGoal;
+
 private:
 	Ui::MainGUI ui;
 	RobotQ* m_RobotQ;
@@ -40,7 +46,7 @@ private:
 	CMotor motor;
 	Cstar StarGazer;
 	bool Init();
-	int m_timerId;	//计数器查询将机器人数据显示在仪表盘中
+	int m_timerId;		//计数器查询将机器人数据显示在仪表盘中
 	virtual void timerEvent(QTimerEvent *event);
 
 private slots:

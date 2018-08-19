@@ -103,7 +103,7 @@ MainGUI::~MainGUI(){
 	delete m_DashBoard;
 }
 bool MainGUI::Init(){
-	// 电机串口初始化
+	// 串口初始化
 	if(motor.open_com_motor(COMM_MOTOR)){
 		m_DashBoard->ui.ck_Motor->setChecked(true);
 		motor.VectorMove(1200,2);	//启动电机后漂移示意
@@ -111,6 +111,13 @@ bool MainGUI::Init(){
 	if (StarGazer.open_com(COMM_STAR)){
 		m_DashBoard->ui.ck_Star->setChecked(true);
 	}
+
+	//仪表盘数据初始化
+	PosByStar1=QPointF(0.00,0.00);
+	PosByStar2=QPointF(0.00,0.00);
+	PosByMotor=QPointF(0.00,0.00);
+	PosSafe=QPointF(0.00,0.00);
+	PosGoal=QPointF(0.00,0.00);
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
@@ -152,7 +159,30 @@ int MainGUI::On_MC_BtnRobotQSpeak(){
 	return 0;
 }
 void MainGUI::timerEvent(QTimerEvent *event){
+	//刷新仪表盘数据
 	if(event->timerId()==m_timerId){
-		
+		PosByStar1=QPointF(0.00,0.00);
+		PosByStar2=QPointF(0.00,0.00);
+		for (int loop_mark = 0; loop_mark < 14; loop_mark++){
+			if (MARK[loop_mark].markID == StarGazer.starID){
+				PosByStar1.setX(MARK[loop_mark].mark_x + StarGazer.starX);
+				PosByStar1.setY(MARK[loop_mark].mark_y + StarGazer.starY);
+			}
+			if (MARK[loop_mark].markID == StarGazer.starID2){
+				PosByStar2.setX(MARK[loop_mark].mark_x + StarGazer.starX2);
+				PosByStar2.setY(MARK[loop_mark].mark_y + StarGazer.starY2);
+			}
+		}
+		QString str;
+		str.sprintf("(%.2f,%.2f)",PosByStar1.x(),PosByStar1.y());
+		m_DashBoard->ui.posStar1->setText(str);
+		str.sprintf("(%.2f,%.2f)",PosByStar2.x(),PosByStar2.y());
+		m_DashBoard->ui.posStar2->setText(str);
+		str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
+		m_DashBoard->ui.posMotor->setText(str);
+		str.sprintf("(%.2f,%.2f)",PosSafe.x(),PosSafe.y());
+		m_DashBoard->ui.posSafe->setText(str);
+		str.sprintf("(%.2f,%.2f)",PosGoal.x(),PosGoal.y());
+		m_DashBoard->ui.posGoal->setText(str);
 	}
 }
