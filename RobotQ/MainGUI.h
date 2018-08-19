@@ -9,6 +9,7 @@
 #include "ManualControl.h"
 #include "DashBoard.h"
 #include "include/Comm_data_motor3.h"
+#include "include/Comm_data_star.h"
 
 #define COMM_MOTOR 3 //底部电机串口号
 #define COMM_STAR 4//星标定位串口
@@ -27,8 +28,8 @@ private:
 	ManualControl* m_ManualControl;
 	DashBoard* m_DashBoard;
 	CMotor motor;
+	Cstar StarGazer;
 	bool Init();
-	bool isMotorOpen;	//电机端口是否开启
 
 private slots:
 	int OnBtnRobotQ();

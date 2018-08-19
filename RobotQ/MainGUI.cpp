@@ -27,13 +27,14 @@ MainGUI::~MainGUI(){
 	delete m_DashBoard;
 }
 bool MainGUI::Init(){
-	isMotorOpen = false;
 	// 电机串口初始化
-	if(motor.open_com_motor(COMM_MOTOR)) 
-		isMotorOpen = true;
-	else
-		return false;
-	motor.VectorMove(1200,2);
+	if(motor.open_com_motor(COMM_MOTOR)){
+		m_DashBoard->ui.ck_Motor->setChecked(true);
+		motor.VectorMove(1200,2);	//启动电机后漂移示意
+	}
+	if (StarGazer.open_com(COMM_STAR)){
+		m_DashBoard->ui.ck_Star->setChecked(true);
+	}
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){

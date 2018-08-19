@@ -83,6 +83,7 @@
     <ClCompile Include="common\CommonTool.cpp" />
     <ClCompile Include="common\FileReader.cpp" />
     <ClCompile Include="Comm_data_motor3.cpp" />
+    <ClCompile Include="Comm_data_star.cpp" />
     <ClCompile Include="DashBoard.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_DashBoard.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -169,6 +170,7 @@
     <ClInclude Include="GeneratedFiles\ui_ManualControl.h" />
     <ClInclude Include="GeneratedFiles\ui_robotq.h" />
     <ClInclude Include="include\Comm_data_motor3.h" />
+    <ClInclude Include="include\Comm_data_star.h" />
     <ClInclude Include="include\hci_asr.h" />
     <ClInclude Include="include\hci_asr_recorder.h" />
     <ClInclude Include="include\hci_sys.h" />
