@@ -21,7 +21,8 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_RobotQ=new RobotQ(this);	//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
-	m_timer_refresh_dashboard=startTimer(500);		//计数器查询显示机器状态
+	m_timer_refresh_task=startTimer(1000);
+	m_timer_refresh_dashboard=startTimer(600);		//计数器查询显示机器状态
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
@@ -100,31 +101,18 @@ void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
 		CalculateSectorDistance();		//计算扇区内障碍物距离
 		refreshDashboardSector();		//刷新障碍物分布图
-		//刷新仪表盘数据
-		if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
-		PosByStar1=QPointF(0.00,0.00);
-		PosByStar2=QPointF(0.00,0.00);
-		for (int loop_mark = 0; loop_mark < 14; loop_mark++){
-			if (m_MARK[loop_mark].markID == m_StarGazer.starID){
-				PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
-				PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
-			}
-			if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
-				PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
-				PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
-			}
+		refreshDashboardData();			//刷新仪表盘数据
+	}else if(event->timerId()==m_timer_refresh_task){
+		int randomTask=rand()%6;
+		switch (randomTask){
+			case 0:m_motor.VectorMove(800,0);break;
+			case 1:m_motor.VectorMove(-800,0);break;
+			case 2:m_motor.VectorMove(0,100);break;
+			case 3:m_motor.VectorMove(0,-100);break;
+			case 4:m_motor.stop();
+			default:RobotQ::RobotQSpeak("呵呵呵");
 		}
-		QString str;
-		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar1.x(),PosByStar1.y(),m_StarGazer.starID);
-		m_DashBoard->ui.posStar1->setText(str);
-		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar2.x(),PosByStar2.y(),m_StarGazer.starID2);
-		m_DashBoard->ui.posStar2->setText(str);
-		str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
-		m_DashBoard->ui.posMotor->setText(str);
-		str.sprintf("(%.2f,%.2f)",PosSafe.x(),PosSafe.y());
-		m_DashBoard->ui.posSafe->setText(str);
-		str.sprintf("(%.2f,%.2f)",PosGoal.x(),PosGoal.y());
-		m_DashBoard->ui.posGoal->setText(str);
+		//m_motor.VectorMove(800,0);
 	}
 }
 UINT ThreadReadLaser_Data(LPVOID lpParam){
@@ -220,7 +208,7 @@ void MainGUI::InitStarMark(){
 void MainGUI::InitCommMotorAndStar(){
 	if(m_motor.open_com_motor(COMM_MOTOR)){
 		m_DashBoard->ui.ck_Motor->setChecked(true);
-		m_motor.VectorMove(1200,2);	//启动电机后漂移示意
+		m_motor.VectorMove(800,0);	//启动电机后漂移示意
 	}
 	if(m_StarGazer.open_com(COMM_STAR)){
 		m_DashBoard->ui.ck_Star->setChecked(true);
@@ -335,4 +323,30 @@ void MainGUI::refreshDashboardSector(){
 	if(sectorObstacleDistance[N-33]<threshold)m_DashBoard->ui.r170->setChecked(flag);
 	if(sectorObstacleDistance[N-34]<threshold)m_DashBoard->ui.r175->setChecked(flag);
 	if(sectorObstacleDistance[N-35]<threshold)m_DashBoard->ui.r180->setChecked(flag);
+}
+void MainGUI::refreshDashboardData(){
+	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
+	PosByStar1=QPointF(0.00,0.00);
+	PosByStar2=QPointF(0.00,0.00);
+	for (int loop_mark = 0; loop_mark < 14; loop_mark++){
+		if (m_MARK[loop_mark].markID == m_StarGazer.starID){
+			PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
+			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
+		}
+		if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
+			PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
+			PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
+		}
+	}
+	QString str;
+	str.sprintf("(%.2f,%.2f) - (%d)",PosByStar1.x(),PosByStar1.y(),m_StarGazer.starID);
+	m_DashBoard->ui.posStar1->setText(str);
+	str.sprintf("(%.2f,%.2f) - (%d)",PosByStar2.x(),PosByStar2.y(),m_StarGazer.starID2);
+	m_DashBoard->ui.posStar2->setText(str);
+	str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
+	m_DashBoard->ui.posMotor->setText(str);
+	str.sprintf("(%.2f,%.2f)",PosSafe.x(),PosSafe.y());
+	m_DashBoard->ui.posSafe->setText(str);
+	str.sprintf("(%.2f,%.2f)",PosGoal.x(),PosGoal.y());
+	m_DashBoard->ui.posGoal->setText(str);
 }

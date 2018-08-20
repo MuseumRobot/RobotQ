@@ -71,6 +71,7 @@ private:
 	void InitCommMotorAndStar();					//电机星标串口初始化
 	void CalculateSectorDistance();					//计算扇区内障碍物的距离
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
+	void refreshDashboardData();					//刷新仪表盘上的普通数据
 	virtual void timerEvent(QTimerEvent *event);
 
 private slots:
