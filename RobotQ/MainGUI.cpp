@@ -1,11 +1,25 @@
 #include "MainGUI.h"
 
+//若干对象需要自始至终存在于主界面中
+CUPURG m_cURG;									//激光对象
+CWinThread* pThread_Read_Laser;					//读激光数据线程
+UINT ThreadReadLaser_Data(LPVOID lpParam);		//读激光数据函数
+bool is_Comm_URG_Open = false;					//初始化激光未开启
+bool key_laser = false;							//激光数据存储位置开关
+void InitCommLaser();							//激光串口初始化
+int m_laser_data_postpro[1000];					//激光最远返回值(单位cm)
+int m_laser_data_raw[1000];
+int m_Laser_Data_Point_PostPro;
+CEvent wait_data;
+CEvent wait_laserpose;
+threadInfo_laser_data Info_laser_data;
+
 MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	ui.setupUi(this);
 	m_RobotQ=new RobotQ(this);	//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
-	m_timerId=startTimer(1000);		//计数器查询显示机器状态
+	m_timer_refresh_dashboard=startTimer(1000);		//计数器查询显示机器状态
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
@@ -30,8 +44,8 @@ MainGUI::~MainGUI(){
 bool MainGUI::Init(){
 	
 	InitStarMark();		//LED标签数组赋值
-
-	InitComm();			// 串口初始化Motor/Star/Urg
+	InitCommMotorAndStar();			//串口初始化Motor/Star
+	InitCommLaser();	//串口初始化URG
 
 	//仪表盘数据初始化
 	PosByStar1=QPointF(0.00,0.00);
@@ -81,8 +95,9 @@ int MainGUI::On_MC_BtnRobotQSpeak(){
 	return 0;
 }
 void MainGUI::timerEvent(QTimerEvent *event){
-	//刷新仪表盘数据
-	if(event->timerId()==m_timerId){
+	if(event->timerId()==m_timer_refresh_dashboard){
+		//刷新仪表盘数据
+		if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
 		PosByStar1=QPointF(0.00,0.00);
 		PosByStar2=QPointF(0.00,0.00);
 		for (int loop_mark = 0; loop_mark < 14; loop_mark++){
@@ -108,33 +123,26 @@ void MainGUI::timerEvent(QTimerEvent *event){
 		m_DashBoard->ui.posGoal->setText(str);
 	}
 }
-UINT MainGUI::ThreadReadLaser_Data(LPVOID lpParam){
-	//FILE *allout;
-	//allout = fopen("allout2laser.txt","a+");
-	//while (lase_key){
-	//	m_cURG.GetDataByGD(0,768,1);
-	//	WaitForSingleObject(m_cURG.wait_laser,INFINITE);
-
-	//	//	m_cURG.GetDataByGD(0,768,1);//前两个参数决定扫描角度范围（384是正前方的线，288线为90度范围），最后一个参数决定了角度分辨率。获取激光测距起的数据;
-	//	//////////////////////////////////////////
-	//	Info_laser_data.m_Laser_Data_Point=m_nValPoint_temp;
-
-	//	m_Laser_Data_Point_PostPro=m_nValPoint_temp;
-	//	//	pReadThread_postpro->m_Laser_Point=m_nValPoint_temp;
-
-	//	key_laser = !m_cURG.key;
-	//	for (int i=0;i<Info_laser_data.m_Laser_Data_Point;i++){
-	//		Info_laser_data.m_Laser_Data_Value[i]=m_cURG.m_distVal_temp_test[key_laser][i];
-	//		m_laser_data_raw[i]=m_cURG.m_distVal_temp_test[key_laser][i];
-	//		m_laser_data_postpro[i] = m_cURG.m_distVal_temp_test[key_laser][i];
-	//		if(i%10==0){
-	//			fprintf(allout," 0000===%d   \n",m_laser_data_postpro[i]);
-	//		}
-	//	}
-	//	wait_data.SetEvent();
-	//	m_cURG.wait_laser.ResetEvent();
-	//	wait_laserpose.SetEvent();
-	//}
+UINT ThreadReadLaser_Data(LPVOID lpParam){
+	bool laser_key = true;
+	while (laser_key){
+		m_cURG.GetDataByGD(0,768,1);//前两个参数决定扫描角度范围（384是正前方的线，288线为90度范围），最后一个参数决定了角度分辨率。获取激光测距起的数据;
+		WaitForSingleObject(m_cURG.wait_laser,INFINITE);
+		Info_laser_data.m_Laser_Data_Point=m_nValPoint_temp;
+		m_Laser_Data_Point_PostPro=m_nValPoint_temp;
+		key_laser = !m_cURG.key;
+		for (int i=0;i<Info_laser_data.m_Laser_Data_Point;i++){
+			Info_laser_data.m_Laser_Data_Value[i]=m_cURG.m_distVal_temp_test[key_laser][i];
+			m_laser_data_raw[i]=m_cURG.m_distVal_temp_test[key_laser][i];
+			m_laser_data_postpro[i] = m_cURG.m_distVal_temp_test[key_laser][i];
+			if(i%10==0){
+				qDebug()<<m_laser_data_postpro[i];
+			}
+		}
+		wait_data.SetEvent();
+		m_cURG.wait_laser.ResetEvent();
+		wait_laserpose.SetEvent();
+	}
 	return 0;
 }
 void MainGUI::InitStarMark(){
@@ -208,7 +216,7 @@ void MainGUI::InitStarMark(){
 	m_MARK[13].mark_x = 309;
 	m_MARK[13].mark_y = 1;
 }
-void MainGUI::InitComm(){
+void MainGUI::InitCommMotorAndStar(){
 	if(m_motor.open_com_motor(COMM_MOTOR)){
 		m_DashBoard->ui.ck_Motor->setChecked(true);
 		m_motor.VectorMove(1200,2);	//启动电机后漂移示意
@@ -216,6 +224,8 @@ void MainGUI::InitComm(){
 	if(m_StarGazer.open_com(COMM_STAR)){
 		m_DashBoard->ui.ck_Star->setChecked(true);
 	}
+}
+void InitCommLaser(){
 	for(int loop=0;loop<1000;loop++){
 		m_laser_data_postpro[loop] = 50000;
 	}
@@ -223,7 +233,7 @@ void MainGUI::InitComm(){
 		m_cURG.SwitchOn();
 		m_cURG.SCIP20();	
 		m_cURG.GetDataByGD(0,768,1);
-		//pThread_Read_Laser=AfxBeginThread(ThreadReadLaser_Data,&Info_laser_data);
-		m_DashBoard->ui.ck_URG->setChecked(true);
-	}
+		pThread_Read_Laser=AfxBeginThread(ThreadReadLaser_Data,&Info_laser_data);
+		is_Comm_URG_Open = true;
+	}	
 }

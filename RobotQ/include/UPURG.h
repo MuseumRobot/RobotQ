@@ -12,6 +12,9 @@
 #include "include/SerialCom.h"
 #include <afxmt.h>
 
+extern int m_distVal_temp_temp[1000];
+extern int m_nValPoint_temp;//m_distVal的长度
+
 #define URG_RECVBUF_LEN 3072
 struct Beam{
 	double left_angle, right_angle;		//扇区的实际角度
@@ -43,8 +46,6 @@ public:
 	CEvent wait_laser;		//激光线程中断开关
 	bool key;				//数据存储控制开关,false--m_distVal_temp_test[0]接收;ture--m_distVal_temp_test[1]接收
 	void fileter(int * p);
-	int m_distVal_temp_temp[1000];
-	int m_nValPoint_temp;	//m_distVal的长度
 	int *m_distVal_temp;
 	double m_distVal_temp_test[2][1000];
 	double robotPosition_x;

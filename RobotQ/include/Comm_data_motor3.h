@@ -35,13 +35,10 @@ public:
 	float speed_z ; //右轮实时速度
 
 public:
-
 	void Parse(BYTE inData);//串口接收并解析线程
 	char m_cmdToSend[512];//数据缓冲区
-
 	//recv
 	BYTE m_recvbuf[50]; //数据包储存
-
 	//parse
 	char m_ParHeader; //数据包的开头格式
 	char m_ParEnd;  //数据包结束格式
@@ -49,13 +46,11 @@ public:
 	char rdata_star;
 	char zdata_star;
 	char Time_start;
-
 	char m_lastChar;   //存储上一个接收到的字符
 	bool m_bFrameStart; //数据包接收开始标志位，TRUE为已开始接收，FLASE为没有开始
 	bool m_right;//数据包开始正确
 	int m_nFrameLen;    //存储数据包的长度
 	int m_nRecvindex; //数据写入位，m_recvbuf
-
 	char* m_databuf; //数据存储
 	int* m_distVal;  //数据解析结果存储
 	CMotor(void);

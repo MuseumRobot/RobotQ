@@ -55,7 +55,6 @@ CMotor::~CMotor(void){
 }
 
 void CMotor::Parse(BYTE inData){
-	
 	if (m_bFrameStart == false){
 		//若没有开始接收数据，则需要检测是否有数据包头出现，数据包接收开始标志位，TRUE为已开始接收，FLASE为没有开始
 		//判断是否为包头

@@ -24,6 +24,24 @@ typedef struct StarMark{
 	float mark_y;
 }StarMark;
 
+struct threadInfo_laser_data{
+	double 	m_Laser_Data_Value[768];
+	int	m_Laser_Data_Point;
+};
+
+//激光测距器数据读取结构参数
+struct threadInfo_laser_data_postpro{
+	double 	m_Laser_Data_Value_PostPro[768];
+	int	m_Laser_Data_Point_PostPro;
+	double rx;
+	double ry;   //robot odometry pos
+	double  th;   //robot orientation 
+	double  x[10][769];//[cm]
+	double  y[10][769];//[cm]
+	int bad[10][769];// 0 if OK
+	int seg[10][769];
+};
+
 class MainGUI : public QMainWindow{
 	Q_OBJECT
 
@@ -43,16 +61,13 @@ private:
 	DashBoard* m_DashBoard;
 	CMotor m_motor;
 	Cstar m_StarGazer;
-	CUPURG m_cURG;
+	CUPURG m_cURG;	
 	bool Init();
-	int m_timerId;									//计数器查询将机器人数据显示在仪表盘中
+	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	StarMark m_MARK[100];							//LED定位标签数组 - 每块边长455
 	void InitStarMark();							//为LED定位标签数组赋值
-	void InitComm();								//电机星标激光串口初始化
-	int m_laser_data_postpro[1000];					//激光最远返回值(单位cm)
-	CWinThread* pThread_Read_Laser;					//读激光数据线程
+	void InitCommMotorAndStar();								//电机星标串口初始化
 	virtual void timerEvent(QTimerEvent *event);
-	UINT ThreadReadLaser_Data(LPVOID lpParam);		//读激光数据函数
 
 private slots:
 	int OnBtnRobotQ();

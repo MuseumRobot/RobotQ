@@ -327,9 +327,7 @@ bool RobotQ::CheckAndUpdataAuth(){
 	HCI_ERR_CODE errCode = hci_get_auth_expire_time( &nExpireTime );
 	if( errCode == HCI_ERR_NONE ){
 		//获取成功则判断是否过期
-		if( nExpireTime > nCurTime ){
-			//没有过期
-			qDebug()<<"auth can use continue";
+		if( nExpireTime > nCurTime ){	//没有过期
 			return true;
 		}
 	}
@@ -337,7 +335,6 @@ bool RobotQ::CheckAndUpdataAuth(){
 	//手动调用更新授权
 	errCode = hci_check_auth();
 	if( errCode == HCI_ERR_NONE ){	//更新成功
-		qDebug()<<"check auth success";
 		return true;
 	}
 	else{	//更新失败
