@@ -43,8 +43,13 @@ MainGUI::~MainGUI(){
 	delete m_RobotQ;
 	delete m_ManualControl;
 	delete m_DashBoard;
+	m_cURG.SwitchOff();		//关闭激光
 }
 bool MainGUI::Init(){
+	//启动时就开启各面板
+	OnBtnDashBoard();
+	OnBtnManualControl();
+	OnBtnRobotQ();
 	
 	InitStarMark();		//LED标签数组赋值
 	InitCommMotorAndStar();			//串口初始化Motor/Star
@@ -60,14 +65,17 @@ bool MainGUI::Init(){
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
+	m_RobotQ->move(800,435);
 	m_RobotQ->show();
 	return 0;
 }
 int MainGUI::OnBtnManualControl(){
+	m_ManualControl->move(300,20);
 	m_ManualControl->show();
 	return 0;
 }
 int MainGUI::OnBtnDashBoard(){
+	m_DashBoard->move(750,20);
 	m_DashBoard->show();
 	return 0;
 }

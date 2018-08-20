@@ -7,6 +7,7 @@ int main(int argc, char *argv[]){
 	QApplication a(argc, argv);
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("GBK"));
 	MainGUI w;
+	w.move(20,20);
 	w.show();
 	return a.exec();
 }
