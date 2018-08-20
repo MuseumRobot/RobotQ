@@ -3,12 +3,14 @@
 //若干对象需要自始至终存在于主界面中
 CUPURG m_cURG;									//激光对象
 CWinThread* pThread_Read_Laser;					//读激光数据线程
+//CWinThread* pThread_Cal_Obstacle_Dist;			//计算障碍物距离线程
 UINT ThreadReadLaser_Data(LPVOID lpParam);		//读激光数据函数
 bool is_Comm_URG_Open = false;					//初始化激光未开启
 bool key_laser = false;							//激光数据存储位置开关
 void InitCommLaser();							//激光串口初始化
-int m_laser_data_postpro[1000];					//激光最远返回值(单位cm)
-int m_laser_data_raw[1000];
+//float sectorObstacleDistance[36];				//每五度划分一个扇区
+int m_laser_data_postpro[768];					//激光最远返回值(单位cm)
+int m_laser_data_raw[768];
 int m_Laser_Data_Point_PostPro;
 CEvent wait_data;
 CEvent wait_laserpose;
@@ -19,7 +21,7 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_RobotQ=new RobotQ(this);	//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
-	m_timer_refresh_dashboard=startTimer(1000);		//计数器查询显示机器状态
+	m_timer_refresh_dashboard=startTimer(500);		//计数器查询显示机器状态
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
@@ -69,19 +71,19 @@ int MainGUI::OnBtnDashBoard(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	m_motor.VectorMove(1200,0);
+	m_motor.VectorMove(800,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
-	m_motor.VectorMove(-1200,0);
+	m_motor.VectorMove(-800,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
-	m_motor.VectorMove(200,2);
+	m_motor.VectorMove(0,1);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
-	m_motor.VectorMove(200,-2);
+	m_motor.VectorMove(0,-1);
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){
@@ -96,6 +98,8 @@ int MainGUI::On_MC_BtnRobotQSpeak(){
 }
 void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
+		CalculateSectorDistance();		//计算扇区内障碍物距离
+		refreshDashboardSector();		//刷新障碍物分布图
 		//刷新仪表盘数据
 		if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
 		PosByStar1=QPointF(0.00,0.00);
@@ -135,9 +139,6 @@ UINT ThreadReadLaser_Data(LPVOID lpParam){
 			Info_laser_data.m_Laser_Data_Value[i]=m_cURG.m_distVal_temp_test[key_laser][i];
 			m_laser_data_raw[i]=m_cURG.m_distVal_temp_test[key_laser][i];
 			m_laser_data_postpro[i] = m_cURG.m_distVal_temp_test[key_laser][i];
-			if(i%10==0){
-				qDebug()<<m_laser_data_postpro[i];
-			}
 		}
 		wait_data.SetEvent();
 		m_cURG.wait_laser.ResetEvent();
@@ -234,6 +235,104 @@ void InitCommLaser(){
 		m_cURG.SCIP20();	
 		m_cURG.GetDataByGD(0,768,1);
 		pThread_Read_Laser=AfxBeginThread(ThreadReadLaser_Data,&Info_laser_data);
+		//pThread_Cal_Obstacle_Dist=AfxBeginThread(CalculateSectorDistance,&sectorObstacleDistance);
 		is_Comm_URG_Open = true;
 	}	
+}
+void MainGUI::CalculateSectorDistance(){
+	for(int i=0;i<36;i++)sectorObstacleDistance[i]=0.0;
+	int sectorId = 0;
+	while(sectorId < 36){	//从6到762这21*36条射线中结果分析
+		int n = 0;	//扇区中有障碍物的射线数
+		float sum = 0.0;	//障碍物距离总值
+		for(int i=0;i<21;i++){
+			int k=sectorId*21+i;
+			if(m_laser_data_postpro[k]>100&&m_laser_data_postpro[k]<50000){
+				sum += m_laser_data_postpro[k];
+				n++;
+			}
+		}
+		if(n>0){
+			sectorObstacleDistance[sectorId] = sum/n;
+		}
+		sectorId++;
+	}
+}
+void MainGUI::refreshDashboardSector(){
+	float threshold = 2000.0;
+	bool flag = false;
+	m_DashBoard->ui.r5->setChecked(flag);
+	m_DashBoard->ui.r10->setChecked(flag);
+	m_DashBoard->ui.r15->setChecked(flag);
+	m_DashBoard->ui.r20->setChecked(flag);
+	m_DashBoard->ui.r25->setChecked(flag);
+	m_DashBoard->ui.r30->setChecked(flag);
+	m_DashBoard->ui.r35->setChecked(flag);
+	m_DashBoard->ui.r40->setChecked(flag);
+	m_DashBoard->ui.r45->setChecked(flag);
+	m_DashBoard->ui.r50->setChecked(flag);
+	m_DashBoard->ui.r55->setChecked(flag);
+	m_DashBoard->ui.r60->setChecked(flag);
+	m_DashBoard->ui.r65->setChecked(flag);
+	m_DashBoard->ui.r70->setChecked(flag);
+	m_DashBoard->ui.r75->setChecked(flag);
+	m_DashBoard->ui.r80->setChecked(flag);
+	m_DashBoard->ui.r85->setChecked(flag);
+	m_DashBoard->ui.r90->setChecked(flag);
+	m_DashBoard->ui.r95->setChecked(flag);
+	m_DashBoard->ui.r100->setChecked(flag);
+	m_DashBoard->ui.r105->setChecked(flag);
+	m_DashBoard->ui.r110->setChecked(flag);
+	m_DashBoard->ui.r115->setChecked(flag);
+	m_DashBoard->ui.r120->setChecked(flag);
+	m_DashBoard->ui.r125->setChecked(flag);
+	m_DashBoard->ui.r130->setChecked(flag);
+	m_DashBoard->ui.r135->setChecked(flag);
+	m_DashBoard->ui.r140->setChecked(flag);
+	m_DashBoard->ui.r145->setChecked(flag);
+	m_DashBoard->ui.r150->setChecked(flag);
+	m_DashBoard->ui.r155->setChecked(flag);
+	m_DashBoard->ui.r160->setChecked(flag);
+	m_DashBoard->ui.r165->setChecked(flag);
+	m_DashBoard->ui.r170->setChecked(flag);
+	m_DashBoard->ui.r175->setChecked(flag);
+	m_DashBoard->ui.r180->setChecked(flag);
+	flag = true;
+	int N = 35;
+	if(sectorObstacleDistance[N-0]<threshold)m_DashBoard->ui.r5->setChecked(flag);
+	if(sectorObstacleDistance[N-1]<threshold)m_DashBoard->ui.r10->setChecked(flag);
+	if(sectorObstacleDistance[N-2]<threshold)m_DashBoard->ui.r15->setChecked(flag);
+	if(sectorObstacleDistance[N-3]<threshold)m_DashBoard->ui.r20->setChecked(flag);
+	if(sectorObstacleDistance[N-4]<threshold)m_DashBoard->ui.r25->setChecked(flag);
+	if(sectorObstacleDistance[N-5]<threshold)m_DashBoard->ui.r30->setChecked(flag);
+	if(sectorObstacleDistance[N-6]<threshold)m_DashBoard->ui.r35->setChecked(flag);
+	if(sectorObstacleDistance[N-7]<threshold)m_DashBoard->ui.r40->setChecked(flag);
+	if(sectorObstacleDistance[N-8]<threshold)m_DashBoard->ui.r45->setChecked(flag);
+	if(sectorObstacleDistance[N-9]<threshold)m_DashBoard->ui.r50->setChecked(flag);
+	if(sectorObstacleDistance[N-10]<threshold)m_DashBoard->ui.r55->setChecked(flag);
+	if(sectorObstacleDistance[N-11]<threshold)m_DashBoard->ui.r60->setChecked(flag);
+	if(sectorObstacleDistance[N-12]<threshold)m_DashBoard->ui.r65->setChecked(flag);
+	if(sectorObstacleDistance[N-13]<threshold)m_DashBoard->ui.r70->setChecked(flag);
+	if(sectorObstacleDistance[N-14]<threshold)m_DashBoard->ui.r75->setChecked(flag);
+	if(sectorObstacleDistance[N-15]<threshold)m_DashBoard->ui.r80->setChecked(flag);
+	if(sectorObstacleDistance[N-16]<threshold)m_DashBoard->ui.r85->setChecked(flag);
+	if(sectorObstacleDistance[N-17]<threshold)m_DashBoard->ui.r90->setChecked(flag);
+	if(sectorObstacleDistance[N-18]<threshold)m_DashBoard->ui.r95->setChecked(flag);
+	if(sectorObstacleDistance[N-19]<threshold)m_DashBoard->ui.r100->setChecked(flag);
+	if(sectorObstacleDistance[N-20]<threshold)m_DashBoard->ui.r105->setChecked(flag);
+	if(sectorObstacleDistance[N-21]<threshold)m_DashBoard->ui.r110->setChecked(flag);
+	if(sectorObstacleDistance[N-22]<threshold)m_DashBoard->ui.r115->setChecked(flag);
+	if(sectorObstacleDistance[N-23]<threshold)m_DashBoard->ui.r120->setChecked(flag);
+	if(sectorObstacleDistance[N-24]<threshold)m_DashBoard->ui.r125->setChecked(flag);
+	if(sectorObstacleDistance[N-25]<threshold)m_DashBoard->ui.r130->setChecked(flag);
+	if(sectorObstacleDistance[N-26]<threshold)m_DashBoard->ui.r135->setChecked(flag);
+	if(sectorObstacleDistance[N-27]<threshold)m_DashBoard->ui.r140->setChecked(flag);
+	if(sectorObstacleDistance[N-28]<threshold)m_DashBoard->ui.r145->setChecked(flag);
+	if(sectorObstacleDistance[N-29]<threshold)m_DashBoard->ui.r150->setChecked(flag);
+	if(sectorObstacleDistance[N-30]<threshold)m_DashBoard->ui.r155->setChecked(flag);
+	if(sectorObstacleDistance[N-31]<threshold)m_DashBoard->ui.r160->setChecked(flag);
+	if(sectorObstacleDistance[N-32]<threshold)m_DashBoard->ui.r165->setChecked(flag);
+	if(sectorObstacleDistance[N-33]<threshold)m_DashBoard->ui.r170->setChecked(flag);
+	if(sectorObstacleDistance[N-34]<threshold)m_DashBoard->ui.r175->setChecked(flag);
+	if(sectorObstacleDistance[N-35]<threshold)m_DashBoard->ui.r180->setChecked(flag);
 }

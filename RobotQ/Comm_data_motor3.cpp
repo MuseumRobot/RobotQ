@@ -237,15 +237,15 @@ bool CMotor::stop(){
 void CMotor::VectorMove(float inLV, float inPSpeed){	
 	//两个参数代表机器人运动的线速度，机器人运动的角速度
 	float Vx,Vy;
-	if(m_speedslowchang-inLV>800||m_speedslowchang-inLV<-800){
-		inLV=inLV/3+2*m_speedslowchang/3;
-	}
-	m_speedslowchang=inLV;
+	//if(m_speedslowchang-inLV>800||m_speedslowchang-inLV<-800){
+	//	inLV=inLV/3+2*m_speedslowchang/3;
+	//}
+	//m_speedslowchang=inLV;
 
-	if(m_wlowchang-inPSpeed>1.0||m_wlowchang-inPSpeed<-1.0){
-		inPSpeed=inPSpeed/3+2*m_wlowchang/3;
-	}
-	m_wlowchang=inPSpeed;
+	//if(m_wlowchang-inPSpeed>1.0||m_wlowchang-inPSpeed<-1.0){
+	//	inPSpeed=inPSpeed/3+2*m_wlowchang/3;
+	//}
+	//m_wlowchang=inPSpeed;
 
 	float Radius_robot =     200.0;  // robot radius: 18cm
 	float Wheel_radius = 50.00; ////mm

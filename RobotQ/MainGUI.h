@@ -63,10 +63,14 @@ private:
 	Cstar m_StarGazer;
 	CUPURG m_cURG;	
 	bool Init();
+	float sectorObstacleDistance[36];				//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
+	int m_timer_refresh_task;						//计数器查询刷新当前任务
 	StarMark m_MARK[100];							//LED定位标签数组 - 每块边长455
 	void InitStarMark();							//为LED定位标签数组赋值
-	void InitCommMotorAndStar();								//电机星标串口初始化
+	void InitCommMotorAndStar();					//电机星标串口初始化
+	void CalculateSectorDistance();					//计算扇区内障碍物的距离
+	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	virtual void timerEvent(QTimerEvent *event);
 
 private slots:
