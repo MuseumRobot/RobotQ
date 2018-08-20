@@ -17,13 +17,12 @@
 #define COMM_STAR 4		//星标定位串口
 #define COMM_LASER 5	//激光传感器串口号
 
-struct StarMark{
+typedef struct StarMark{
 	int markID;
 	float mark_angle;
 	float mark_x;
 	float mark_y;
-};
-extern struct StarMark MARK[100];
+}StarMark;
 
 class MainGUI : public QMainWindow{
 	Q_OBJECT
@@ -42,11 +41,14 @@ private:
 	RobotQ* m_RobotQ;
 	ManualControl* m_ManualControl;
 	DashBoard* m_DashBoard;
-	CMotor motor;
-	Cstar StarGazer;
+	CMotor m_motor;
+	Cstar m_StarGazer;
 	CUPURG m_cURG;
 	bool Init();
 	int m_timerId;									//计数器查询将机器人数据显示在仪表盘中
+	StarMark m_MARK[100];							//LED定位标签数组 - 每块边长455
+	void InitStarMark();							//为LED定位标签数组赋值
+	void InitComm();								//电机星标激光串口初始化
 	int m_laser_data_postpro[1000];					//激光最远返回值(单位cm)
 	CWinThread* pThread_Read_Laser;					//读激光数据线程
 	virtual void timerEvent(QTimerEvent *event);

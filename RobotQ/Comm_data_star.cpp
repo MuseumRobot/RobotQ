@@ -28,18 +28,14 @@ void Cstar::Parse(BYTE inData){
 			m_bFrameStart=true;
 			m_nRecvindex = 0;
 			m_recvbuf[m_nRecvindex]=inData;
-			if (!key)
-			{
+			if (!key){
 				m_pInBuffer1 += inData;
-			}
-			else
-			{
+			}else{
 				m_pInBuffer1 += inData;
 			}
 			
 		}
-	}
-	else{
+	}else{
 		m_nRecvindex++;
 		m_recvbuf[m_nRecvindex]=inData;
 		if (m_recvbuf[2] == '1'){
@@ -63,26 +59,19 @@ void Cstar::Parse(BYTE inData){
 		}else{
 			m_pInBuffer1 += inData;
 		}
-
 		if (inData=='`'){
-			//memset(m_recvbuf,0x00,sizeof(m_recvbuf));
 			m_bFrameStart=false;
-		//	memcpy(m_recvbuf_temp[key],m_recvbuf,sizeof(m_recvbuf));
 			key = !key;
 			m_ParseFrame();
-		//	wait_star.SetEvent();
-			//m_ParseFrame();
 		}
 	}
-	
 }
 
 #define MAX_MARK_NUM 3
 
 void Cstar::m_ParseFrame(void){
 	int num_ETX	= m_pInBuffer1.Find('`');
-	int len		=  m_pInBuffer1.GetLength();
-
+	int len	= m_pInBuffer1.GetLength();
 	int count=0;
 	int data_len;
 	int num_of_Landmark;
@@ -103,19 +92,14 @@ void Cstar::m_ParseFrame(void){
 		else if ( m_pBuffer.Left(2)=="~$"){
 			m_pRecvGet =  m_pBuffer;
 			strGetData =  m_pBuffer;
-
 			data_len = strGetData.GetLength();
 			strGetData = strGetData.Left(data_len-1);
-
 			data_len = strGetData.GetLength();
 			strGetData = strGetData.Right(data_len-2);
-
 			AfxExtractSubString(strToken, strGetData, 0, '|');
 			strCommand = strToken;
-
 			AfxExtractSubString(strToken, strGetData, 1, '|');
 			strData = strToken;
-
 			if (strCommand=="Version")			m_pVersion_Get = strData;
 			else if (strCommand=="MarkType")	m_pMarkType_Get = strData;
 			else if (strCommand=="MarkMode")	m_pMarkMode_Get = strData;
@@ -127,7 +111,6 @@ void Cstar::m_ParseFrame(void){
 		}else if ( m_pBuffer.Left(2)=="~^"){
 			m_pRecvData =  m_pBuffer;
 			strGetData =  m_pBuffer;
-
 			temp = strGetData[2];
 			if(temp == 'I'){
 				num_of_Landmark = 1;
@@ -135,40 +118,28 @@ void Cstar::m_ParseFrame(void){
 				num_of_Landmark = temp - '0';
 				if (num_of_Landmark<=0 || num_of_Landmark>35) return ;
 			}
-
 			data_len = strGetData.GetLength();
 			strGetData = strGetData.Left(data_len-1);
-
 			data_len = strGetData.GetLength();
 			strGetData = strGetData.Right(data_len-3);
-
 			while (AfxExtractSubString(strToken, strGetData, count, '|')!=NULL){
 				strReceiveData[count++] = strToken;
 			}
-
-			// 데이터 갯수 체크 루틴
 			if (count!=num_of_Landmark*5) return ;
-			//
-
-			// 데이터 출력
 			for (int i=0; i<num_of_Landmark; i++){
 				m_pData_IDNum[i] = strReceiveData[i*5+0];
 				m_pData_Angle[i] = strReceiveData[i*5+1];
 				m_pData_X[i] = strReceiveData[i*5+2];
 				m_pData_Y[i] = strReceiveData[i*5+3];
 				m_pData_Z[i] = strReceiveData[i*5+4];
-
 				strLogData = strLogData + m_pData_IDNum[i] + " " + m_pData_Angle[i] + " " + m_pData_X[i] + " " + m_pData_Y[i] + " " + m_pData_Z[i] + "\n";
 			}
-
-
 			times++;
 			newID = _ttof(m_pData_IDNum[0]);
 			sumID += newID;
 			sumAngle +=  _ttof(m_pData_Angle[0]);
 			sumX +=  _ttof(m_pData_X[0]);
 			sumY +=  _ttof(m_pData_Y[0]);
-
 			if (times == 4){
 				if(sumID/times == newID){
 					starID = newID;					
@@ -191,25 +162,13 @@ void Cstar::m_ParseFrame(void){
 				sumX = 0.00;
 				sumY = 0.00;
 			}
-		//	starID = _ttof(m_pData_IDNum[0]);
-		//	starAngel = _ttof(m_pData_Angle[0]);
-		//	starX = _ttof(m_pData_X[0]);
-		//	starY = _ttof(m_pData_Y[0]);
-
 			if(LandmarkNum == 2){
-				/*starID2 = _ttof(m_pData_IDNum[1]);
-				starAngel2 = _ttof(m_pData_Angle[1]);
-				starX2 = _ttof(m_pData_X[1]);
-				starY2 = _ttof(m_pData_Y[1]);*/
-
-
 				times2++;
 				newID2 = _ttof(m_pData_IDNum[1]);
 				sumID2 += newID2;
 				sumAngle2 +=  _ttof(m_pData_Angle[1]);
 				sumX2 +=  _ttof(m_pData_X[1]);
 				sumY2 +=  _ttof(m_pData_Y[1]);
-
 				if (times2 == 4){
 					if(sumID2/times2 == newID2){
 						starID2 = newID2;
@@ -232,16 +191,6 @@ void Cstar::m_ParseFrame(void){
 					sumX2 = 0.00;
 					sumY2 = 0.00;
 				}
-				////////////xhy
-				//if(starID2==starID)
-				//{
-				//	times2 = 0;
-				//	sumID2 = 0.00;
-				//	sumAngle2 = 0.00;
-				//	sumX2 = 0.00;
-				//	sumY2 = 0.00;
-				//}
-				///////////////////
 			}else if (LandmarkNum == 1){
 				times2 = 0;
 				sumID2 = 0.00;

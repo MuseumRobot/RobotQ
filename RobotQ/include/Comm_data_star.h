@@ -13,7 +13,7 @@ public:
 	bool m_bFrameStart;
 	BYTE m_recvbuf[90];
 	BYTE m_recvbuf_temp[2][90];
-	bool key; //数据存储控制开关 false--m_pInBuffer1接收;ture--m_pInBuffer2接收
+	bool key;		//数据存储控制开关 false--m_pInBuffer1接收;ture--m_pInBuffer2接收
 	int m_nRecvindex;
 	int m_nFrameLen;
 	int m_buffer_maxnum;

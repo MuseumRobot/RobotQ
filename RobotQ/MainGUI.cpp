@@ -1,80 +1,5 @@
 #include "MainGUI.h"
 
-struct StarMark MARK[100]={ //LED定位标签数组
-	//每块边长455
-	MARK[0].markID = 624,
-	MARK[0].mark_angle = 0.00,
-	MARK[0].mark_x = -427,
-	MARK[0].mark_y = 10,
-
-
-	MARK[1].markID = 610,
-	MARK[1].mark_angle = 0.00,
-	MARK[1].mark_x = -344,
-	MARK[1].mark_y = 132,
-
-	MARK[2].markID = 594, 
-	MARK[2].mark_angle = 0.00,
-	MARK[2].mark_x = -212,
-	MARK[2].mark_y = 0,
-
-	MARK[3].markID = 608,
-	MARK[3].mark_angle = 0.00,
-	MARK[3].mark_x = -20,
-	MARK[3].mark_y = 30,
-
-	MARK[4].markID = 626,
-	MARK[4].mark_angle = 0.00,
-	MARK[4].mark_x = -195,
-	MARK[4].mark_y = 179,
-
-	MARK[5].markID = 592,
-	MARK[5].mark_angle = 0.00,
-	MARK[5].mark_x = -6,
-	MARK[5].mark_y = 177,
-
-
-	MARK[6].markID = 560,
-	MARK[6].mark_angle = 0.00,
-	MARK[6].mark_x = 160,
-	MARK[6].mark_y = 12,
-
-	MARK[7].markID = 546,
-	MARK[7].mark_angle = 0.00,
-	MARK[7].mark_x = 150,
-	MARK[7].mark_y = 183,
-
-	MARK[8].markID = 578,
-	MARK[8].mark_angle = 0.00,
-	MARK[8].mark_x = 140,
-	MARK[8].mark_y = 377,
-
-	MARK[9].markID = 544,
-	MARK[9].mark_angle = 0.00,
-	MARK[9].mark_x = 309,
-	MARK[9].mark_y = 358,
-
-	MARK[10].markID = 576,
-	MARK[10].mark_angle = 0.00,
-	MARK[10].mark_x = 138,
-	MARK[10].mark_y = 540,
-
-	MARK[11].markID = 16,
-	MARK[11].mark_angle = 0.00,
-	MARK[11].mark_x = 308,
-	MARK[11].mark_y = 168,
-
-	MARK[12].markID = 562,
-	MARK[12].mark_angle = 0.00,
-	MARK[12].mark_x = 311,
-	MARK[12].mark_y = 528,
-
-	MARK[13].markID = 530,
-	MARK[13].mark_angle = 0.00,
-	MARK[13].mark_x = 309,
-	MARK[13].mark_y = 1,
-};
-
 MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	ui.setupUi(this);
 	m_RobotQ=new RobotQ(this);	//初始化这些成员对象需要在connect前
@@ -103,30 +28,18 @@ MainGUI::~MainGUI(){
 	delete m_DashBoard;
 }
 bool MainGUI::Init(){
-	// 串口初始化Motor/Star/Urg
-	if(motor.open_com_motor(COMM_MOTOR)){
-		m_DashBoard->ui.ck_Motor->setChecked(true);
-		motor.VectorMove(1200,2);	//启动电机后漂移示意
-	}
-	if(StarGazer.open_com(COMM_STAR)){
-		m_DashBoard->ui.ck_Star->setChecked(true);
-	}
-	for(int loop=0;loop<1000;loop++){
-		m_laser_data_postpro[loop] = 50000;
-	}
-	if (m_cURG.Create(COMM_LASER)){
-		m_cURG.SwitchOn();
-		m_cURG.SCIP20();	
-		m_cURG.GetDataByGD(0,768,1);
-		//pThread_Read_Laser=AfxBeginThread(ThreadReadLaser_Data,&Info_laser_data);
-		m_DashBoard->ui.ck_URG->setChecked(true);
-	}
+	
+	InitStarMark();		//LED标签数组赋值
+
+	InitComm();			// 串口初始化Motor/Star/Urg
+
 	//仪表盘数据初始化
 	PosByStar1=QPointF(0.00,0.00);
 	PosByStar2=QPointF(0.00,0.00);
 	PosByMotor=QPointF(0.00,0.00);
 	PosSafe=QPointF(0.00,0.00);
 	PosGoal=QPointF(0.00,0.00);
+
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
@@ -142,23 +55,23 @@ int MainGUI::OnBtnDashBoard(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	motor.VectorMove(1200,0);
+	m_motor.VectorMove(1200,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
-	motor.VectorMove(-1200,0);
+	m_motor.VectorMove(-1200,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
-	motor.VectorMove(200,2);
+	m_motor.VectorMove(200,2);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
-	motor.VectorMove(200,-2);
+	m_motor.VectorMove(200,-2);
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){
-	motor.stop();
+	m_motor.stop();
 	return 0;
 }
 int MainGUI::On_MC_BtnRobotQSpeak(){
@@ -173,19 +86,19 @@ void MainGUI::timerEvent(QTimerEvent *event){
 		PosByStar1=QPointF(0.00,0.00);
 		PosByStar2=QPointF(0.00,0.00);
 		for (int loop_mark = 0; loop_mark < 14; loop_mark++){
-			if (MARK[loop_mark].markID == StarGazer.starID){
-				PosByStar1.setX(MARK[loop_mark].mark_x + StarGazer.starX);
-				PosByStar1.setY(MARK[loop_mark].mark_y + StarGazer.starY);
+			if (m_MARK[loop_mark].markID == m_StarGazer.starID){
+				PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
+				PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
 			}
-			if (MARK[loop_mark].markID == StarGazer.starID2){
-				PosByStar2.setX(MARK[loop_mark].mark_x + StarGazer.starX2);
-				PosByStar2.setY(MARK[loop_mark].mark_y + StarGazer.starY2);
+			if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
+				PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
+				PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
 			}
 		}
 		QString str;
-		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar1.x(),PosByStar1.y(),StarGazer.starID);
+		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar1.x(),PosByStar1.y(),m_StarGazer.starID);
 		m_DashBoard->ui.posStar1->setText(str);
-		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar2.x(),PosByStar2.y(),StarGazer.starID2);
+		str.sprintf("(%.2f,%.2f) - (%d)",PosByStar2.x(),PosByStar2.y(),m_StarGazer.starID2);
 		m_DashBoard->ui.posStar2->setText(str);
 		str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
 		m_DashBoard->ui.posMotor->setText(str);
@@ -223,4 +136,94 @@ UINT MainGUI::ThreadReadLaser_Data(LPVOID lpParam){
 	//	wait_laserpose.SetEvent();
 	//}
 	return 0;
+}
+void MainGUI::InitStarMark(){
+	m_MARK[0].markID = 624;
+	m_MARK[0].mark_angle = 0.00;
+	m_MARK[0].mark_x = -427;
+	m_MARK[0].mark_y = 10;
+
+	m_MARK[1].markID = 610;
+	m_MARK[1].mark_angle = 0.00;
+	m_MARK[1].mark_x = -344;
+	m_MARK[1].mark_y = 132;
+
+	m_MARK[2].markID = 594;
+	m_MARK[2].mark_angle = 0.00;
+	m_MARK[2].mark_x = -212;
+	m_MARK[2].mark_y = 0;
+
+	m_MARK[3].markID = 608;
+	m_MARK[3].mark_angle = 0.00;
+	m_MARK[3].mark_x = -20;
+	m_MARK[3].mark_y = 30;
+
+	m_MARK[4].markID = 626;
+	m_MARK[4].mark_angle = 0.00;
+	m_MARK[4].mark_x = -195;
+	m_MARK[4].mark_y = 179;
+
+	m_MARK[5].markID = 592;
+	m_MARK[5].mark_angle = 0.00;
+	m_MARK[5].mark_x = -6;
+	m_MARK[5].mark_y = 177;
+
+	m_MARK[6].markID = 560;
+	m_MARK[6].mark_angle = 0.00;
+	m_MARK[6].mark_x = 160;
+	m_MARK[6].mark_y = 12;
+
+	m_MARK[7].markID = 546;
+	m_MARK[7].mark_angle = 0.00;
+	m_MARK[7].mark_x = 150;
+	m_MARK[7].mark_y = 183;
+
+	m_MARK[8].markID = 578;
+	m_MARK[8].mark_angle = 0.00;
+	m_MARK[8].mark_x = 140;
+	m_MARK[8].mark_y = 377;
+
+	m_MARK[9].markID = 544;
+	m_MARK[9].mark_angle = 0.00;
+	m_MARK[9].mark_x = 309;
+	m_MARK[9].mark_y = 358;
+
+	m_MARK[10].markID = 576;
+	m_MARK[10].mark_angle = 0.00;
+	m_MARK[10].mark_x = 138;
+	m_MARK[10].mark_y = 540;
+
+	m_MARK[11].markID = 16;
+	m_MARK[11].mark_angle = 0.00;
+	m_MARK[11].mark_x = 308;
+	m_MARK[11].mark_y = 168;
+
+	m_MARK[12].markID = 562;
+	m_MARK[12].mark_angle = 0.00;
+	m_MARK[12].mark_x = 311;
+	m_MARK[12].mark_y = 528;
+
+	m_MARK[13].markID = 530;
+	m_MARK[13].mark_angle = 0.00;
+	m_MARK[13].mark_x = 309;
+	m_MARK[13].mark_y = 1;
+}
+void MainGUI::InitComm(){
+	if(m_motor.open_com_motor(COMM_MOTOR)){
+		m_DashBoard->ui.ck_Motor->setChecked(true);
+		m_motor.VectorMove(1200,2);	//启动电机后漂移示意
+	}
+	if(m_StarGazer.open_com(COMM_STAR)){
+		m_DashBoard->ui.ck_Star->setChecked(true);
+	}
+	for(int loop=0;loop<1000;loop++){
+		m_laser_data_postpro[loop] = 50000;
+	}
+	if (m_cURG.Create(COMM_LASER)){
+		m_cURG.SwitchOn();
+		m_cURG.SCIP20();	
+		m_cURG.GetDataByGD(0,768,1);
+		//pThread_Read_Laser=AfxBeginThread(ThreadReadLaser_Data,&Info_laser_data);
+		m_DashBoard->ui.ck_URG->setChecked(true);
+	}
 }
