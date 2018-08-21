@@ -12,17 +12,10 @@
 #include "include/SerialCom.h"
 #include <afxmt.h>
 
-extern int m_distVal_temp_temp[1000];
 extern int m_nValPoint_temp;//m_distVal的长度
 
 #define URG_RECVBUF_LEN 3072
-struct Beam{
-	double left_angle, right_angle;		//扇区的实际角度
-	double width_of_angle;				//right_angle-left_angle
-	double left_dis,right_dis,min_distance;
-	double width;
-	int m_Obstacle;						//=1时,扇区为障碍物
-};
+
 /***                 ***/
 class CUPURG : public CSerialCom{
 public:
@@ -47,7 +40,7 @@ public:
 	bool key;				//数据存储控制开关,false--m_distVal_temp_test[0]接收;ture--m_distVal_temp_test[1]接收
 	void fileter(int * p);
 	int *m_distVal_temp;
-	double m_distVal_temp_test[2][1000];
+	double m_distVal_temp_test[2][768];
 	double robotPosition_x;
 	double robotPosition_y;
 	int target_angle;		//the angle between robot and target 0-72 ,correspond to m_vfh[72]

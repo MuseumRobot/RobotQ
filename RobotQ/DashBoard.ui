@@ -174,7 +174,7 @@
           <item>
            <widget class="QLineEdit" name="posStar1">
             <property name="text">
-             <string>(0.0,0.0)</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -204,7 +204,7 @@
           <item>
            <widget class="QLineEdit" name="posStar2">
             <property name="text">
-             <string>(0.0,0.0)</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -234,7 +234,7 @@
           <item>
            <widget class="QLineEdit" name="posMotor">
             <property name="text">
-             <string>(0.0,0.0)</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -264,7 +264,7 @@
           <item>
            <widget class="QLineEdit" name="posSafe">
             <property name="text">
-             <string>(0.0,0.0)</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -294,7 +294,7 @@
           <item>
            <widget class="QLineEdit" name="posGoal">
             <property name="text">
-             <string>(325.3,-23.5)</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -321,7 +321,7 @@
           <item>
            <widget class="QLineEdit" name="text_Todolist">
             <property name="text">
-             <string>1,7,5,2,4</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -339,7 +339,7 @@
           <item>
            <widget class="QLineEdit" name="text_CurrentTaskId">
             <property name="text">
-             <string>1</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -627,7 +627,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -671,7 +671,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -781,7 +781,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -963,7 +963,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -1051,7 +1051,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -1095,7 +1095,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -1161,7 +1161,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -1183,7 +1183,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>false</bool>
@@ -1237,8 +1237,7 @@
         <item>
          <widget class="QPlainTextEdit" name="textStatus">
           <property name="plainText">
-           <string>02:45:33 准备前行（线速度1200，角速度0）
-02:47:21 准备左转（线速度200，角速度2）</string>
+           <string/>
           </property>
          </widget>
         </item>

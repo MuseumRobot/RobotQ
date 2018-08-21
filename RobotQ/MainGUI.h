@@ -35,19 +35,6 @@ struct threadInfo_laser_data{
 	int	m_Laser_Data_Point;
 };
 
-//激光测距器数据读取结构参数
-struct threadInfo_laser_data_postpro{
-	double 	m_Laser_Data_Value_PostPro[768];
-	int	m_Laser_Data_Point_PostPro;
-	double rx;
-	double ry;   //robot odometry pos
-	double  th;   //robot orientation 
-	double  x[10][769];//[cm]
-	double  y[10][769];//[cm]
-	int bad[10][769];// 0 if OK
-	int seg[10][769];
-};
-
 class MainGUI : public QMainWindow{
 	Q_OBJECT
 
@@ -71,17 +58,15 @@ private:
 	CMotor m_motor;
 	Cstar m_StarGazer;
 	CUPURG m_cURG;	
-	float m_EMERGENCY_DISTANCE;						//紧急制动距离，单位mm
 	bool is_Auto_Mode_Open;
 	bool is_mission_accomplished;					//当前任务是否完成
 	bool is_project_accomplished;					//当前项目是否完成
 	bool is_path_clear;								//当前视野下前方是否通畅
 	bool is_dodge_moment;							//是否进入闪避时刻
-	bool is_time_to_dodge_right;					//是时候向右闪避次了吗
-	bool is_time_to_dodge_left;						//是时候向左转向修正闪避了吗
-	int dodge_right_times;							//开启闪避时刻后右躲避动作是否经历了许多次
+	int dodge_move_times;							//开启闪避时刻后右躲避动作是否经历了许多次
 	int Emergency_times;							//连续紧急制动3次后拒绝紧急制动转而避障
-	float sectorObstacleDistance[36];				//每五度划分一个扇区
+	int m_EMERGENCY_DISTANCE;						//紧急制动距离，单位mm
+	int sectorObstacleDistance[36];				//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
 	int m_timer_refresh_emergency_distance;			//计数器刷新紧急制动距离
@@ -96,8 +81,7 @@ private:
 	void JudgeForwardSituation();					//判断前路是否通畅
 	void AssignInstruction();						//分配下一步指令
 	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
-	void DodgeTurnRight();							//闪避时刻第一步(向右闪避准则)
-	void DodgeTurnLeft();							//闪避时刻第二步(向右闪避准则)
+	void DodgeTurnRight();							//闪避时刻函数(向右闪避准则)
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
 	float zTool_cos_angle(float angle);					//计算余弦值，参数单位为°
