@@ -17,6 +17,7 @@
 #define COMM_STAR 4		//星标定位串口
 #define COMM_LASER 5	//激光传感器串口号
 #define PI 3.141592653
+#define OBSTACLE_DISTANCE 800	//距离低于这个值将认为是障碍物
 #define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 
 typedef struct StarMark{
@@ -70,17 +71,27 @@ private:
 	bool is_Auto_Mode_Open;
 	bool is_mission_accomplished;					//当前任务是否完成
 	bool is_project_accomplished;					//当前项目是否完成
+	bool is_path_clear;								//当前视野下前方是否通畅
+	bool is_dodge_moment;							//是否进入闪避时刻
+	bool is_time_to_dodge_right;					//是时候向右闪避次了吗
+	bool is_time_to_dodge_left;						//是时候向左转向修正闪避了吗
+	int dodge_right_times;						//开启闪避时刻后右躲避动作是否经历了许多次
 	float sectorObstacleDistance[36];				//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
+	int todoList[10];								//任务清单
+	int currentTodoListId;							//当前任务在清单中的下标
 	StarMark m_MARK[100];							//LED定位标签数组 - 每块边长455
 	void Init();									//初始化
 	void InitStarMark();							//为LED定位标签数组赋值
 	void InitCommMotorAndStar();					//电机星标串口初始化
 	void InitDashBoardData();						//仪表盘数据初始化
 	void CalculateSectorDistance();					//计算扇区内障碍物的距离
+	void JudgeForwardSituation();					//判断前路是否通畅
 	void AssignInstruction();						//分配下一步指令
 	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
+	void DodgeTurnRight();							//闪避时刻第一步(向右闪避准则)
+	void DodgeTurnLeft();							//闪避时刻第二步(向右闪避准则)
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
 	float zTool_cos_angle(float angle);					//计算余弦值，参数单位为°

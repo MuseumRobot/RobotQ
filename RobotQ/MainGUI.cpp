@@ -55,15 +55,26 @@ void MainGUI::Init(){
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
 
-
+	currentTodoListId = 0;	//初始化当前todolist的下标为0
+	todoList[0] = 3;	//任务代号3，起点，坐标(178,73)
+	todoList[1] = 5;	//任务代号5，终点，坐标(143,270)
+	todoList[2] = 0;	
+	//todoList[0] = 3;	//任务代号为3，意味着目标坐标为(25,25)，作为起点
+	//todoList[1] = 11;	//朗读任务代号11
+	//todoList[2] = 5;	//任务代号为5，意味着目标坐标为(70,160)
+	//todoList[3] = 2;	//任务代号为2，意味着目标坐标为(30,120)
+	//todoList[4] = 13;	//朗读呵呵呵
+	//todoList[5] = 0;	//当读到任务代号为0时，整个项目完成
 }
 int MainGUI::OnBtnAutoGuide(){
 	if(is_Auto_Mode_Open == true){
 		is_Auto_Mode_Open = false;
 		m_DashBoard->ui.ck_Auto->setChecked(false);
 		ui.btnAutoGuide->setText("开启自动导航");
-		is_mission_accomplished = false;
 	}else{
+		currentTodoListId = 0;
+		is_mission_accomplished = false;
+		is_project_accomplished = false;
 		is_Auto_Mode_Open = true;
 		m_DashBoard->ui.ck_Auto->setChecked(true);
 		ui.btnAutoGuide->setText("关闭自动导航");
@@ -238,7 +249,7 @@ void MainGUI::CalculateSectorDistance(){
 	for(int i=0;i<36;i++)sectorObstacleDistance[i]=0.0;
 	int sectorId = 0;
 	while(sectorId < 36){	//从6到762这21*36条射线中结果分析
-		int n = 0;	//扇区中有障碍物的射线数
+		int n = 0;			//扇区中有障碍物的射线数
 		float sum = 0.0;	//障碍物距离总值
 		for(int i=0;i<21;i++){
 			int k=sectorId*21+i;
@@ -247,14 +258,14 @@ void MainGUI::CalculateSectorDistance(){
 				n++;
 			}
 		}
-		if(n>0){
+		if(n>1){
 			sectorObstacleDistance[sectorId] = sum/n;
 		}
 		sectorId++;
 	}
 }
 void MainGUI::refreshDashboardSector(){
-	float threshold = 2000.0;
+	float threshold = OBSTACLE_DISTANCE;	//激光射线返回的单位为mm
 	bool flag = false;
 	m_DashBoard->ui.r5->setChecked(flag);
 	m_DashBoard->ui.r10->setChecked(flag);
@@ -333,6 +344,7 @@ void MainGUI::refreshDashboardSector(){
 }
 void MainGUI::refreshDashboardData(){
 	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
+	JudgeForwardSituation();		//判断前方是否畅通无阻
 	PosByStar1=QPointF(0.00,0.00);
 	PosByStar2=QPointF(0.00,0.00);
 	for (int loop_mark = 0; loop_mark < 14; loop_mark++){
@@ -341,7 +353,7 @@ void MainGUI::refreshDashboardData(){
 			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
 			AngleByStar1 = m_StarGazer.starAngel;
 			AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
-			AngleSafe = 360.0 - AngleSafe;		//得到机器人本体朝向（逆时针）
+			AngleSafe = 360.0 - AngleSafe;											//得到机器人本体朝向（逆时针）
 			float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
 			float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
 			PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()+dy);
@@ -352,7 +364,17 @@ void MainGUI::refreshDashboardData(){
 			AngleByStar2 = m_StarGazer.starAngel;
 		}
 	}
-	Angle_face_Goal = 180.0 + atan((PosGoal.y()-PosSafe.y())/(PosGoal.x()-PosSafe.x()))/PI/2*360.0;
+	QPointF d = PosGoal - PosSafe;
+	if(d.x() > 0 && d.y() > 0){
+		Angle_face_Goal =atan((d.y())/d.x())/PI/2*360.0;	//目标在第一象限
+	}else if(d.x() < 0 && d.y() < 0){
+		Angle_face_Goal =180 + atan((d.y())/d.x())/PI/2*360.0;	//目标在第三象限
+	}else if(d.x() <0 && d.y() > 0){
+		Angle_face_Goal =180 + atan((d.y())/d.x())/PI/2*360.0;	//目标在第二象限
+	}else{
+		Angle_face_Goal =360 + atan((PosGoal.y()-PosSafe.y())/(PosGoal.x()-PosSafe.x()))/PI/2*360.0;	//目标在第四象限
+	}
+
 	QString str;
 	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
 	m_DashBoard->ui.posStar1->setText(str);
@@ -364,34 +386,119 @@ void MainGUI::refreshDashboardData(){
 	m_DashBoard->ui.posSafe->setText(str);
 	str.sprintf("(%.2f,%.2f)",PosGoal.x(),PosGoal.y());
 	m_DashBoard->ui.posGoal->setText(str);
+
+	//更新任务显示
+	if(is_project_accomplished == false){
+		str = "任务序号:";str += QString("%2").arg(currentTodoListId);str +="(代号:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
+		m_DashBoard->ui.text_CurrentTaskId->setText(str);
+	}
+	int i=0;
+	str = "";
+	while(todoList[i] != 0){
+		QString a =QString("%2").arg(todoList[i]);str += a;str += " ";i++;
+	}
+	m_DashBoard->ui.text_Todolist->setText(str);
 }
 void MainGUI::InitDashBoardData(){
 	PosByStar1=QPointF(0.00,0.00);
 	PosByStar2=QPointF(0.00,0.00);
 	PosByMotor=QPointF(0.00,0.00);
 	PosSafe=QPointF(0.00,0.00);
-	PosGoal=QPointF(0.00,0.00);
+	PosGoal=QPointF(50.00,50.00);
 	is_Auto_Mode_Open = false;
 	is_mission_accomplished = false;
+	is_project_accomplished = false;
+	is_path_clear = true;
+	is_dodge_moment = false;
+	is_time_to_dodge_left = false;
+	is_time_to_dodge_right = false;
+	dodge_right_times = 0;
 }
 void MainGUI::AssignInstruction(){
-	if(is_mission_accomplished == false){
-		float errorRange_Angle = 10.0;		//选择角度的误差范围，单位°
-		float errorRange_Distance = 30.0;	//抵达目标点的距离误差范围，单位cm
-		QPointF d = PosGoal - PosSafe;
-		float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//距离目标点的距离，单位cm
-		if(dDistance > errorRange_Distance){
-			if(abs(Angle_face_Goal-AngleSafe)>errorRange_Angle){		
-				Rotate_to_GoalAngle(Angle_face_Goal);
+	if(is_project_accomplished == false){
+		if(is_mission_accomplished == false){
+			int taskID=todoList[currentTodoListId];		
+			if (taskID<10){		//taskID<10意味着是路径点
+				if(taskID == 3){
+					PosGoal = QPointF(178.0,73.0);
+				}else if(taskID == 2){
+					PosGoal = QPointF(30.0,120.0);
+				}else if(taskID == 5){
+					PosGoal = QPointF(168.0,436.0);
+				}else if(taskID == 0){
+					is_project_accomplished = true;
+					m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成项目");
+					RobotQ::RobotQSpeak("我已经完成项目");
+				}
+				float errorRange_Angle = 10.0;		//选择角度的误差范围，单位°
+				float errorRange_Distance = 30.0;	//抵达目标点的距离误差范围，单位cm
+				QPointF d = PosGoal - PosSafe;
+				float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//距离目标点的距离，单位cm
+				if(dDistance > errorRange_Distance){
+					if(is_dodge_moment == true){
+						if(is_path_clear == true && dodge_right_times > 11){
+							is_dodge_moment = false;	//如果当前前路通畅且朝向目标，则可直线畅行，退出躲避时刻
+							m_DashBoard->ui.ck_isDodgetime->setChecked(false);
+						}else{
+							if(is_time_to_dodge_right){
+								DodgeTurnRight();
+								if(sectorObstacleDistance[29] > OBSTACLE_DISTANCE && dodge_right_times>11){
+									//如果第29扇区（140,145）无障碍且率先进入右侧躲避后再进入向左修正
+									is_dodge_moment = false;	//向右躲避9次直接退出躲避时刻
+									m_DashBoard->ui.ck_isClear->setChecked(false);
+									//is_time_to_dodge_right = false;
+									//is_time_to_dodge_left = true;
+								}
+							}else if(is_time_to_dodge_left){
+								DodgeTurnLeft();
+								if(sectorObstacleDistance[24] > 0.1 && sectorObstacleDistance[24] < OBSTACLE_DISTANCE || sectorObstacleDistance[8] > OBSTACLE_DISTANCE){
+									//如果向左闪避到第24扇区(115,120)出现障碍，则进入向右修正
+									is_time_to_dodge_left = false;
+									is_time_to_dodge_right = true;
+								}
+							}
+						}
+					}else{
+						//如果不是躲避时间，则正常运行
+						if(abs(Angle_face_Goal-AngleSafe)>errorRange_Angle){		
+							Rotate_to_GoalAngle(Angle_face_Goal);
+						}else{
+							if(is_path_clear == true){
+								On_MC_BtnForward();		//转到想要的角度后如果前路通畅就继续走
+							}else{
+								//如果前路不通畅，尝试向右侧绕行进入闪避时刻
+								is_dodge_moment = true;
+								dodge_right_times = 0;
+								m_DashBoard->ui.ck_isDodgetime->setChecked(true);
+								is_time_to_dodge_right = true;
+							}
+						}
+					}
+				}else{
+					is_mission_accomplished = true;
+					QString TaskCode;
+					TaskCode.sprintf("任务代号%d",taskID);
+					m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经到达目标点," + TaskCode);
+					RobotQ::RobotQSpeak("我已经到达目标点," + TaskCode);
+					Sleep(3000);
+					currentTodoListId++;
+					is_mission_accomplished = false;	//一个任务完成后，怒吼一下，休息3秒，又开始接新任务了
+				}
 			}else{
-				On_MC_BtnForward();
+				//taskID>10意味着是语音播报点
+				QString str;
+				if(taskID == 11 ){
+					str.sprintf("这件六耳大铜锅是金代典型炊具，埋锅造饭"); 
+				}else{
+					str="呵呵呵";
+				}
+				Sleep(3000);
+				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + str);
+				RobotQ::RobotQSpeak(str);
+				currentTodoListId++;
 			}
-		}else{
-			is_mission_accomplished = true;
-			m_DashBoard->AppendMessage("我已经到达目标点");
-			RobotQ::RobotQSpeak("我已经到达目标点");
 		}
-	}
+	}	
 	//int randomTask=rand()%6;
 	//switch (randomTask){
 	//case 0:m_motor.VectorMove(800,0);break;
@@ -410,9 +517,65 @@ float MainGUI::zTool_sin_angle(float angle){
 }
 void MainGUI::Rotate_to_GoalAngle(float AngleGoal){
 	float dAngle=AngleGoal-AngleSafe;	//目标朝向与当前朝向的角度差
-	if(dAngle>0){
+	if(dAngle>360.0){
+		dAngle -=360;
+	}else if(dAngle<0.0){
+		dAngle +=360;
+	}
+	if(dAngle>0 && dAngle<180){
 		On_MC_BtnTurnleft();
 	}else{
 		On_MC_BtnTurnright();
+	}
+}
+void MainGUI::JudgeForwardSituation(){
+	int n=0;
+	for(int i=9;i<27;i++){
+		if(sectorObstacleDistance[i]>1 && sectorObstacleDistance[i] < OBSTACLE_DISTANCE){
+			n++;
+		}
+	}
+	if(n>1){
+		is_path_clear = false;
+		m_DashBoard->ui.ck_isClear->setChecked(false);
+	}else{
+		is_path_clear = true;
+		m_DashBoard->ui.ck_isClear->setChecked(true);
+	}
+
+}
+void MainGUI::DodgeTurnRight(){
+	dodge_right_times++;
+	bool perfectChance1 = sectorObstacleDistance[26]>0.1 && sectorObstacleDistance[26] < OBSTACLE_DISTANCE && sectorObstacleDistance[25]>OBSTACLE_DISTANCE;
+	bool perfectChance2 = sectorObstacleDistance[25]>0.1 && sectorObstacleDistance[25] < OBSTACLE_DISTANCE && sectorObstacleDistance[24]>OBSTACLE_DISTANCE;
+	bool perfectChance3 = sectorObstacleDistance[24]>0.1 && sectorObstacleDistance[24] < OBSTACLE_DISTANCE && sectorObstacleDistance[23]>OBSTACLE_DISTANCE;
+	bool perfectChance4 = sectorObstacleDistance[27]>0.1 && sectorObstacleDistance[27] < OBSTACLE_DISTANCE && sectorObstacleDistance[26]>OBSTACLE_DISTANCE;
+	bool perfectChance5 = sectorObstacleDistance[28]>0.1 && sectorObstacleDistance[28] < OBSTACLE_DISTANCE && sectorObstacleDistance[27]>OBSTACLE_DISTANCE;
+	bool perfectChance6 = sectorObstacleDistance[29]>0.1 && sectorObstacleDistance[29] < OBSTACLE_DISTANCE && sectorObstacleDistance[28]>OBSTACLE_DISTANCE;
+	if(perfectChance1 || perfectChance2 || perfectChance3 || perfectChance4 || perfectChance5 || perfectChance6 || is_path_clear){
+		On_MC_BtnForward();		//在向右转到完美时机时前进一步
+	}else{
+		if(is_path_clear){
+			On_MC_BtnForward();
+		}else{
+			On_MC_BtnTurnright();
+		}
+	}
+}
+void MainGUI::DodgeTurnLeft(){
+	bool perfectChance1 = sectorObstacleDistance[26]>0.1 && sectorObstacleDistance[26] > OBSTACLE_DISTANCE && sectorObstacleDistance[25] > OBSTACLE_DISTANCE;
+	bool perfectChance2 = sectorObstacleDistance[25]>0.1 && sectorObstacleDistance[25] > OBSTACLE_DISTANCE && sectorObstacleDistance[24] > OBSTACLE_DISTANCE;
+	bool perfectChance3 = sectorObstacleDistance[24]>0.1 && sectorObstacleDistance[24] > OBSTACLE_DISTANCE && sectorObstacleDistance[23] > OBSTACLE_DISTANCE;
+	bool perfectChance4 = sectorObstacleDistance[27]>0.1 && sectorObstacleDistance[27] > OBSTACLE_DISTANCE && sectorObstacleDistance[26] > OBSTACLE_DISTANCE;
+	bool perfectChance5 = sectorObstacleDistance[28]>0.1 && sectorObstacleDistance[28] > OBSTACLE_DISTANCE && sectorObstacleDistance[27] > OBSTACLE_DISTANCE;
+	bool perfectChance6 = sectorObstacleDistance[29]>0.1 && sectorObstacleDistance[29] > OBSTACLE_DISTANCE && sectorObstacleDistance[28] > OBSTACLE_DISTANCE;
+	if((perfectChance1 || perfectChance2 || perfectChance3 || perfectChance4 || perfectChance5 || perfectChance6) && is_path_clear && sectorObstacleDistance[8] >OBSTACLE_DISTANCE){
+		On_MC_BtnForward();		//在向左转到完美时机时前进一步
+	}else{
+		if(is_path_clear){
+			On_MC_BtnForward();
+		}else{
+			On_MC_BtnTurnleft();
+		}
 	}
 }

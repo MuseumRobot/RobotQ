@@ -15,12 +15,12 @@ class DashBoard : public QDialog{
 	Q_OBJECT
 private:
 	int m_timerId;
-	QTime m_time;
-	QDateTime m_day;
 public:
 	DashBoard(QWidget *parent = 0);
 	~DashBoard();
 	Ui::DashBoard ui;
+	QTime m_time;
+	QDateTime m_day;
 	void AppendMessage(QString strMsg);
 	virtual void timerEvent(QTimerEvent *event);
 private slots:
