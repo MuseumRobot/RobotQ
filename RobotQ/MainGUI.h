@@ -48,12 +48,13 @@ class MainGUI : public QMainWindow{
 public:
 	MainGUI(QWidget *parent = 0);
 	~MainGUI();
-	QPointF PosByStar1;		//首选星标得到的机器人世界坐标
+	QPointF PosByStar1;		//首选星标得到的星标定位器的世界坐标
 	QPointF PosByStar2;		//备选星标
 	QPointF PosByMotor;		//电机里程计确定的坐标
 	QPointF PosSafe;		//综合考虑电机和星标进而得出可靠的坐标结果
 	QPointF PosGoal;		//目标坐标
-
+	float AngleByStar1;		//首选星标得到的星标定位器的角度
+	float AngleByStar2;		//备选星标得到的星标定位器的角度
 private:
 	Ui::MainGUI ui;
 	RobotQ* m_RobotQ;
@@ -62,14 +63,17 @@ private:
 	CMotor m_motor;
 	Cstar m_StarGazer;
 	CUPURG m_cURG;	
-	bool Init();
+	bool is_Auto_Mode_Open;
 	float sectorObstacleDistance[36];				//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
 	StarMark m_MARK[100];							//LED定位标签数组 - 每块边长455
+	void Init();									//初始化
 	void InitStarMark();							//为LED定位标签数组赋值
 	void InitCommMotorAndStar();					//电机星标串口初始化
+	void InitDashBoardData();						//仪表盘数据初始化
 	void CalculateSectorDistance();					//计算扇区内障碍物的距离
+	void AssignInstruction();						//分配下一步指令
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
 	virtual void timerEvent(QTimerEvent *event);
@@ -78,6 +82,7 @@ private slots:
 	int OnBtnRobotQ();
 	int OnBtnManualControl();
 	int OnBtnDashBoard();
+	int OnBtnAutoGuide();
 	int On_MC_BtnForward();
 	int On_MC_BtnBackward();
 	int On_MC_BtnTurnleft();

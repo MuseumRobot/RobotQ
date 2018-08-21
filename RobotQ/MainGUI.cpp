@@ -3,12 +3,10 @@
 //若干对象需要自始至终存在于主界面中
 CUPURG m_cURG;									//激光对象
 CWinThread* pThread_Read_Laser;					//读激光数据线程
-//CWinThread* pThread_Cal_Obstacle_Dist;			//计算障碍物距离线程
 UINT ThreadReadLaser_Data(LPVOID lpParam);		//读激光数据函数
 bool is_Comm_URG_Open = false;					//初始化激光未开启
 bool key_laser = false;							//激光数据存储位置开关
 void InitCommLaser();							//激光串口初始化
-//float sectorObstacleDistance[36];				//每五度划分一个扇区
 int m_laser_data_postpro[768];					//激光最远返回值(单位cm)
 int m_laser_data_raw[768];
 int m_Laser_Data_Point_PostPro;
@@ -18,14 +16,15 @@ threadInfo_laser_data Info_laser_data;
 
 MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	ui.setupUi(this);
-	m_RobotQ=new RobotQ(this);	//初始化这些成员对象需要在connect前
+	m_RobotQ=new RobotQ(this);						//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
-	m_timer_refresh_task=startTimer(1000);
+	m_timer_refresh_task=startTimer(1000);			//计数器查询分配任务
 	m_timer_refresh_dashboard=startTimer(600);		//计数器查询显示机器状态
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
+	connect(ui.btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
 	connect(ui.btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
 	connect(ui.btnManualControl,SIGNAL(clicked()),this,SLOT(OnBtnManualControl()));
 	connect(ui.btnDashBoard,SIGNAL(clicked()),this,SLOT(OnBtnDashBoard()));
@@ -37,6 +36,7 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	connect(m_ManualControl->ui.btnStartSpeak,SIGNAL(clicked()),this,SLOT(On_MC_BtnRobotQSpeak()));
 	connect(m_ManualControl->ui.btnStopSpeak,SIGNAL(clicked()),m_RobotQ,SLOT(OnStopSpeak()));	
 	//connect(m_RobotQ,SIGNAL(TTS_Ready()),this,SLOT(check_TTS_Ready()));//在子窗口的初始化函数中发射信号无法被接受，而在初始化函数之外发射有效
+	//因为初始化函数为静态函数
 	Init();
 }
 MainGUI::~MainGUI(){
@@ -45,27 +45,32 @@ MainGUI::~MainGUI(){
 	delete m_DashBoard;
 	m_cURG.SwitchOff();		//关闭激光
 }
-bool MainGUI::Init(){
-	//启动时就开启各面板
-	OnBtnDashBoard();
-	OnBtnManualControl();
-	OnBtnRobotQ();
+void MainGUI::Init(){
+	OnBtnDashBoard();				//开启仪表盘面板
+	OnBtnManualControl();			//开启遥控器面板
+	OnBtnRobotQ();					//开启语音对话面板
 	
-	InitStarMark();		//LED标签数组赋值
+	InitStarMark();					//LED标签数组赋值
 	InitCommMotorAndStar();			//串口初始化Motor/Star
-	InitCommLaser();	//串口初始化URG
+	InitCommLaser();				//串口初始化URG
+	InitDashBoardData();			//仪表盘数据初始化
 
-	//仪表盘数据初始化
-	PosByStar1=QPointF(0.00,0.00);
-	PosByStar2=QPointF(0.00,0.00);
-	PosByMotor=QPointF(0.00,0.00);
-	PosSafe=QPointF(0.00,0.00);
-	PosGoal=QPointF(0.00,0.00);
 
+}
+int MainGUI::OnBtnAutoGuide(){
+	if(is_Auto_Mode_Open == true){
+		is_Auto_Mode_Open = false;
+		m_DashBoard->ui.ck_Auto->setChecked(false);
+		ui.btnAutoGuide->setText("开启自动导航");
+	}else{
+		is_Auto_Mode_Open = true;
+		m_DashBoard->ui.ck_Auto->setChecked(true);
+		ui.btnAutoGuide->setText("关闭自动导航");
+	}
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
-	m_RobotQ->move(800,435);
+	m_RobotQ->move(800,450);
 	m_RobotQ->show();
 	return 0;
 }
@@ -111,16 +116,9 @@ void MainGUI::timerEvent(QTimerEvent *event){
 		refreshDashboardSector();		//刷新障碍物分布图
 		refreshDashboardData();			//刷新仪表盘数据
 	}else if(event->timerId()==m_timer_refresh_task){
-		int randomTask=rand()%6;
-		switch (randomTask){
-			case 0:m_motor.VectorMove(800,0);break;
-			case 1:m_motor.VectorMove(-800,0);break;
-			case 2:m_motor.VectorMove(0,100);break;
-			case 3:m_motor.VectorMove(0,-100);break;
-			case 4:m_motor.stop();
-			default:RobotQ::RobotQSpeak("呵呵呵");
+		if(is_Auto_Mode_Open){
+			AssignInstruction();		//分配下一步指令
 		}
-		//m_motor.VectorMove(800,0);
 	}
 }
 UINT ThreadReadLaser_Data(LPVOID lpParam){
@@ -340,16 +338,18 @@ void MainGUI::refreshDashboardData(){
 		if (m_MARK[loop_mark].markID == m_StarGazer.starID){
 			PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
 			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
+			AngleByStar1 = m_StarGazer.starAngel;
 		}
 		if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
 			PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
 			PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
+			AngleByStar2 = m_StarGazer.starAngel;
 		}
 	}
 	QString str;
-	str.sprintf("(%.2f,%.2f) - (%d)",PosByStar1.x(),PosByStar1.y(),m_StarGazer.starID);
+	str.sprintf("(%.2f,%.2f)-(%.2f度)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
 	m_DashBoard->ui.posStar1->setText(str);
-	str.sprintf("(%.2f,%.2f) - (%d)",PosByStar2.x(),PosByStar2.y(),m_StarGazer.starID2);
+	str.sprintf("(%.2f,%.2f)-(%.2f度)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
 	m_DashBoard->ui.posStar2->setText(str);
 	str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
 	m_DashBoard->ui.posMotor->setText(str);
@@ -357,4 +357,23 @@ void MainGUI::refreshDashboardData(){
 	m_DashBoard->ui.posSafe->setText(str);
 	str.sprintf("(%.2f,%.2f)",PosGoal.x(),PosGoal.y());
 	m_DashBoard->ui.posGoal->setText(str);
+}
+void MainGUI::InitDashBoardData(){
+	PosByStar1=QPointF(0.00,0.00);
+	PosByStar2=QPointF(0.00,0.00);
+	PosByMotor=QPointF(0.00,0.00);
+	PosSafe=QPointF(0.00,0.00);
+	PosGoal=QPointF(0.00,0.00);
+	is_Auto_Mode_Open = false;
+}
+void MainGUI::AssignInstruction(){
+	int randomTask=rand()%6;
+	switch (randomTask){
+	case 0:m_motor.VectorMove(800,0);break;
+	case 1:m_motor.VectorMove(-800,0);break;
+	case 2:m_motor.VectorMove(0,100);break;
+	case 3:m_motor.VectorMove(0,-100);break;
+	case 4:m_motor.stop();
+	default:RobotQ::RobotQSpeak("呵呵呵");
+	}
 }

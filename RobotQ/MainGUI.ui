@@ -43,7 +43,7 @@
           </size>
          </property>
          <property name="text">
-          <string>自动导航</string>
+          <string>开启自动导航</string>
          </property>
         </widget>
        </item>
