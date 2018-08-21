@@ -452,41 +452,36 @@ void MainGUI::AssignInstruction(){
 						PosGoal = QPointF(148.0,260.0);
 					}else if(taskID == 0){
 						is_project_accomplished = true;
-						Sleep(6000);
+						Sleep(3000);
 						m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成项目");
 						RobotQ::RobotQSpeak("我已经完成项目");
 						is_Auto_Mode_Open = false;
 						m_DashBoard->ui.ck_Auto->setChecked(false);
 						ui.btnAutoGuide->setText("开启自动导航");
 					}
-					float errorRange_Angle = 10.0;		//选择角度的误差范围，单位°
-					float errorRange_Distance = 30.0;	//抵达目标点的距离误差范围，单位cm
+					float errorRange_Angle = 10.0;						//选择角度的误差范围，单位°
+					float errorRange_Distance = 30.0;					//抵达目标点的距离误差范围，单位cm
 					QPointF d = PosGoal - PosSafe;
-					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//距离目标点的距离，单位cm
+					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
 					if(dDistance > errorRange_Distance){
 						if(is_dodge_moment == true){
 							if(is_path_clear == true && dodge_move_times > DODGESTEPS){
-								is_dodge_moment = false;	//如果当前前路通畅且朝向目标，则可直线畅行，退出躲避时刻
+								is_dodge_moment = false;				//超出闪避有效步数后，如果当前前路通畅，则退出闪避时刻
 								m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 							}else{
 								DodgeTurnRight();
-								if(sectorObstacleDistance[29] > OBSTACLE_DISTANCE && dodge_move_times>15){
-									//如果第29扇区（140,145）无障碍且率先进入右侧躲避后再进入向左修正
-									is_dodge_moment = false;	//向右躲避9次直接退出躲避时刻
-									m_DashBoard->ui.ck_isClear->setChecked(false);
-								}
 							}
 						}else{
-							//如果不是躲避时间，则正常运行
+							//如果没有进入闪避时间，则正常运行
 							if(abs(Angle_face_Goal-AngleSafe)>errorRange_Angle){		
-								Rotate_to_GoalAngle(Angle_face_Goal);
+								Rotate_to_GoalAngle(Angle_face_Goal);	//如果和目标角度差距大就先看一眼目标
 							}else{
 								if(is_path_clear == true){
-									On_MC_BtnForward();		//转到想要的角度后如果前路通畅就继续走
+									On_MC_BtnForward();					//转到想要的角度后如果前路通畅就继续走
 								}else{
-									//如果前路不通畅，尝试向右侧绕行进入闪避时刻
+									//如果前路不通畅，进入闪避时刻
 									is_dodge_moment = true;
-									dodge_move_times = 0;
+									dodge_move_times = 0;				//清空闪避操作次数计数器
 									m_DashBoard->ui.ck_isDodgetime->setChecked(true);
 								}
 							}
@@ -554,20 +549,10 @@ void MainGUI::JudgeForwardSituation(){
 
 }
 void MainGUI::DodgeTurnRight(){
-	dodge_move_times++;
-	bool perfectChance1 = sectorObstacleDistance[26]>0 && sectorObstacleDistance[26] < OBSTACLE_DISTANCE && sectorObstacleDistance[25]>OBSTACLE_DISTANCE;
-	bool perfectChance2 = sectorObstacleDistance[25]>0 && sectorObstacleDistance[25] < OBSTACLE_DISTANCE && sectorObstacleDistance[24]>OBSTACLE_DISTANCE;
-	bool perfectChance3 = sectorObstacleDistance[24]>0 && sectorObstacleDistance[24] < OBSTACLE_DISTANCE && sectorObstacleDistance[23]>OBSTACLE_DISTANCE;
-	bool perfectChance4 = sectorObstacleDistance[27]>0 && sectorObstacleDistance[27] < OBSTACLE_DISTANCE && sectorObstacleDistance[26]>OBSTACLE_DISTANCE;
-	bool perfectChance5 = sectorObstacleDistance[28]>0 && sectorObstacleDistance[28] < OBSTACLE_DISTANCE && sectorObstacleDistance[27]>OBSTACLE_DISTANCE;
-	bool perfectChance6 = sectorObstacleDistance[29]>0 && sectorObstacleDistance[29] < OBSTACLE_DISTANCE && sectorObstacleDistance[28]>OBSTACLE_DISTANCE;
-	if(perfectChance1 || perfectChance2 || perfectChance3 || perfectChance4 || perfectChance5 || perfectChance6 || is_path_clear){
+	if(is_path_clear){
 		On_MC_BtnForward();		//在向右转到完美时机时前进一步
+		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
-		if(is_path_clear){
-			On_MC_BtnForward();
-		}else{
-			On_MC_BtnTurnright();
-		}
+		On_MC_BtnTurnright();
 	}
 }

@@ -20,7 +20,7 @@
 #define EMERGENCY_TIMES 3
 #define EMERGENCY_DISTANCE 300
 #define OBSTACLE_DISTANCE 800	//距离低于这个值将认为是障碍物
-#define DODGESTEPS 15
+#define DODGESTEPS 8
 #define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 
 typedef struct StarMark{
