@@ -13,14 +13,15 @@
 #include "include/Comm_data_star.h"
 #include "include/UPURG.h"
 
-#define COMM_MOTOR 3			//底部电机串口号
-#define COMM_STAR 4				//星标定位串口
-#define COMM_LASER 5			//激光传感器串口号
+#define COMM_MOTOR 3				//底部电机串口号
+#define COMM_STAR 4					//星标定位串口
+#define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define EMERGENCY_TIMES 3
-#define EMERGENCY_DISTANCE 300
-#define OBSTACLE_DISTANCE 800	//距离低于这个值将认为是障碍物
-#define DODGESTEPS 8
+#define DODGESTEPS 8				//闪避时刻中最低有效步数
+#define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
+#define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm
+#define EMERGENCY_RECOVER_CYCLE 10	//紧急制动解除后将于N个任务周期后恢复
+#define OBSTACLE_DISTANCE 800		//障碍物探测距离，单位mm
 #define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 
 typedef struct StarMark{
@@ -82,6 +83,7 @@ private:
 	void AssignInstruction();						//分配下一步指令
 	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
 	void DodgeTurnRight();							//闪避时刻函数(向右闪避准则)
+	void DodgeTurnLeft();							//闪避时刻函数(向左闪避准则)
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
 	float zTool_cos_angle(float angle);					//计算余弦值，参数单位为°

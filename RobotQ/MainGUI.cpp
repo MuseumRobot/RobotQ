@@ -91,7 +91,6 @@ int MainGUI::OnBtnManualControl(){
 	return 0;
 }
 int MainGUI::OnBtnDashBoard(){
-	m_DashBoard->move(750,20);
 	m_DashBoard->show();
 	return 0;
 }
@@ -239,7 +238,7 @@ void MainGUI::InitCommMotorAndStar(){
 	}
 }
 void InitCommLaser(){
-	for(int i=0;i<1000;i++)	m_laser_data_postpro[i] = 0;	//初始化接受激光返回的数据为0mm
+	for(int i=0;i<1000;i++)	m_laser_data_postpro[i] = 10000;	//初始化接受激光返回的数据为10000mm
 	if (m_cURG.Create(COMM_LASER)){
 		m_cURG.SwitchOn();
 		m_cURG.SCIP20();	
@@ -453,8 +452,8 @@ void MainGUI::AssignInstruction(){
 					}else if(taskID == 0){
 						is_project_accomplished = true;
 						Sleep(3000);
-						m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成项目");
-						RobotQ::RobotQSpeak("我已经完成项目");
+						m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
+						RobotQ::RobotQSpeak("我已经完成整个项目");
 						is_Auto_Mode_Open = false;
 						m_DashBoard->ui.ck_Auto->setChecked(false);
 						ui.btnAutoGuide->setText("开启自动导航");
@@ -469,7 +468,13 @@ void MainGUI::AssignInstruction(){
 								is_dodge_moment = false;				//超出闪避有效步数后，如果当前前路通畅，则退出闪避时刻
 								m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 							}else{
-								DodgeTurnRight();
+								float d = AngleSafe-Angle_face_Goal;
+								if(d > 0.0 && d< 90.0 || d < -270.0 ){
+									DodgeTurnLeft();
+								}else{
+									DodgeTurnRight();
+								}
+
 							}
 						}else{
 							//如果没有进入闪避时间，则正常运行
@@ -550,9 +555,17 @@ void MainGUI::JudgeForwardSituation(){
 }
 void MainGUI::DodgeTurnRight(){
 	if(is_path_clear){
-		On_MC_BtnForward();		//在向右转到完美时机时前进一步
+		On_MC_BtnForward();		//在向右转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
 		On_MC_BtnTurnright();
+	}
+}
+void MainGUI::DodgeTurnLeft(){
+	if(is_path_clear){
+		On_MC_BtnForward();		//在向左转到前方无障碍时前进一步
+		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
+	}else{
+		On_MC_BtnTurnleft();
 	}
 }
