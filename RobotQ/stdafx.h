@@ -22,6 +22,7 @@
 #include "common/FileReader.h"
 #include "include/hci_asr_recorder.h"
 #include "include/hci_tts_player.h"
+#include <math.h>
 
 
 

@@ -62,6 +62,7 @@ int MainGUI::OnBtnAutoGuide(){
 		is_Auto_Mode_Open = false;
 		m_DashBoard->ui.ck_Auto->setChecked(false);
 		ui.btnAutoGuide->setText("开启自动导航");
+		is_mission_accomplished = false;
 	}else{
 		is_Auto_Mode_Open = true;
 		m_DashBoard->ui.ck_Auto->setChecked(true);
@@ -339,6 +340,11 @@ void MainGUI::refreshDashboardData(){
 			PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
 			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
 			AngleByStar1 = m_StarGazer.starAngel;
+			AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
+			AngleSafe = 360.0 - AngleSafe;		//得到机器人本体朝向（逆时针）
+			float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
+			float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
+			PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()+dy);
 		}
 		if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
 			PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
@@ -346,14 +352,15 @@ void MainGUI::refreshDashboardData(){
 			AngleByStar2 = m_StarGazer.starAngel;
 		}
 	}
+	Angle_face_Goal = 180.0 + atan((PosGoal.y()-PosSafe.y())/(PosGoal.x()-PosSafe.x()))/PI/2*360.0;
 	QString str;
-	str.sprintf("(%.2f,%.2f)-(%.2f度)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
+	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
 	m_DashBoard->ui.posStar1->setText(str);
-	str.sprintf("(%.2f,%.2f)-(%.2f度)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
+	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
 	m_DashBoard->ui.posStar2->setText(str);
 	str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
 	m_DashBoard->ui.posMotor->setText(str);
-	str.sprintf("(%.2f,%.2f)",PosSafe.x(),PosSafe.y());
+	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosSafe.x(),PosSafe.y(),AngleSafe);
 	m_DashBoard->ui.posSafe->setText(str);
 	str.sprintf("(%.2f,%.2f)",PosGoal.x(),PosGoal.y());
 	m_DashBoard->ui.posGoal->setText(str);
@@ -365,15 +372,47 @@ void MainGUI::InitDashBoardData(){
 	PosSafe=QPointF(0.00,0.00);
 	PosGoal=QPointF(0.00,0.00);
 	is_Auto_Mode_Open = false;
+	is_mission_accomplished = false;
 }
 void MainGUI::AssignInstruction(){
-	int randomTask=rand()%6;
-	switch (randomTask){
-	case 0:m_motor.VectorMove(800,0);break;
-	case 1:m_motor.VectorMove(-800,0);break;
-	case 2:m_motor.VectorMove(0,100);break;
-	case 3:m_motor.VectorMove(0,-100);break;
-	case 4:m_motor.stop();
-	default:RobotQ::RobotQSpeak("呵呵呵");
+	if(is_mission_accomplished == false){
+		float errorRange_Angle = 10.0;		//选择角度的误差范围，单位°
+		float errorRange_Distance = 30.0;	//抵达目标点的距离误差范围，单位cm
+		QPointF d = PosGoal - PosSafe;
+		float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//距离目标点的距离，单位cm
+		if(dDistance > errorRange_Distance){
+			if(abs(Angle_face_Goal-AngleSafe)>errorRange_Angle){		
+				Rotate_to_GoalAngle(Angle_face_Goal);
+			}else{
+				On_MC_BtnForward();
+			}
+		}else{
+			is_mission_accomplished = true;
+			m_DashBoard->AppendMessage("我已经到达目标点");
+			RobotQ::RobotQSpeak("我已经到达目标点");
+		}
+	}
+	//int randomTask=rand()%6;
+	//switch (randomTask){
+	//case 0:m_motor.VectorMove(800,0);break;
+	//case 1:m_motor.VectorMove(-800,0);break;
+	//case 2:m_motor.VectorMove(0,100);break;
+	//case 3:m_motor.VectorMove(0,-100);break;
+	//case 4:m_motor.stop();
+	//default:RobotQ::RobotQSpeak("呵呵呵");
+	//}
+}
+float MainGUI::zTool_cos_angle(float angle){
+	return cos(angle/360.0*2*PI);
+}
+float MainGUI::zTool_sin_angle(float angle){
+	return sin(angle/360.0*2*PI);
+}
+void MainGUI::Rotate_to_GoalAngle(float AngleGoal){
+	float dAngle=AngleGoal-AngleSafe;	//目标朝向与当前朝向的角度差
+	if(dAngle>0){
+		On_MC_BtnTurnleft();
+	}else{
+		On_MC_BtnTurnright();
 	}
 }

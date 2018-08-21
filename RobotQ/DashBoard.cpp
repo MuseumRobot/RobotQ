@@ -8,6 +8,21 @@ DashBoard::DashBoard(QWidget *parent):QDialog(parent){
 DashBoard::~DashBoard(){
 
 }
+void DashBoard::AppendMessage(QString strMsg){
+	QString strMessage = "";
+	strMessage=ui.textStatus->toPlainText();
+	int nMessageLenMax = 1024;		//状态文本框最大承受1024个字符
+	if(strMessage.length() > nMessageLenMax){
+		strMessage = strMessage.left(nMessageLenMax);	//如果实际字符长度超过预设最大值，则截取最新部分予以显示，旧的舍弃
+	}
+	QString strNewMessage = "";
+	strNewMessage = strMsg;
+	if(strMessage.length() > 0){
+		strNewMessage += "\r\n";
+		strNewMessage += strMessage;
+	}
+	ui.textStatus->setPlainText(strNewMessage);
+}
 void DashBoard::OnBtnSaveLog(){
 	QString Filename = "RobotQLog";
 	Filename = Filename + m_day.toString("yyyyMMdd") + m_time.toString("hhmmss") + ".txt";

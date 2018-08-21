@@ -21,6 +21,7 @@ public:
 	DashBoard(QWidget *parent = 0);
 	~DashBoard();
 	Ui::DashBoard ui;
+	void AppendMessage(QString strMsg);
 	virtual void timerEvent(QTimerEvent *event);
 private slots:
 	void OnBtnSaveLog();
