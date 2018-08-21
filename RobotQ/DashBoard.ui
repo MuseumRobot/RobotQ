@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>578</width>
-    <height>381</height>
+    <height>394</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -123,6 +123,16 @@
            <widget class="QCheckBox" name="ck_isDodgetime">
             <property name="text">
              <string>闪避时刻</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="ck_isEmergency">
+            <property name="text">
+             <string>紧急制动</string>
             </property>
             <property name="checkable">
              <bool>true</bool>

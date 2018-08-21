@@ -20,7 +20,8 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
 	m_timer_refresh_task=startTimer(1000);			//计数器查询分配任务
-	m_timer_refresh_dashboard=startTimer(600);		//计数器查询显示机器状态
+	m_timer_refresh_dashboard=startTimer(300);		//计数器查询显示机器状态
+	m_timer_refresh_emergency_distance=0;			//依赖分配任务计数器查询刷新恢复制动距离，模20
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
@@ -128,6 +129,15 @@ void MainGUI::timerEvent(QTimerEvent *event){
 		refreshDashboardSector();		//刷新障碍物分布图
 		refreshDashboardData();			//刷新仪表盘数据
 	}else if(event->timerId()==m_timer_refresh_task){
+		m_timer_refresh_emergency_distance++;
+		if(m_timer_refresh_emergency_distance == 20){
+			m_timer_refresh_emergency_distance = 0;
+			if(m_EMERGENCY_DISTANCE<0.1){
+				m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
+				//RobotQ::RobotQSpeak("紧急制动已恢复");
+				//Sleep(3000);
+			}
+		}
 		if(is_Auto_Mode_Open){
 			AssignInstruction();		//分配下一步指令
 		}
@@ -413,8 +423,33 @@ void MainGUI::InitDashBoardData(){
 	is_time_to_dodge_left = false;
 	is_time_to_dodge_right = false;
 	dodge_right_times = 0;
+	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
+	Emergency_times = 0;
 }
 void MainGUI::AssignInstruction(){
+	bool isEMERGENCY = false;
+	for(int i=9;i<27;i++){
+		if(sectorObstacleDistance[i]>1 && sectorObstacleDistance[i] < OBSTACLE_DISTANCE){
+			if(sectorObstacleDistance[i] > 0.1 && sectorObstacleDistance[i] < m_EMERGENCY_DISTANCE){
+				isEMERGENCY =true;
+				break;
+			}
+		}
+	}
+	if(isEMERGENCY && is_Auto_Mode_Open && m_DashBoard->ui.ck_isEmergency->isChecked()){
+		Emergency_times++;
+		m_motor.stop();
+		RobotQ::RobotQSpeak("紧急制动!您挡到小灵啦!");
+		Sleep(5000);
+		if(Emergency_times == 3){
+			Emergency_times = 0;
+			m_EMERGENCY_DISTANCE = 0.0;
+			RobotQ::RobotQSpeak("紧急制动已解除，10秒后恢复");
+			m_timer_refresh_emergency_distance = 0;
+		}
+	}else{	
+		//非紧急情况下正常发配指令
+
 	if(is_project_accomplished == false){
 		if(is_mission_accomplished == false){
 			int taskID=todoList[currentTodoListId];		
@@ -424,11 +459,15 @@ void MainGUI::AssignInstruction(){
 				}else if(taskID == 2){
 					PosGoal = QPointF(30.0,120.0);
 				}else if(taskID == 5){
-					PosGoal = QPointF(168.0,436.0);
+					PosGoal = QPointF(148.0,260.0);
 				}else if(taskID == 0){
 					is_project_accomplished = true;
+					Sleep(6000);
 					m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成项目");
 					RobotQ::RobotQSpeak("我已经完成项目");
+					is_Auto_Mode_Open = false;
+					m_DashBoard->ui.ck_Auto->setChecked(false);
+					ui.btnAutoGuide->setText("开启自动导航");
 				}
 				float errorRange_Angle = 10.0;		//选择角度的误差范围，单位°
 				float errorRange_Distance = 30.0;	//抵达目标点的距离误差范围，单位cm
@@ -436,18 +475,16 @@ void MainGUI::AssignInstruction(){
 				float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//距离目标点的距离，单位cm
 				if(dDistance > errorRange_Distance){
 					if(is_dodge_moment == true){
-						if(is_path_clear == true && dodge_right_times > 11){
+						if(is_path_clear == true && dodge_right_times > DODGESTEPS){
 							is_dodge_moment = false;	//如果当前前路通畅且朝向目标，则可直线畅行，退出躲避时刻
 							m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 						}else{
 							if(is_time_to_dodge_right){
 								DodgeTurnRight();
-								if(sectorObstacleDistance[29] > OBSTACLE_DISTANCE && dodge_right_times>11){
+								if(sectorObstacleDistance[29] > OBSTACLE_DISTANCE && dodge_right_times>15){
 									//如果第29扇区（140,145）无障碍且率先进入右侧躲避后再进入向左修正
 									is_dodge_moment = false;	//向右躲避9次直接退出躲避时刻
 									m_DashBoard->ui.ck_isClear->setChecked(false);
-									//is_time_to_dodge_right = false;
-									//is_time_to_dodge_left = true;
 								}
 							}else if(is_time_to_dodge_left){
 								DodgeTurnLeft();
@@ -508,6 +545,7 @@ void MainGUI::AssignInstruction(){
 	//case 4:m_motor.stop();
 	//default:RobotQ::RobotQSpeak("呵呵呵");
 	//}
+	}
 }
 float MainGUI::zTool_cos_angle(float angle){
 	return cos(angle/360.0*2*PI);
@@ -535,7 +573,7 @@ void MainGUI::JudgeForwardSituation(){
 			n++;
 		}
 	}
-	if(n>1){
+	if(n>0){
 		is_path_clear = false;
 		m_DashBoard->ui.ck_isClear->setChecked(false);
 	}else{
