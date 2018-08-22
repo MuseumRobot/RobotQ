@@ -163,11 +163,11 @@ struct{
 	char* pszName;
 	char* pszComment;
 }g_sStatus[] ={
-	{"RECORDER_EVENT_BEGIN_RECORD",         "录音开始"},
+	{"RECORDER_EVENT_BEGIN_RECORD",         "开始聆听..."},
 	{"RECORDER_EVENT_HAVING_VOICE",         "听到声音 检测到始端的时候会触发该事件"},
 	{"RECORDER_EVENT_NO_VOICE_INPUT",       "没有听到声音"},
 	{"RECORDER_EVENT_BUFF_FULL",            "缓冲区已填满"},
-	{"RECORDER_EVENT_END_RECORD",           "录音完毕（自动或手动结束）"},
+	{"RECORDER_EVENT_END_RECORD",           "聆听完毕！"},
 	{"RECORDER_EVENT_BEGIN_RECOGNIZE",      "开始识别"},
 	{"RECORDER_EVENT_RECOGNIZE_COMPLETE",   "识别完毕"},
 	{"RECORDER_EVENT_ENGINE_ERROR",         "引擎出错"},
@@ -201,8 +201,11 @@ void HCIAPI RobotQ::RecordEventChange(RECORDER_EVENT eRecorderEvent, void *pUsrP
 	if(eRecorderEvent == RECORDER_EVENT_BEGIN_RECOGNIZE){
 		dlg->m_startClock = clock();
 	}
-	QString strMessage(g_sStatus[eRecorderEvent].pszComment);
-	dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
+	if(eRecorderEvent == RECORDER_EVENT_BEGIN_RECORD || eRecorderEvent == RECORDER_EVENT_END_RECORD){
+		//当开始录音和结束录音时给予文字提示
+		QString strMessage(g_sStatus[eRecorderEvent].pszComment);
+		dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
+	}
 }
 void HCIAPI RobotQ::RecorderErr(RECORDER_EVENT eRecorderEvent,HCI_ERR_CODE eErrorCode,void *pUsrParam){
 		RobotQ *dlg=(RobotQ *)pUsrParam;
@@ -224,9 +227,9 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			clock_t endClock = clock();
 			QString add;
 			add.sprintf("识别时间:%dms", (int)endClock - (int)dlg->m_startClock);
-			strMessage+=add;
-			if(psAsrRecogResult->uiResultItemCount>0)
-				dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);
+			strMessage+=add;		
+			//if(psAsrRecogResult->uiResultItemCount>0)
+			//	dlg->PostRecorderEventAndMsg(eRecorderEvent, strMessage);	//如果想显示识别时间则取消此行注释
 		}
 		strMessage = "";
 		if( psAsrRecogResult->uiResultItemCount > 0 ){
@@ -246,7 +249,7 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			Json_Explain(buf,result,answer);
 			QString QResult(result);
 			QString QAnswer(answer);
-			strMessage="小灵的回答:" + QAnswer  + "\n" + "识别结果:"+ QResult;
+			strMessage="小灵的回答:" + QAnswer  + "\n" + "您的提问:"+ QResult;
 			unsigned char* pszUTF8 = NULL;
 			HciExampleComon::GBKToUTF8( (unsigned char*)QAnswer.toStdString().c_str(), &pszUTF8 );
 			string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";

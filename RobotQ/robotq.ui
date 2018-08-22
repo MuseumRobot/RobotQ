@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
-    <height>237</height>
+    <width>540</width>
+    <height>380</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -54,7 +54,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>小M机器人语音功能</string>
+   <string>小灵机器人语音</string>
   </property>
   <property name="windowIcon">
    <iconset resource="robotq.qrc">
@@ -63,80 +63,178 @@
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <widget class="QPlainTextEdit" name="textStatus">
+   <property name="geometry">
+    <rect>
+     <x>94</x>
+     <y>56</y>
+     <width>352</width>
+     <height>146</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>540</width>
+     <height>380</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="robotq.qrc">:/RobotQ/Resources/博物馆语音交互背景.bmp</pixmap>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnQuery">
+   <property name="geometry">
+    <rect>
+     <x>376</x>
+     <y>240</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>楷体</family>
+     <pointsize>12</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>询问</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnStart">
+   <property name="geometry">
+    <rect>
+     <x>74</x>
+     <y>291</y>
+     <width>120</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <family>楷体</family>
+     <pointsize>16</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>开始对话</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnStopspeak">
+   <property name="geometry">
+    <rect>
+     <x>351</x>
+     <y>291</y>
+     <width>120</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <family>楷体</family>
+     <pointsize>16</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>停止说话</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>240</y>
+     <width>271</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>楷体</family>
+     <pointsize>12</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
    <item>
-    <widget class="QPlainTextEdit" name="textStatus"/>
+    <property name="text">
+     <string>博物馆简介</string>
+    </property>
    </item>
    <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
+    <property name="text">
+     <string>洗手间位置</string>
+    </property>
    </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="btnStart">
-       <property name="text">
-        <string>开始对话</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnEnd">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>结束对话</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnStopspeak">
-       <property name="text">
-        <string>停止说话</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboBox">
-       <item>
-        <property name="text">
-         <string>博物馆简介</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>洗手间位置</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnQuery">
-       <property name="text">
-        <string>询问</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-  </layout>
+  </widget>
+  <widget class="QPushButton" name="btnEnd">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>212</x>
+     <y>291</y>
+     <width>120</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <family>楷体</family>
+     <pointsize>16</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>结束对话</string>
+   </property>
+  </widget>
+  <zorder>label</zorder>
+  <zorder>textStatus</zorder>
+  <zorder>btnQuery</zorder>
+  <zorder>btnStart</zorder>
+  <zorder>btnStopspeak</zorder>
+  <zorder>comboBox</zorder>
+  <zorder>btnEnd</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

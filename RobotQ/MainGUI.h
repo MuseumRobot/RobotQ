@@ -17,6 +17,7 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
+#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面
 #define DODGESTEPS 8				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm
@@ -75,6 +76,7 @@ private:
 	int currentTodoListId;							//当前任务在清单中的下标
 	StarMark m_MARK[100];							//LED定位标签数组 - 每块边长455
 	void Init();									//初始化
+	void InitAdjustGUI();							//初始化调整界面（选择启动博物馆模式或开发者模式）
 	void InitStarMark();							//为LED定位标签数组赋值
 	void InitCommMotorAndStar();					//电机星标串口初始化
 	void InitDashBoardData();						//仪表盘数据初始化

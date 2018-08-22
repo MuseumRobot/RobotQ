@@ -45,14 +45,11 @@ MainGUI::~MainGUI(){
 	m_cURG.SwitchOff();		//关闭激光
 }
 void MainGUI::Init(){
-	OnBtnDashBoard();				//开启仪表盘面板
-	OnBtnManualControl();			//开启遥控器面板
-	OnBtnRobotQ();					//开启语音对话面板
-	
 	InitStarMark();					//LED标签数组赋值
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
+	InitAdjustGUI();				//调整界面适配使用者
 
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	todoList[0] = 3;	//任务代号3，起点，坐标(178,73)
@@ -68,20 +65,27 @@ void MainGUI::Init(){
 int MainGUI::OnBtnAutoGuide(){
 	if(is_Auto_Mode_Open == true){
 		is_Auto_Mode_Open = false;
-		m_DashBoard->ui.ck_Auto->setChecked(false);
-		ui.btnAutoGuide->setText("开启自动导航");
+		if(MUSEUMMODE == 0){
+			m_DashBoard->ui.ck_Auto->setChecked(false);
+			ui.btnAutoGuide->setText("开启自动导航");
+		}
 	}else{
 		currentTodoListId = 0;
 		is_mission_accomplished = false;
 		is_project_accomplished = false;
 		is_Auto_Mode_Open = true;
-		m_DashBoard->ui.ck_Auto->setChecked(true);
-		ui.btnAutoGuide->setText("关闭自动导航");
+		if(MUSEUMMODE == 0){
+			m_DashBoard->ui.ck_Auto->setChecked(true);
+			ui.btnAutoGuide->setText("关闭自动导航");
+		}
+
 	}
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
-	m_RobotQ->move(800,450);
+	if(MUSEUMMODE ==0 ){
+		m_RobotQ->move(800,460);
+	}
 	m_RobotQ->show();
 	return 0;
 }
@@ -91,6 +95,7 @@ int MainGUI::OnBtnManualControl(){
 	return 0;
 }
 int MainGUI::OnBtnDashBoard(){
+	m_DashBoard->move(750,20);
 	m_DashBoard->show();
 	return 0;
 }
@@ -238,7 +243,7 @@ void MainGUI::InitCommMotorAndStar(){
 	}
 }
 void InitCommLaser(){
-	for(int i=0;i<1000;i++)	m_laser_data_postpro[i] = 10000;	//初始化接受激光返回的数据为10000mm
+	for(int i=0;i<768;i++)	m_laser_data_postpro[i] = 10000;	//初始化接受激光返回的数据为10000mm
 	if (m_cURG.Create(COMM_LASER)){
 		m_cURG.SwitchOn();
 		m_cURG.SCIP20();	
@@ -567,5 +572,69 @@ void MainGUI::DodgeTurnLeft(){
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
 		On_MC_BtnTurnleft();
+	}
+}
+void MainGUI::InitAdjustGUI(){
+	if(MUSEUMMODE == 1){
+		delete ui.centralWidget;		//清除所有开发者界面控件重新编写布局
+		QSize MainGUISize(640,480);		//主界面尺寸
+		QSize RobotQSize(540,380);		//语音交互截面尺寸
+		QSize btnRobotQSize(150,50);	//语音交互按钮尺寸
+		QSize btnPathSize(180,36);
+
+		QLabel* MainBackGround = new QLabel(this);
+		QPushButton* btnRobotQ = new QPushButton(this);
+		QPushButton* btnAutoGuide = new QPushButton(this);
+		QPushButton* btnPath1 = new QPushButton(this);
+		QPushButton* btnPath2 = new QPushButton(this);
+		QPushButton* btnPath3 = new QPushButton(this);
+		
+		const QIcon pic_RobotQ_MainGUI = QIcon("Resources/语音交互.bmp");
+		const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航.bmp");
+		const QIcon pic_Path1_MainGUI = QIcon("Resources/路线1.bmp");
+		const QIcon pic_Path2_MainGUI = QIcon("Resources/路线2.bmp");
+		const QIcon pic_Path3_MainGUI = QIcon("Resources/路线3.bmp");
+		const QPixmap pic_BG_MainGUI = QPixmap("Resources/博物馆背景.bmp");
+
+		resize(MainGUISize);
+		MainBackGround->resize(MainGUISize);
+		MainBackGround->setPixmap(pic_BG_MainGUI);
+		MainBackGround->setScaledContents(true);
+
+		btnRobotQ->move(60,50);
+		btnRobotQ->resize(btnRobotQSize);
+		btnRobotQ->setIconSize(btnRobotQSize);
+		btnRobotQ->setIcon(pic_RobotQ_MainGUI);
+
+		btnAutoGuide->move(60,120);
+		btnAutoGuide->resize(btnRobotQSize);
+		btnAutoGuide->setIconSize(btnRobotQSize);
+		btnAutoGuide->setIcon(pic_AutoGuide_MainGUI);
+
+		btnPath1->move(360,280);
+		btnPath1->resize(btnPathSize);
+		btnPath1->setIconSize(btnPathSize);
+		btnPath1->setIcon(pic_Path1_MainGUI);
+
+		btnPath2->move(360,330);
+		btnPath2->resize(btnPathSize);
+		btnPath2->setIconSize(btnPathSize);
+		btnPath2->setIcon(pic_Path2_MainGUI);
+
+		btnPath3->move(360,380);
+		btnPath3->resize(btnPathSize);
+		btnPath3->setIconSize(btnPathSize);
+		btnPath3->setIcon(pic_Path3_MainGUI);
+
+		m_RobotQ->move(130,110);
+		m_RobotQ->resize(RobotQSize);
+		
+		connect(btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
+		connect(btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
+		
+	}else{	//进入开发者模式
+		OnBtnDashBoard();				//开启仪表盘面板
+		OnBtnManualControl();			//开启遥控器面板
+		//OnBtnRobotQ();					//开启语音对话面板
 	}
 }

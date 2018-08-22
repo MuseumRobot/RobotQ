@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainGUI</string>
+   <string>博物馆小灵</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="robotq.qrc">
+    <normaloff>:/RobotQ/Resources/HIT_Robot_ico.ico</normaloff>:/RobotQ/Resources/HIT_Robot_ico.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -145,6 +149,8 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="robotq.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -7,7 +7,12 @@ int main(int argc, char *argv[]){
 	QApplication a(argc, argv);
 	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("GBK"));
 	MainGUI w;
-	w.move(20,20);
+	if(MUSEUMMODE == 0){
+		w.move(20,20);
+	}else if(MUSEUMMODE == 1){
+		w.move(80,60);
+	}
+
 	w.show();
 	return a.exec();
 }
