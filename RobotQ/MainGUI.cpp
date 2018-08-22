@@ -17,7 +17,7 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_RobotQ=new RobotQ(this);						//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
-	m_timer_refresh_task=startTimer(1000);			//计数器查询分配任务
+	m_timer_refresh_task=startTimer(1500);			//计数器查询分配任务
 	m_timer_refresh_dashboard=startTimer(300);		//计数器查询显示机器状态
 	m_timer_refresh_emergency_distance=0;			//依赖分配任务计数器查询刷新恢复制动距离，模20
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
@@ -107,12 +107,20 @@ int MainGUI::On_MC_BtnBackward(){
 	m_motor.VectorMove(-800,0);
 	return 0;
 }
-int MainGUI::On_MC_BtnTurnleft(){
-	m_motor.VectorMove(0,1);
+int MainGUI::On_MC_BtnTurnleft(int level){
+	if(level == 0){
+		m_motor.VectorMove(0,1);
+	}else if(level == 1){
+		m_motor.VectorMove(0,2);
+	}
 	return 0;
 }
-int MainGUI::On_MC_BtnTurnright(){
-	m_motor.VectorMove(0,-1);
+int MainGUI::On_MC_BtnTurnright(int level){
+	if(level == 0){
+		m_motor.VectorMove(0,-1);
+	}else if(level == 1){
+		m_motor.VectorMove(0,-2);
+	}
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){
@@ -236,7 +244,6 @@ void MainGUI::InitStarMark(){
 void MainGUI::InitCommMotorAndStar(){
 	if(m_motor.open_com_motor(COMM_MOTOR)){
 		m_DashBoard->ui.ck_Motor->setChecked(true);
-		m_motor.VectorMove(800,0);	//启动电机后漂移示意
 	}
 	if(m_StarGazer.open_com(COMM_STAR)){
 		m_DashBoard->ui.ck_Star->setChecked(true);
@@ -312,42 +319,42 @@ void MainGUI::refreshDashboardSector(){
 	m_DashBoard->ui.r180->setChecked(flag);
 	flag = true;
 	int N = 35;
-	if(sectorObstacleDistance[N-0]<threshold)m_DashBoard->ui.r5->setChecked(flag);
-	if(sectorObstacleDistance[N-1]<threshold)m_DashBoard->ui.r10->setChecked(flag);
-	if(sectorObstacleDistance[N-2]<threshold)m_DashBoard->ui.r15->setChecked(flag);
-	if(sectorObstacleDistance[N-3]<threshold)m_DashBoard->ui.r20->setChecked(flag);
-	if(sectorObstacleDistance[N-4]<threshold)m_DashBoard->ui.r25->setChecked(flag);
-	if(sectorObstacleDistance[N-5]<threshold)m_DashBoard->ui.r30->setChecked(flag);
-	if(sectorObstacleDistance[N-6]<threshold)m_DashBoard->ui.r35->setChecked(flag);
-	if(sectorObstacleDistance[N-7]<threshold)m_DashBoard->ui.r40->setChecked(flag);
-	if(sectorObstacleDistance[N-8]<threshold)m_DashBoard->ui.r45->setChecked(flag);
-	if(sectorObstacleDistance[N-9]<threshold)m_DashBoard->ui.r50->setChecked(flag);
-	if(sectorObstacleDistance[N-10]<threshold)m_DashBoard->ui.r55->setChecked(flag);
-	if(sectorObstacleDistance[N-11]<threshold)m_DashBoard->ui.r60->setChecked(flag);
-	if(sectorObstacleDistance[N-12]<threshold)m_DashBoard->ui.r65->setChecked(flag);
-	if(sectorObstacleDistance[N-13]<threshold)m_DashBoard->ui.r70->setChecked(flag);
-	if(sectorObstacleDistance[N-14]<threshold)m_DashBoard->ui.r75->setChecked(flag);
-	if(sectorObstacleDistance[N-15]<threshold)m_DashBoard->ui.r80->setChecked(flag);
-	if(sectorObstacleDistance[N-16]<threshold)m_DashBoard->ui.r85->setChecked(flag);
-	if(sectorObstacleDistance[N-17]<threshold)m_DashBoard->ui.r90->setChecked(flag);
-	if(sectorObstacleDistance[N-18]<threshold)m_DashBoard->ui.r95->setChecked(flag);
-	if(sectorObstacleDistance[N-19]<threshold)m_DashBoard->ui.r100->setChecked(flag);
-	if(sectorObstacleDistance[N-20]<threshold)m_DashBoard->ui.r105->setChecked(flag);
-	if(sectorObstacleDistance[N-21]<threshold)m_DashBoard->ui.r110->setChecked(flag);
-	if(sectorObstacleDistance[N-22]<threshold)m_DashBoard->ui.r115->setChecked(flag);
-	if(sectorObstacleDistance[N-23]<threshold)m_DashBoard->ui.r120->setChecked(flag);
-	if(sectorObstacleDistance[N-24]<threshold)m_DashBoard->ui.r125->setChecked(flag);
-	if(sectorObstacleDistance[N-25]<threshold)m_DashBoard->ui.r130->setChecked(flag);
-	if(sectorObstacleDistance[N-26]<threshold)m_DashBoard->ui.r135->setChecked(flag);
-	if(sectorObstacleDistance[N-27]<threshold)m_DashBoard->ui.r140->setChecked(flag);
-	if(sectorObstacleDistance[N-28]<threshold)m_DashBoard->ui.r145->setChecked(flag);
-	if(sectorObstacleDistance[N-29]<threshold)m_DashBoard->ui.r150->setChecked(flag);
-	if(sectorObstacleDistance[N-30]<threshold)m_DashBoard->ui.r155->setChecked(flag);
-	if(sectorObstacleDistance[N-31]<threshold)m_DashBoard->ui.r160->setChecked(flag);
-	if(sectorObstacleDistance[N-32]<threshold)m_DashBoard->ui.r165->setChecked(flag);
-	if(sectorObstacleDistance[N-33]<threshold)m_DashBoard->ui.r170->setChecked(flag);
-	if(sectorObstacleDistance[N-34]<threshold)m_DashBoard->ui.r175->setChecked(flag);
-	if(sectorObstacleDistance[N-35]<threshold)m_DashBoard->ui.r180->setChecked(flag);
+	if(sectorObstacleDistance[N-0]<threshold && sectorObstacleDistance[N-0] >0)m_DashBoard->ui.r5->setChecked(flag);
+	if(sectorObstacleDistance[N-1]<threshold && sectorObstacleDistance[N-1] >0)m_DashBoard->ui.r10->setChecked(flag);
+	if(sectorObstacleDistance[N-2]<threshold && sectorObstacleDistance[N-2] >0)m_DashBoard->ui.r15->setChecked(flag);
+	if(sectorObstacleDistance[N-3]<threshold && sectorObstacleDistance[N-3] >0)m_DashBoard->ui.r20->setChecked(flag);
+	if(sectorObstacleDistance[N-4]<threshold && sectorObstacleDistance[N-4] >0)m_DashBoard->ui.r25->setChecked(flag);
+	if(sectorObstacleDistance[N-5]<threshold && sectorObstacleDistance[N-5] >0)m_DashBoard->ui.r30->setChecked(flag);
+	if(sectorObstacleDistance[N-6]<threshold && sectorObstacleDistance[N-6] >0)m_DashBoard->ui.r35->setChecked(flag);
+	if(sectorObstacleDistance[N-7]<threshold && sectorObstacleDistance[N-7] >0)m_DashBoard->ui.r40->setChecked(flag);
+	if(sectorObstacleDistance[N-8]<threshold && sectorObstacleDistance[N-8] >0)m_DashBoard->ui.r45->setChecked(flag);
+	if(sectorObstacleDistance[N-9]<threshold && sectorObstacleDistance[N-9] >0)m_DashBoard->ui.r50->setChecked(flag);
+	if(sectorObstacleDistance[N-10]<threshold && sectorObstacleDistance[N-10] >0)m_DashBoard->ui.r55->setChecked(flag);
+	if(sectorObstacleDistance[N-11]<threshold && sectorObstacleDistance[N-11] >0)m_DashBoard->ui.r60->setChecked(flag);
+	if(sectorObstacleDistance[N-12]<threshold && sectorObstacleDistance[N-12] >0)m_DashBoard->ui.r65->setChecked(flag);
+	if(sectorObstacleDistance[N-13]<threshold && sectorObstacleDistance[N-13] >0)m_DashBoard->ui.r70->setChecked(flag);
+	if(sectorObstacleDistance[N-14]<threshold && sectorObstacleDistance[N-14] >0)m_DashBoard->ui.r75->setChecked(flag);
+	if(sectorObstacleDistance[N-15]<threshold && sectorObstacleDistance[N-15] >0)m_DashBoard->ui.r80->setChecked(flag);
+	if(sectorObstacleDistance[N-16]<threshold && sectorObstacleDistance[N-16] >0)m_DashBoard->ui.r85->setChecked(flag);
+	if(sectorObstacleDistance[N-17]<threshold && sectorObstacleDistance[N-17] >0)m_DashBoard->ui.r90->setChecked(flag);
+	if(sectorObstacleDistance[N-18]<threshold && sectorObstacleDistance[N-18] >0)m_DashBoard->ui.r95->setChecked(flag);
+	if(sectorObstacleDistance[N-19]<threshold && sectorObstacleDistance[N-19] >0)m_DashBoard->ui.r100->setChecked(flag);
+	if(sectorObstacleDistance[N-20]<threshold && sectorObstacleDistance[N-20] >0)m_DashBoard->ui.r105->setChecked(flag);
+	if(sectorObstacleDistance[N-21]<threshold && sectorObstacleDistance[N-21] >0)m_DashBoard->ui.r110->setChecked(flag);
+	if(sectorObstacleDistance[N-22]<threshold && sectorObstacleDistance[N-22] >0)m_DashBoard->ui.r115->setChecked(flag);
+	if(sectorObstacleDistance[N-23]<threshold && sectorObstacleDistance[N-23] >0)m_DashBoard->ui.r120->setChecked(flag);
+	if(sectorObstacleDistance[N-24]<threshold && sectorObstacleDistance[N-24] >0)m_DashBoard->ui.r125->setChecked(flag);
+	if(sectorObstacleDistance[N-25]<threshold && sectorObstacleDistance[N-25] >0)m_DashBoard->ui.r130->setChecked(flag);
+	if(sectorObstacleDistance[N-26]<threshold && sectorObstacleDistance[N-26] >0)m_DashBoard->ui.r135->setChecked(flag);
+	if(sectorObstacleDistance[N-27]<threshold && sectorObstacleDistance[N-27] >0)m_DashBoard->ui.r140->setChecked(flag);
+	if(sectorObstacleDistance[N-28]<threshold && sectorObstacleDistance[N-28] >0)m_DashBoard->ui.r145->setChecked(flag);
+	if(sectorObstacleDistance[N-29]<threshold && sectorObstacleDistance[N-29] >0)m_DashBoard->ui.r150->setChecked(flag);
+	if(sectorObstacleDistance[N-30]<threshold && sectorObstacleDistance[N-30] >0)m_DashBoard->ui.r155->setChecked(flag);
+	if(sectorObstacleDistance[N-31]<threshold && sectorObstacleDistance[N-31] >0)m_DashBoard->ui.r160->setChecked(flag);
+	if(sectorObstacleDistance[N-32]<threshold && sectorObstacleDistance[N-32] >0)m_DashBoard->ui.r165->setChecked(flag);
+	if(sectorObstacleDistance[N-33]<threshold && sectorObstacleDistance[N-33] >0)m_DashBoard->ui.r170->setChecked(flag);
+	if(sectorObstacleDistance[N-34]<threshold && sectorObstacleDistance[N-34] >0)m_DashBoard->ui.r175->setChecked(flag);
+	if(sectorObstacleDistance[N-35]<threshold && sectorObstacleDistance[N-35] >0)m_DashBoard->ui.r180->setChecked(flag);
 }
 void MainGUI::refreshDashboardData(){
 	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
@@ -463,13 +470,13 @@ void MainGUI::AssignInstruction(){
 						m_DashBoard->ui.ck_Auto->setChecked(false);
 						ui.btnAutoGuide->setText("开启自动导航");
 					}
-					float errorRange_Angle = 10.0;						//选择角度的误差范围，单位°
+					float errorRange_Angle = ERRORANGLE;				//选择角度的误差范围，单位°
 					float errorRange_Distance = 30.0;					//抵达目标点的距离误差范围，单位cm
 					QPointF d = PosGoal - PosSafe;
 					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
 					if(dDistance > errorRange_Distance){
 						if(is_dodge_moment == true){
-							if(is_path_clear == true && dodge_move_times > DODGESTEPS){
+							if((is_path_clear == true && dodge_move_times > DODGESTEPS-2) || dodge_move_times > DODGESTEPS){
 								is_dodge_moment = false;				//超出闪避有效步数后，如果当前前路通畅，则退出闪避时刻
 								m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 							}else{
@@ -537,9 +544,17 @@ void MainGUI::Rotate_to_GoalAngle(float AngleGoal){
 		dAngle +=360;
 	}
 	if(dAngle>0 && dAngle<180){
-		On_MC_BtnTurnleft();
+		if(abs(dAngle)<30){
+			On_MC_BtnTurnleft(0);
+		}else{
+			On_MC_BtnTurnleft(1);
+		}
 	}else{
-		On_MC_BtnTurnright();
+		if(abs(dAngle)<30){
+			On_MC_BtnTurnright(0);
+		}else{
+			On_MC_BtnTurnright(1);
+		}
 	}
 }
 void MainGUI::JudgeForwardSituation(){
@@ -563,7 +578,7 @@ void MainGUI::DodgeTurnRight(){
 		On_MC_BtnForward();		//在向右转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
-		On_MC_BtnTurnright();
+		On_MC_BtnTurnright(0);
 	}
 }
 void MainGUI::DodgeTurnLeft(){
@@ -571,7 +586,7 @@ void MainGUI::DodgeTurnLeft(){
 		On_MC_BtnForward();		//在向左转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
-		On_MC_BtnTurnleft();
+		On_MC_BtnTurnleft(0);
 	}
 }
 void MainGUI::InitAdjustGUI(){

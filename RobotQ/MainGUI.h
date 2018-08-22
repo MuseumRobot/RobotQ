@@ -17,12 +17,13 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面
-#define DODGESTEPS 8				//闪避时刻中最低有效步数
+#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
+#define DODGESTEPS 5				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm
-#define EMERGENCY_RECOVER_CYCLE 10	//紧急制动解除后将于N个任务周期后恢复
-#define OBSTACLE_DISTANCE 800		//障碍物探测距离，单位mm
+#define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个任务周期后恢复
+#define OBSTACLE_DISTANCE 400		//障碍物探测距离，单位mm
+#define ERRORANGLE 15.0				//选择角度的误差范围，单位°
 #define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 
 typedef struct StarMark{
@@ -99,8 +100,8 @@ private slots:
 	int OnBtnAutoGuide();
 	int On_MC_BtnForward();
 	int On_MC_BtnBackward();
-	int On_MC_BtnTurnleft();
-	int On_MC_BtnTurnright();
+	int On_MC_BtnTurnleft(int speedlevel);
+	int On_MC_BtnTurnright(int speedlevel);
 	int On_MC_BtnStopmove();
 	int On_MC_BtnRobotQSpeak();
 };

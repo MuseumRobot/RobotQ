@@ -11,6 +11,7 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+int m_distVal_temp_temp[768];
 int m_nValPoint_temp;		//m_distVal的长度
 
 CUPURG::CUPURG(){
@@ -128,6 +129,7 @@ void CUPURG::m_ParseFrame(){
 	m_nValPoint = (nBlock*64+nLeft)/3;
 	pDataBuf = m_databuf;
 	CString str;
+	m_distVal[0] = 100;
 	m_nValPoint_temp=m_nValPoint;
 	for (int i=1;i<m_nValPoint;i++){
 		int temp;
@@ -139,15 +141,20 @@ void CUPURG::m_ParseFrame(){
 	for (int i=0;i<m_nValPoint;i++){
 		for (int j=0;j<768;j++){
 			if (m_distVal[j]<50){		//争取开放双侧激光后所有射线都能读到有效值，如果被壳挡住了一部分光线则这部分返回值会很小，可能是小于50mm
-				m_distVal[j]=0;			//表明激光器没有测量到障碍物，设定其返回结果为0mm
+				m_distVal[j]=10000;			//表明激光器没有测量到障碍物，设定其返回结果为0mm
 			}
 		}
-		m_distVal_temp_test[key][i]=(double)m_distVal[i];
+		m_distVal_temp_temp[i]=m_distVal[i];
+		m_distVal_temp_test[key][i]=m_distVal[i];
 	}
 	key = !key;
 	wait_laser.SetEvent();
 }
 
 void CUPURG::fileter(int * p){
-
+	for (int i=100;i<666;i++){
+		if (p[i]<50){
+			p[i]=10000;
+		}
+	}
 }
