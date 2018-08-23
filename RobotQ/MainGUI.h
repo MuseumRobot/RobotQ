@@ -17,7 +17,7 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面
+#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
 #define MARKNUM	31					//全局星标总数
 #define DODGESTEPS 5				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
@@ -73,7 +73,7 @@ private:
 	int dodge_move_times;							//开启闪避时刻后右躲避动作是否经历了许多次
 	int Emergency_times;							//连续紧急制动3次后拒绝紧急制动转而避障
 	int m_EMERGENCY_DISTANCE;						//紧急制动距离，单位mm
-	int sectorObstacleDistance[36];				//每五度划分一个扇区
+	int sectorObstacleDistance[36];					//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
 	int m_timer_refresh_emergency_distance;			//计数器刷新紧急制动距离
@@ -90,7 +90,7 @@ private:
 	void CalculateSectorDistance();					//计算扇区内障碍物的距离
 	void JudgeForwardSituation();					//判断前路是否通畅
 	void AssignInstruction();						//分配下一步指令
-	void AssignGoalPos(int taskID);							//分配目标位置
+	void AssignGoalPos(int taskID);					//分配目标位置
 	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
 	void DodgeTurnRight();							//闪避时刻函数(向右闪避准则)
 	void DodgeTurnLeft();							//闪避时刻函数(向左闪避准则)
@@ -107,8 +107,8 @@ private slots:
 	int OnBtnAutoGuide();
 	int On_MC_BtnForward();
 	int On_MC_BtnBackward();
-	int On_MC_BtnTurnleft(int speedlevel);
-	int On_MC_BtnTurnright(int speedlevel);
+	int On_Auto_BtnTurnleft(int speedlevel);
+	int On_Auto_BtnTurnright(int speedlevel);
 	int On_MC_BtnTurnleft();
 	int On_MC_BtnTurnright();
 	int On_MC_BtnStopmove();

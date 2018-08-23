@@ -307,6 +307,9 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
           <item>
            <property name="text">
             <string>大家好，我是哈尔滨工业大学智能导览机器人小灵，我正在测试，请不要靠近我哦</string>

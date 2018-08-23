@@ -99,7 +99,7 @@ int MainGUI::On_MC_BtnBackward(){
 	m_motor.VectorMove(-800,0);
 	return 0;
 }
-int MainGUI::On_MC_BtnTurnleft(int level){
+int MainGUI::On_Auto_BtnTurnleft(int level){
 	if(level == 0){
 		m_motor.VectorMove(0,0.8);
 	}else if(level == 1){
@@ -107,7 +107,7 @@ int MainGUI::On_MC_BtnTurnleft(int level){
 	}
 	return 0;
 }
-int MainGUI::On_MC_BtnTurnright(int level){
+int MainGUI::On_Auto_BtnTurnright(int level){
 	if(level == 0){
 		m_motor.VectorMove(0,-0.8);
 	}else if(level == 1){
@@ -699,15 +699,15 @@ void MainGUI::Rotate_to_GoalAngle(float AngleGoal){
 	}
 	if(dAngle>0 && dAngle<180){
 		if(dAngle<30){
-			On_MC_BtnTurnleft(0);
+			On_Auto_BtnTurnleft(0);
 		}else{
-			On_MC_BtnTurnleft(1);
+			On_Auto_BtnTurnleft(1);
 		 }
 	}else{
 		if(dAngle>330){
-			On_MC_BtnTurnright(0);
+			On_Auto_BtnTurnright(0);
 		}else{
-			On_MC_BtnTurnright(1);
+			On_Auto_BtnTurnright(1);
 		}
 	}
 }
@@ -732,7 +732,7 @@ void MainGUI::DodgeTurnRight(){
 		On_MC_BtnForward();		//在向右转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
-		On_MC_BtnTurnright(0);
+		On_Auto_BtnTurnright(0);
 	}
 }
 void MainGUI::DodgeTurnLeft(){
@@ -740,7 +740,7 @@ void MainGUI::DodgeTurnLeft(){
 		On_MC_BtnForward();		//在向左转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
-		On_MC_BtnTurnleft(0);
+		On_Auto_BtnTurnleft(0);
 	}
 }
 void MainGUI::InitAdjustGUI(){

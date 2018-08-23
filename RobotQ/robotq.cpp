@@ -150,6 +150,7 @@ bool RobotQ::Init(){
 bool RobotQ::Uninit(void){
 	HCI_ERR_CODE eRet = HCI_ERR_NONE;
 	RECORDER_ERR_CODE eRecRet;
+	hci_tts_player_stop();
 	eRecRet = hci_asr_recorder_release();
 	if(eRecRet != RECORDER_ERR_NONE){
 		return false;
