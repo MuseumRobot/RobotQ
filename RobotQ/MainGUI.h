@@ -17,13 +17,17 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
+#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面
+#define MARKNUM	31					//全局星标总数
 #define DODGESTEPS 5				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm
-#define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个任务周期后恢复
+#define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
+#define INSTRUCTION_CYCLE 1500		//指令周期，单位ms
+#define INFOREFRESH_CYCLE 300		//数据刷新周期，单位ms
 #define OBSTACLE_DISTANCE 400		//障碍物探测距离，单位mm
-#define ERRORANGLE 15.0				//选择角度的误差范围，单位°
+#define ERRORANGLE 12.0				//选择角度的误差范围，单位°
+#define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm
 #define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 
 typedef struct StarMark{
@@ -79,18 +83,21 @@ private:
 	void Init();									//初始化
 	void InitAdjustGUI();							//初始化调整界面（选择启动博物馆模式或开发者模式）
 	void InitStarMark();							//为LED定位标签数组赋值
+	void InitStarMarkMuseum();						//LED标签数组赋值(博物馆)
+	void InitTaskAssignment(int n);					//初始化分配任务路线
 	void InitCommMotorAndStar();					//电机星标串口初始化
 	void InitDashBoardData();						//仪表盘数据初始化
 	void CalculateSectorDistance();					//计算扇区内障碍物的距离
 	void JudgeForwardSituation();					//判断前路是否通畅
 	void AssignInstruction();						//分配下一步指令
+	void AssignGoalPos(int taskID);							//分配目标位置
 	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
 	void DodgeTurnRight();							//闪避时刻函数(向右闪避准则)
 	void DodgeTurnLeft();							//闪避时刻函数(向左闪避准则)
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
-	float zTool_cos_angle(float angle);					//计算余弦值，参数单位为°
-	float zTool_sin_angle(float angle);					//计算正弦值，参数单位为°
+	float zTool_cos_angle(float angle);				//计算余弦值，参数单位为°
+	float zTool_sin_angle(float angle);				//计算正弦值，参数单位为°
 	virtual void timerEvent(QTimerEvent *event);
 
 private slots:
@@ -102,6 +109,8 @@ private slots:
 	int On_MC_BtnBackward();
 	int On_MC_BtnTurnleft(int speedlevel);
 	int On_MC_BtnTurnright(int speedlevel);
+	int On_MC_BtnTurnleft();
+	int On_MC_BtnTurnright();
 	int On_MC_BtnStopmove();
 	int On_MC_BtnRobotQSpeak();
 };

@@ -17,9 +17,9 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_RobotQ=new RobotQ(this);						//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
-	m_timer_refresh_task=startTimer(1500);			//计数器查询分配任务
-	m_timer_refresh_dashboard=startTimer(300);		//计数器查询显示机器状态
-	m_timer_refresh_emergency_distance=0;			//依赖分配任务计数器查询刷新恢复制动距离，模20
+	m_timer_refresh_task=startTimer(INSTRUCTION_CYCLE);					//计数器查询分配任务
+	m_timer_refresh_dashboard=startTimer(INFOREFRESH_CYCLE);			//计数器查询显示机器状态
+	m_timer_refresh_emergency_distance=0;								//依赖分配任务计数器查询刷新恢复制动距离，模20
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
@@ -45,22 +45,14 @@ MainGUI::~MainGUI(){
 	m_cURG.SwitchOff();		//关闭激光
 }
 void MainGUI::Init(){
-	InitStarMark();					//LED标签数组赋值
+	//InitStarMark();				//LED标签数组赋值(实验室)
+	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
 	InitAdjustGUI();				//调整界面适配使用者
-
-	currentTodoListId = 0;	//初始化当前todolist的下标为0
-	todoList[0] = 3;	//任务代号3，起点，坐标(178,73)
-	todoList[1] = 5;	//任务代号5，终点，坐标(143,270)
-	todoList[2] = 0;	
-	//todoList[0] = 3;	//任务代号为3，意味着目标坐标为(25,25)，作为起点
-	//todoList[1] = 11;	//朗读任务代号11
-	//todoList[2] = 5;	//任务代号为5，意味着目标坐标为(70,160)
-	//todoList[3] = 2;	//任务代号为2，意味着目标坐标为(30,120)
-	//todoList[4] = 13;	//朗读呵呵呵
-	//todoList[5] = 0;	//当读到任务代号为0时，整个项目完成
+	InitTaskAssignment(1);			//默认分配路线一
+	
 }
 int MainGUI::OnBtnAutoGuide(){
 	if(is_Auto_Mode_Open == true){
@@ -109,18 +101,26 @@ int MainGUI::On_MC_BtnBackward(){
 }
 int MainGUI::On_MC_BtnTurnleft(int level){
 	if(level == 0){
-		m_motor.VectorMove(0,1);
+		m_motor.VectorMove(0,0.8);
 	}else if(level == 1){
-		m_motor.VectorMove(0,2);
+		m_motor.VectorMove(0,1.5);
 	}
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(int level){
 	if(level == 0){
-		m_motor.VectorMove(0,-1);
+		m_motor.VectorMove(0,-0.8);
 	}else if(level == 1){
-		m_motor.VectorMove(0,-2);
+		m_motor.VectorMove(0,-1.5);
 	}
+	return 0;
+}
+int MainGUI::On_MC_BtnTurnleft(){
+	m_motor.VectorMove(0,1);
+	return 0;
+}
+int MainGUI::On_MC_BtnTurnright(){
+	m_motor.VectorMove(0,-1);
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){
@@ -240,6 +240,164 @@ void MainGUI::InitStarMark(){
 	m_MARK[13].mark_angle = 0.00;
 	m_MARK[13].mark_x = 309;
 	m_MARK[13].mark_y = 1;
+}
+void MainGUI::InitStarMarkMuseum(){
+	m_MARK[0].markID = 2;
+	m_MARK[0].mark_angle = 0.00;
+	m_MARK[0].mark_x = 118;
+	m_MARK[0].mark_y = 183;
+
+
+	m_MARK[1].markID = 16;
+	m_MARK[1].mark_angle = 0.00;
+	m_MARK[1].mark_x = 283;
+	m_MARK[1].mark_y = 243;
+
+	m_MARK[2].markID = 32;
+	m_MARK[2].mark_angle = 0.00;
+	m_MARK[2].mark_x = 463;
+	m_MARK[2].mark_y = 243;
+
+	m_MARK[3].markID = 18;
+	m_MARK[3].mark_angle = 0.00;
+	m_MARK[3].mark_x = 658;
+	m_MARK[3].mark_y = 168;
+
+	m_MARK[4].markID = 624;
+	m_MARK[4].mark_angle = 0.00;
+	m_MARK[4].mark_x = 193;
+	m_MARK[4].mark_y = 363;
+
+	m_MARK[5].markID = 626;
+	m_MARK[5].mark_angle = 0.00;
+	m_MARK[5].mark_x = 388;
+	m_MARK[5].mark_y = 363;
+
+
+	m_MARK[6].markID = 34;
+	m_MARK[6].mark_angle = 180.00;
+	m_MARK[6].mark_x = 598;
+	m_MARK[6].mark_y = 333;
+
+	m_MARK[7].markID = 610;
+	m_MARK[7].mark_angle = 0.00;
+	m_MARK[7].mark_x = 178;
+	m_MARK[7].mark_y = 528;
+
+	m_MARK[8].markID = 608;
+	m_MARK[8].mark_angle = 0.00;
+	m_MARK[8].mark_x = 418;
+	m_MARK[8].mark_y = 513;
+
+	m_MARK[9].markID = 594;
+	m_MARK[9].mark_angle = 0.00;
+	m_MARK[9].mark_x = 658;
+	m_MARK[9].mark_y = 498;
+
+	m_MARK[10].markID = 578;
+	m_MARK[10].mark_angle = 0.00;
+	m_MARK[10].mark_x = 268;
+	m_MARK[10].mark_y = 648;
+
+	m_MARK[11].markID = 592;
+	m_MARK[11].mark_angle = 0.00;
+	m_MARK[11].mark_x = 523;
+	m_MARK[11].mark_y = 618;
+
+	m_MARK[12].markID = 576;
+	m_MARK[12].mark_angle = 0.00;
+	m_MARK[12].mark_x = 178;
+	m_MARK[12].mark_y = 783;
+
+	m_MARK[13].markID = 50;
+	m_MARK[13].mark_angle = 0.00;
+	m_MARK[13].mark_x = 403;
+	m_MARK[13].mark_y = 738;
+
+	m_MARK[14].markID = 562;
+	m_MARK[14].mark_angle = 0.00;
+	m_MARK[14].mark_x = 673;
+	m_MARK[14].mark_y = 768;
+
+	m_MARK[15].markID = 546,
+		m_MARK[15].mark_angle = 0.00,
+		m_MARK[15].mark_x = 283,
+		m_MARK[15].mark_y = 888,
+
+		m_MARK[16].markID = 560;
+	m_MARK[16].mark_angle = 0.00;
+	m_MARK[16].mark_x = 523;
+	m_MARK[16].mark_y = 858;
+
+	m_MARK[17].markID = 528;
+	m_MARK[17].mark_angle = 0.00;
+	m_MARK[17].mark_x = 178;
+	m_MARK[17].mark_y = 963;
+
+	m_MARK[18].markID = 544;
+	m_MARK[18].mark_angle = 0.00;
+	m_MARK[18].mark_x = 422.5;
+	m_MARK[18].mark_y = 1008;
+
+	m_MARK[19].markID = 530;
+	m_MARK[19].mark_angle = 0.00;
+	m_MARK[19].mark_x = 673;
+	m_MARK[19].mark_y = 1008;
+
+	m_MARK[20].markID = 514;
+	m_MARK[20].mark_angle = 0.00;
+	m_MARK[20].mark_x = 283;
+	m_MARK[20].mark_y = 1083;
+
+	m_MARK[21].markID = 512;
+	m_MARK[21].mark_angle = 0.00;
+	m_MARK[21].mark_x = 487;
+	m_MARK[21].mark_y = 1083;
+
+	m_MARK[22].markID = 80;
+	m_MARK[22].mark_angle = 0.00;
+	m_MARK[22].mark_x = 178;
+	m_MARK[22].mark_y = 1218;
+
+	m_MARK[23].markID = 68;
+	m_MARK[23].mark_angle = 0.00;
+	m_MARK[23].mark_x = 418;
+	m_MARK[23].mark_y = 1188;
+
+	m_MARK[24].markID = 114;
+	m_MARK[24].mark_angle = 0.00;
+	m_MARK[24].mark_x = 688;
+	m_MARK[24].mark_y = 1203;
+
+	m_MARK[25].markID = 82;
+	m_MARK[25].mark_angle = 0.00;
+	m_MARK[25].mark_x = 268;
+	m_MARK[25].mark_y = 1338;
+
+	m_MARK[26].markID = 112;
+	m_MARK[26].mark_angle = 0.00;
+	m_MARK[26].mark_x = 568;
+	m_MARK[26].mark_y = 1353;
+
+	m_MARK[27].markID = 96;
+	m_MARK[27].mark_angle = 0.00;
+	m_MARK[27].mark_x = 178;
+	m_MARK[27].mark_y = 1473;
+
+	m_MARK[28].markID = 48;
+	m_MARK[28].mark_angle = 0.00;
+	m_MARK[28].mark_x = 273;
+	m_MARK[28].mark_y = 1473;
+
+	m_MARK[29].markID = 98;
+	m_MARK[29].mark_angle = 0.00;
+	m_MARK[29].mark_x = 568;
+	m_MARK[29].mark_y = 1473;
+
+	m_MARK[30].markID = 64;
+	m_MARK[30].mark_angle = 0.00;
+	m_MARK[30].mark_x = 740.5;
+	m_MARK[30].mark_y = 1503;
 }
 void MainGUI::InitCommMotorAndStar(){
 	if(m_motor.open_com_motor(COMM_MOTOR)){
@@ -361,21 +519,31 @@ void MainGUI::refreshDashboardData(){
 	JudgeForwardSituation();		//判断前方是否畅通无阻
 	PosByStar1=QPointF(0.00,0.00);
 	PosByStar2=QPointF(0.00,0.00);
-	for (int loop_mark = 0; loop_mark < 14; loop_mark++){
+	for (int loop_mark = 0; loop_mark < MARKNUM - 1; loop_mark++){
 		if (m_MARK[loop_mark].markID == m_StarGazer.starID){
+			
 			PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
 			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
 			AngleByStar1 = m_StarGazer.starAngel;
-			AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
+			
+			//if(m_MARK[loop_mark].markID !=34 && m_MARK[loop_mark].markID !=64 && m_MARK[loop_mark].markID !=66){
+				AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
+				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
+				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
+				PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()+dy);
+			//}
 			AngleSafe = 360.0 - AngleSafe;											//得到机器人本体朝向（逆时针）
-			float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
-			float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
-			PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()+dy);
 		}
 		if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
 			PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
 			PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
 			AngleByStar2 = m_StarGazer.starAngel;
+			//if(m_MARK[loop_mark].markID ==34 && m_MARK[loop_mark].markID ==64 && m_MARK[loop_mark].markID ==66){
+			//	AngleByStar2>0?AngleSafe=AngleByStar2:AngleSafe=AngleByStar2+360.0;		//得到机器人本体的朝向(顺时针)
+			//	float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
+			//	float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
+			//	PosSafe = QPointF(PosByStar2.x()+dx,PosByStar2.y()+dy);
+			//}
 		}
 	}
 	QPointF d = PosGoal - PosSafe;
@@ -398,7 +566,7 @@ void MainGUI::refreshDashboardData(){
 	m_DashBoard->ui.posMotor->setText(str);
 	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosSafe.x(),PosSafe.y(),AngleSafe);
 	m_DashBoard->ui.posSafe->setText(str);
-	str.sprintf("(%.2f,%.2f)",PosGoal.x(),PosGoal.y());
+	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosGoal.x(),PosGoal.y(),Angle_face_Goal);
 	m_DashBoard->ui.posGoal->setText(str);
 
 	//更新任务显示
@@ -455,23 +623,9 @@ void MainGUI::AssignInstruction(){
 			if(is_mission_accomplished == false){
 				int taskID=todoList[currentTodoListId];		
 				if (taskID<10){		//taskID<10意味着是路径点
-					if(taskID == 3){
-						PosGoal = QPointF(178.0,73.0);
-					}else if(taskID == 2){
-						PosGoal = QPointF(30.0,120.0);
-					}else if(taskID == 5){
-						PosGoal = QPointF(148.0,260.0);
-					}else if(taskID == 0){
-						is_project_accomplished = true;
-						Sleep(3000);
-						m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
-						RobotQ::RobotQSpeak("我已经完成整个项目");
-						is_Auto_Mode_Open = false;
-						m_DashBoard->ui.ck_Auto->setChecked(false);
-						ui.btnAutoGuide->setText("开启自动导航");
-					}
+					AssignGoalPos(taskID);	//分配目标坐标
 					float errorRange_Angle = ERRORANGLE;				//选择角度的误差范围，单位°
-					float errorRange_Distance = 30.0;					//抵达目标点的距离误差范围，单位cm
+					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
 					QPointF d = PosGoal - PosSafe;
 					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
 					if(dDistance > errorRange_Distance){
@@ -482,7 +636,7 @@ void MainGUI::AssignInstruction(){
 							}else{
 								float d = AngleSafe-Angle_face_Goal;
 								if(d > 0.0 && d< 90.0 || d < -270.0 ){
-									DodgeTurnLeft();
+									DodgeTurnRight();
 								}else{
 									DodgeTurnRight();
 								}
@@ -517,7 +671,7 @@ void MainGUI::AssignInstruction(){
 					//taskID>10意味着是语音播报点
 					QString str;
 					if(taskID == 11 ){
-						str="这件六耳大铜锅是金代典型炊具，埋锅造饭"; 
+						str="大家好，我是哈尔滨工业大学智能导览机器人小灵，我正在测试，请不要靠近我哦!"; 
 					}else{
 						str="呵呵呵";
 					}
@@ -544,13 +698,13 @@ void MainGUI::Rotate_to_GoalAngle(float AngleGoal){
 		dAngle +=360;
 	}
 	if(dAngle>0 && dAngle<180){
-		if(abs(dAngle)<30){
+		if(dAngle<30){
 			On_MC_BtnTurnleft(0);
 		}else{
 			On_MC_BtnTurnleft(1);
-		}
+		 }
 	}else{
-		if(abs(dAngle)<30){
+		if(dAngle>330){
 			On_MC_BtnTurnright(0);
 		}else{
 			On_MC_BtnTurnright(1);
@@ -651,5 +805,52 @@ void MainGUI::InitAdjustGUI(){
 		OnBtnDashBoard();				//开启仪表盘面板
 		OnBtnManualControl();			//开启遥控器面板
 		//OnBtnRobotQ();					//开启语音对话面板
+	}
+}
+void MainGUI::InitTaskAssignment(int n){
+	//初始化任务分配（路线X）
+	if(n ==1 ){	//路线一
+		currentTodoListId = 0;	//初始化当前todolist的下标为0
+		todoList[0] = 1;	//(227,1514)
+		todoList[1] = 11;
+		todoList[2] = 2;	//(632,1418)
+		todoList[3] = 11;
+		todoList[4] = 3;	//(687,374)
+		todoList[5] = 11;	//语音点
+		todoList[6] = 4;	//(205,277)
+		todoList[7] = 1;	
+		todoList[8] = 0;	//休止符
+	}
+}
+void MainGUI::AssignGoalPos(int taskID){
+	//if(taskID == 1){
+	//	PosGoal = QPointF(227.0,1514.0);
+	//}else if(taskID == 2){
+	//	PosGoal = QPointF(632.0,1418.0);
+	//}else if(taskID == 5){
+	//	PosGoal = QPointF(687.0,1450.0);
+	//}else if(taskID == 0){
+	//	is_project_accomplished = true;
+	//	Sleep(3000);
+	//	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
+	//	RobotQ::RobotQSpeak("我已经完成整个项目");
+	//	is_Auto_Mode_Open = false;
+	//	m_DashBoard->ui.ck_Auto->setChecked(false);
+	//	ui.btnAutoGuide->setText("开启自动导航");
+	//}
+	switch(taskID){
+	case 1:PosGoal = QPointF(227.0,1514.0);break;
+	case 2:PosGoal = QPointF(632.0,1418.0);break;
+	case 3:PosGoal = QPointF(687.0,374.0);break;
+	case 4:PosGoal = QPointF(205.0,277.0);break;
+	default:{
+				is_project_accomplished = true;
+				Sleep(3000);
+				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
+				RobotQ::RobotQSpeak("我已经完成整个项目");
+				is_Auto_Mode_Open = false;
+				m_DashBoard->ui.ck_Auto->setChecked(false);
+				ui.btnAutoGuide->setText("开启自动导航");
+			}
 	}
 }

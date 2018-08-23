@@ -309,17 +309,17 @@
           </property>
           <item>
            <property name="text">
+            <string>大家好，我是哈尔滨工业大学智能导览机器人小灵，我正在测试，请不要靠近我哦</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>展品一</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>展品二</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵呵</string>
            </property>
           </item>
          </widget>
@@ -330,6 +330,9 @@
            <widget class="QPushButton" name="btnStartSpeak">
             <property name="text">
              <string>播放</string>
+            </property>
+            <property name="shortcut">
+             <string>A</string>
             </property>
            </widget>
           </item>
