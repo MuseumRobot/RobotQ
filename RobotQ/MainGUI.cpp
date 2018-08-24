@@ -618,14 +618,14 @@ void MainGUI::AssignInstruction(){
 					}
 				}else{												//如果已经抵达当前目标点
 					PathTaskFinishedMeasures();
-					if(JudgeTaskType(taskID) == SPEAKTASKTYPE)?isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
+					JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 				}
 			}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
 				AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitTime
 				RobotQ::RobotQSpeak(SpeakContent);
 				Sleep(SpeakWaitTime);
 				SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
-				if(JudgeTaskType(taskID) == SPEAKTASKTYPE)?isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
+				JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 			}else{		
 				ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 			}
