@@ -12,8 +12,8 @@ public:
 	char name[32];
 	int taskType;
 	int SpeakContentId;
-	int x;
-	int y;
+	double x;
+	double y;
 };
 
 typedef list<TaskDataType> TaskDataTypeList;
