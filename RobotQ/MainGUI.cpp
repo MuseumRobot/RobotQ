@@ -60,17 +60,18 @@ int MainGUI::OnBtnAutoGuide(){
 		if(MUSEUMMODE == 0){
 			m_DashBoard->ui.ck_Auto->setChecked(false);
 			ui.btnAutoGuide->setText("开启自动导航");
+			RobotQ::RobotQSpeak("自动导航已关闭！");
 		}
 	}else{
 		currentTodoListId = 0;
-		is_mission_accomplished = false;
+		taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
 		is_project_accomplished = false;
 		is_Auto_Mode_Open = true;
 		if(MUSEUMMODE == 0){
 			m_DashBoard->ui.ck_Auto->setChecked(true);
 			ui.btnAutoGuide->setText("关闭自动导航");
+			RobotQ::RobotQSpeak("自动导航已开启！");
 		}
-
 	}
 	return 0;
 }
@@ -128,24 +129,19 @@ int MainGUI::On_MC_BtnStopmove(){
 	return 0;
 }
 int MainGUI::On_MC_BtnRobotQSpeak(){
-	QString str;
-	str=m_ManualControl->ui.comSpeaklist->currentText();
-	RobotQ::RobotQSpeak(str);
+	SpeakContent=m_ManualControl->ui.comSpeaklist->currentText();
+	RobotQ::RobotQSpeak(SpeakContent);
 	return 0;
 }
 void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
-		CalculateSectorDistance();		//计算扇区内障碍物距离
-		refreshDashboardSector();		//刷新障碍物分布图
 		refreshDashboardData();			//刷新仪表盘数据
 	}else if(event->timerId()==m_timer_refresh_task){
 		m_timer_refresh_emergency_distance++;
-		if(m_timer_refresh_emergency_distance == 20){
+		if(m_timer_refresh_emergency_distance == EMERGENCY_RECOVER_CYCLE){
 			m_timer_refresh_emergency_distance = 0;
 			if(m_EMERGENCY_DISTANCE == 0){
-				m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
-				//RobotQ::RobotQSpeak("紧急制动已恢复");
-				//Sleep(3000);
+				m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;	//紧急制动恢复
 			}
 		}
 		if(is_Auto_Mode_Open){
@@ -319,12 +315,12 @@ void MainGUI::InitStarMarkMuseum(){
 	m_MARK[14].mark_x = 673;
 	m_MARK[14].mark_y = 768;
 
-	m_MARK[15].markID = 546,
-		m_MARK[15].mark_angle = 0.00,
-		m_MARK[15].mark_x = 283,
-		m_MARK[15].mark_y = 888,
+	m_MARK[15].markID = 546;
+	m_MARK[15].mark_angle = 0.00;
+	m_MARK[15].mark_x = 283;
+	m_MARK[15].mark_y = 888;
 
-		m_MARK[16].markID = 560;
+	m_MARK[16].markID = 560;
 	m_MARK[16].mark_angle = 0.00;
 	m_MARK[16].mark_x = 523;
 	m_MARK[16].mark_y = 858;
@@ -515,55 +511,49 @@ void MainGUI::refreshDashboardSector(){
 	if(sectorObstacleDistance[N-35]<threshold && sectorObstacleDistance[N-35] >0)m_DashBoard->ui.r180->setChecked(flag);
 }
 void MainGUI::refreshDashboardData(){
-	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
+	CalculateSectorDistance();		//计算扇区内障碍物距离
 	JudgeForwardSituation();		//判断前方是否畅通无阻
+	refreshDashboardSector();		//刷新障碍物分布图
+	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
 	PosByStar1=QPointF(0.00,0.00);
 	PosByStar2=QPointF(0.00,0.00);
 	for (int loop_mark = 0; loop_mark < MARKNUM - 1; loop_mark++){
 		if (m_MARK[loop_mark].markID == m_StarGazer.starID){
-			
+			//采集原始Star1数据
 			PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
 			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
 			AngleByStar1 = m_StarGazer.starAngel;
-			
-			//if(m_MARK[loop_mark].markID !=34 && m_MARK[loop_mark].markID !=64 && m_MARK[loop_mark].markID !=66){
+			//Star1未失灵情况下机器人本体的世界坐标与朝向由Star1确定
+			if(m_MARK[loop_mark].markID !=34 && m_MARK[loop_mark].markID !=64 && m_MARK[loop_mark].markID !=66){
 				AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
 				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
 				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
 				PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()+dy);
-			//}
-			AngleSafe = 360.0 - AngleSafe;											//得到机器人本体朝向（逆时针）
+				AngleSafe = 360.0 - AngleSafe;											//得到机器人本体朝向（逆时针）
+			}
 		}
 		if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
+			//采集原始Star2数据
 			PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
 			PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
 			AngleByStar2 = m_StarGazer.starAngel;
-			//if(m_MARK[loop_mark].markID ==34 && m_MARK[loop_mark].markID ==64 && m_MARK[loop_mark].markID ==66){
-			//	AngleByStar2>0?AngleSafe=AngleByStar2:AngleSafe=AngleByStar2+360.0;		//得到机器人本体的朝向(顺时针)
-			//	float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
-			//	float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
-			//	PosSafe = QPointF(PosByStar2.x()+dx,PosByStar2.y()+dy);
-			//}
+			//Star1失灵情况下机器人本体的世界坐标与朝向由Star2确定
+			if(m_MARK[loop_mark].markID ==34 || m_MARK[loop_mark].markID ==64 || m_MARK[loop_mark].markID ==66){
+				AngleByStar2>0?AngleSafe=AngleByStar2:AngleSafe=AngleByStar2+360.0;		//得到机器人本体的朝向(顺时针)
+				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
+				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
+				PosSafe = QPointF(PosByStar2.x()+dx,PosByStar2.y()+dy);
+				AngleSafe = 360.0 - AngleSafe;
+			}
 		}
 	}
-	QPointF d = PosGoal - PosSafe;
-	if(d.x() > 0 && d.y() > 0){
-		Angle_face_Goal =atan((d.y())/d.x())/PI/2*360.0;	//目标在第一象限
-	}else if(d.x() < 0 && d.y() < 0){
-		Angle_face_Goal =180 + atan((d.y())/d.x())/PI/2*360.0;	//目标在第三象限
-	}else if(d.x() <0 && d.y() > 0){
-		Angle_face_Goal =180 + atan((d.y())/d.x())/PI/2*360.0;	//目标在第二象限
-	}else{
-		Angle_face_Goal =360 + atan((PosGoal.y()-PosSafe.y())/(PosGoal.x()-PosSafe.x()))/PI/2*360.0;	//目标在第四象限
-	}
 
+	Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
 	QString str;
 	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
 	m_DashBoard->ui.posStar1->setText(str);
 	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
 	m_DashBoard->ui.posStar2->setText(str);
-	str.sprintf("(%.2f,%.2f)",PosByMotor.x(),PosByMotor.y());
-	m_DashBoard->ui.posMotor->setText(str);
 	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosSafe.x(),PosSafe.y(),AngleSafe);
 	m_DashBoard->ui.posSafe->setText(str);
 	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosGoal.x(),PosGoal.y(),Angle_face_Goal);
@@ -571,115 +561,67 @@ void MainGUI::refreshDashboardData(){
 
 	//更新任务显示
 	if(is_project_accomplished == false){
-		str = "任务序号:";str += QString("%2").arg(currentTodoListId);str +="(代号:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
-		m_DashBoard->ui.text_CurrentTaskId->setText(str);
+		str = "任务序号:";str += QString("%2").arg(currentTodoListId);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
+	}else{
+		str = "当前没有任务";
 	}
+	m_DashBoard->ui.text_CurrentTaskId->setText(str);
+
 	int i=0;
 	str = "";
 	while(todoList[i] != 0){
-		QString a =QString("%2").arg(todoList[i]);str += a;str += " ";i++;
+		QString a =QString("%2").arg(todoList[i]);str += a;str += ",";i++;
 	}
+	str.resize(str.length() - 1);		//修剪字符串尾部多余的","
 	m_DashBoard->ui.text_Todolist->setText(str);
 }
 void MainGUI::InitDashBoardData(){
 	PosByStar1=QPointF(0.00,0.00);
 	PosByStar2=QPointF(0.00,0.00);
-	PosByMotor=QPointF(0.00,0.00);
 	PosSafe=QPointF(0.00,0.00);
-	PosGoal=QPointF(50.00,50.00);
+	PosGoal=QPointF(00.00,00.00);
 	is_Auto_Mode_Open = false;
-	is_mission_accomplished = false;
-	is_project_accomplished = false;
 	is_path_clear = true;
 	is_dodge_moment = false;
+	isEMERGENCY = false;
 	dodge_move_times = 0;
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
 }
 void MainGUI::AssignInstruction(){
-	bool isEMERGENCY = false;
-	for(int i=9;i<27;i++){
-		if(sectorObstacleDistance[i]>0 && sectorObstacleDistance[i] < OBSTACLE_DISTANCE){
-			if(sectorObstacleDistance[i] > 0 && sectorObstacleDistance[i] < m_EMERGENCY_DISTANCE){
-				isEMERGENCY =true;
-				break;
-			}
-		}
-	}
-	if(isEMERGENCY && is_Auto_Mode_Open && m_DashBoard->ui.ck_isEmergency->isChecked()){
-		Emergency_times++;
-		m_motor.stop();
-		RobotQ::RobotQSpeak("紧急制动!您挡到小灵啦!");
-		Sleep(5000);
-		if(Emergency_times == 3){
-			Emergency_times = 0;
-			m_EMERGENCY_DISTANCE = 0;
-			RobotQ::RobotQSpeak("紧急制动已解除，10秒后恢复");
-			m_timer_refresh_emergency_distance = 0;
-		}
-	}else{	
-		//非紧急情况下正常发配指令
-		if(is_project_accomplished == false){
-			if(is_mission_accomplished == false){
-				int taskID=todoList[currentTodoListId];		
-				if (taskID<10){		//taskID<10意味着是路径点
-					AssignGoalPos(taskID);	//分配目标坐标
-					float errorRange_Angle = ERRORANGLE;				//选择角度的误差范围，单位°
-					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
-					QPointF d = PosGoal - PosSafe;
-					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
-					if(dDistance > errorRange_Distance){
-						if(is_dodge_moment == true){
-							if((is_path_clear == true && dodge_move_times > DODGESTEPS-2) || dodge_move_times > DODGESTEPS){
-								is_dodge_moment = false;				//超出闪避有效步数后，如果当前前路通畅，则退出闪避时刻
-								m_DashBoard->ui.ck_isDodgetime->setChecked(false);
-							}else{
-								float d = AngleSafe-Angle_face_Goal;
-								if(d > 0.0 && d< 90.0 || d < -270.0 ){
-									DodgeTurnRight();
-								}else{
-									DodgeTurnRight();
-								}
-
-							}
-						}else{
-							//如果没有进入闪避时间，则正常运行
-							if(abs(Angle_face_Goal-AngleSafe)>errorRange_Angle){		
-								Rotate_to_GoalAngle(Angle_face_Goal);	//如果和目标角度差距大就先看一眼目标
-							}else{
-								if(is_path_clear == true){
-									On_MC_BtnForward();					//转到想要的角度后如果前路通畅就继续走
-								}else{
-									//如果前路不通畅，进入闪避时刻
-									is_dodge_moment = true;
-									dodge_move_times = 0;				//清空闪避操作次数计数器
-									m_DashBoard->ui.ck_isDodgetime->setChecked(true);
-								}
-							}
-						}
+	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
+	if(isEMERGENCY){			//当前指令周期为紧急状态
+		EmergencyMeasures();	//紧急情况下的措施
+	}else{						//非紧急情况下正常发配指令
+		if(is_project_accomplished == false){			//当项目未完成时（一个项目由若干个任务组成，而一个任务想要完成需要经过若干个指令周期）
+			taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
+			if (taskID<10){											//taskID<10意味着是路径点
+				AssignGoalPos(taskID);								//分配目标坐标
+				float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
+				QPointF d = PosGoal - PosSafe;
+				float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
+				if(dDistance > errorRange_Distance){				//如果还没有抵达当前任务目标点就继续执行任务
+					if(is_dodge_moment == true){	//一旦前路不通会进入闪避时刻，占用若干个指令周期，而闪避时刻有自己的退出条件
+						DodgeMeasures();							//如果处于闪避时刻就闪避
 					}else{
-						is_mission_accomplished = true;
-						QString TaskCode;
-						TaskCode.sprintf("任务代号%d",taskID);
-						m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经到达目标点," + TaskCode);
-						RobotQ::RobotQSpeak("我已经到达目标点," + TaskCode);
-						Sleep(3000);
-						currentTodoListId++;
-						is_mission_accomplished = false;	//一个任务完成后，怒吼一下，休息3秒，又开始接新任务了
+						CommonMeasures();							//如果本指令周期没有处于闪避时刻，则正常向目标运行
 					}
-				}else{
-					//taskID>10意味着是语音播报点
-					QString str;
-					if(taskID == 11 ){
-						str="大家好，我是哈尔滨工业大学智能导览机器人小灵，我正在测试，请不要靠近我哦!"; 
-					}else{
-						str="呵呵呵";
-					}
-					Sleep(3000);
-					m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + str);
-					RobotQ::RobotQSpeak(str);
-					currentTodoListId++;
+				}else{												//如果已经抵达当前目标点
+					PathTaskFinishedMeasures();
 				}
+			}else if(taskID>10){					//taskID>10意味着是语音播报点
+				QString str;
+				if(taskID == 11 ){
+					str="大家好，我是哈尔滨工业大学智能导览机器人小灵，我正在测试，请不要靠近我哦!"; 
+				}else{
+					str="呵呵呵";
+				}
+				Sleep(3000);
+				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + str);
+				RobotQ::RobotQSpeak(str);
+				currentTodoListId++;
+			}else{		
+				ProjectFinishedMeasures();	//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 			}
 		}	
 	}
@@ -691,13 +633,8 @@ float MainGUI::zTool_sin_angle(float angle){
 	return sin(angle/360.0*2*PI);
 }
 void MainGUI::Rotate_to_GoalAngle(float AngleGoal){
-	float dAngle=AngleGoal-AngleSafe;	//目标朝向与当前朝向的角度差
-	if(dAngle>360.0){
-		dAngle -=360;
-	}else if(dAngle<0.0){
-		dAngle +=360;
-	}
-	if(dAngle>0 && dAngle<180){
+	float dAngle = zTool_mod_360f(AngleGoal-AngleSafe);		//目标朝向与当前朝向的角度差，取值范围为(0,360)
+	if(dAngle<180){
 		if(dAngle<30){
 			On_Auto_BtnTurnleft(0);
 		}else{
@@ -720,12 +657,14 @@ void MainGUI::JudgeForwardSituation(){
 	}
 	if(n>0){
 		is_path_clear = false;
+		is_dodge_moment = true;				//如果前路不通畅，进入闪避时刻
+		dodge_move_times = 0;				//清空闪避操作次数计数器
 		m_DashBoard->ui.ck_isClear->setChecked(false);
+		m_DashBoard->ui.ck_isDodgetime->setChecked(true);
 	}else{
 		is_path_clear = true;
 		m_DashBoard->ui.ck_isClear->setChecked(true);
 	}
-
 }
 void MainGUI::DodgeTurnRight(){
 	if(is_path_clear){
@@ -823,34 +762,92 @@ void MainGUI::InitTaskAssignment(int n){
 	}
 }
 void MainGUI::AssignGoalPos(int taskID){
-	//if(taskID == 1){
-	//	PosGoal = QPointF(227.0,1514.0);
-	//}else if(taskID == 2){
-	//	PosGoal = QPointF(632.0,1418.0);
-	//}else if(taskID == 5){
-	//	PosGoal = QPointF(687.0,1450.0);
-	//}else if(taskID == 0){
-	//	is_project_accomplished = true;
-	//	Sleep(3000);
-	//	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
-	//	RobotQ::RobotQSpeak("我已经完成整个项目");
-	//	is_Auto_Mode_Open = false;
-	//	m_DashBoard->ui.ck_Auto->setChecked(false);
-	//	ui.btnAutoGuide->setText("开启自动导航");
-	//}
 	switch(taskID){
 	case 1:PosGoal = QPointF(227.0,1514.0);break;
 	case 2:PosGoal = QPointF(632.0,1418.0);break;
 	case 3:PosGoal = QPointF(687.0,374.0);break;
 	case 4:PosGoal = QPointF(205.0,277.0);break;
-	default:{
-				is_project_accomplished = true;
-				Sleep(3000);
-				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
-				RobotQ::RobotQSpeak("我已经完成整个项目");
-				is_Auto_Mode_Open = false;
-				m_DashBoard->ui.ck_Auto->setChecked(false);
-				ui.btnAutoGuide->setText("开启自动导航");
-			}
+	default:{}
 	}
+}
+void MainGUI::JudgeEmergency(){
+	isEMERGENCY = false;
+	for(int i=9;i<27;i++){
+		if(sectorObstacleDistance[i] > 0 && sectorObstacleDistance[i] < m_EMERGENCY_DISTANCE){
+			isEMERGENCY =true;
+			break;
+		}
+	}
+	m_DashBoard->ui.ck_isEmergency->setChecked(isEMERGENCY);
+}
+void MainGUI::EmergencyMeasures(){
+	Emergency_times++;
+	m_motor.stop();
+	RobotQ::RobotQSpeak("紧急制动!您挡到小灵啦!");
+	Sleep(5000);
+	if(Emergency_times == 3){
+		Emergency_times = 0;
+		m_EMERGENCY_DISTANCE = 0;
+		RobotQ::RobotQSpeak("紧急制动已解除，10秒后恢复");
+		m_timer_refresh_emergency_distance = 0;
+	}
+}
+float MainGUI::zTool_mod_360f(float angle){
+	if(angle>360.0){
+		angle -=360;
+	}else if(angle<0.0){
+		angle +=360;
+	}
+	return angle;
+}
+void MainGUI::DodgeMeasures(){
+	if((is_path_clear == true && dodge_move_times > DODGESTEPS-2) || dodge_move_times > DODGESTEPS){
+		is_dodge_moment = false;				//超出闪避有效步数后，如果当前前路通畅，则退出闪避时刻
+		m_DashBoard->ui.ck_isDodgetime->setChecked(false);
+	}else{
+		float d = zTool_mod_360f(Angle_face_Goal-AngleSafe);
+		if(d<180.0){
+			DodgeTurnLeft();	//目标在当前朝向的左手边则向左避障
+		}else{
+			DodgeTurnRight();	//目标在当前朝向的右手边则向右避障
+		}
+	}
+}
+void MainGUI::CommonMeasures(){
+	float errorRange_Angle = ERRORANGLE;		//选择角度的误差范围，单位°
+	if(abs(Angle_face_Goal-AngleSafe)>errorRange_Angle){		
+		Rotate_to_GoalAngle(Angle_face_Goal);	//如果和目标角度差距大就先看一眼目标
+	}else{
+		On_MC_BtnForward();						//转到想要的角度后就继续走
+	}
+}
+void MainGUI::PathTaskFinishedMeasures(){
+	QString TaskCode;
+	TaskCode.sprintf("任务代码%d",taskID);
+	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经到达目标点," + TaskCode);
+	RobotQ::RobotQSpeak("我已经到达目标点," + TaskCode);
+	Sleep(3000);
+	currentTodoListId++;	//一个任务完成后，准备执行下一个
+}
+void MainGUI::ProjectFinishedMeasures(){
+	is_project_accomplished = true;
+	Sleep(2000);
+	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
+	RobotQ::RobotQSpeak("我已经完成整个项目");
+	is_Auto_Mode_Open = false;
+	m_DashBoard->ui.ck_Auto->setChecked(false);
+	ui.btnAutoGuide->setText("开启自动导航");
+}
+float MainGUI::zTool_vector_angle(QPointF d){
+	float angle;
+	if(d.x() > 0 && d.y() > 0){
+		angle =atan(d.y()/d.x())/PI/2*360.0;	//目标在第一象限
+	}else if(d.x() < 0 && d.y() < 0){
+		angle =180 + atan(d.y()/d.x())/PI/2*360.0;	//目标在第三象限
+	}else if(d.x() <0 && d.y() > 0){
+		angle =180 + atan(d.y()/d.x())/PI/2*360.0;	//目标在第二象限
+	}else{
+		angle =360 + atan(d.y()/d.x())/PI/2*360.0;	//目标在第四象限
+	}
+	return angle;
 }
