@@ -36,7 +36,7 @@ private slots:
 	int OnEndClicked();
 	int OnQueryClicked();
 public slots:
-	int OnStopSpeak();
+	static int OnStopSpeak();
 private:
 	bool Init();
 	bool Uninit(void);

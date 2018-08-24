@@ -1,7 +1,5 @@
 #pragma once
 #include <list>
-#include <QString>
-#include <QPoint>
 
 using namespace std;
 

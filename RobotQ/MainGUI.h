@@ -20,7 +20,7 @@
 #define PI 3.141592653
 #define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
 #define MARKNUM	31					//全局星标总数
-#define TODOLISTMAXNUM 10			//任务清单数目的上限
+#define TODOLISTMAXNUM 20			//任务清单数目的上限
 #define DODGESTEPS 5				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm
@@ -30,9 +30,10 @@
 #define OBSTACLE_DISTANCE 400		//障碍物探测距离，单位mm
 #define ERRORANGLE 12.0				//选择角度的误差范围，单位°
 #define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm
+#define SPEAKWORDSPERSECOND 4		//王静每秒钟阅读的字数
 #define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
-#define PATHTASKTYPE 1				//位移任务点类型
-#define SPEAKTASKTYPE 0				//语音任务点类型
+#define PATHTASKTYPE 0				//位移任务点类型
+#define SPEAKTASKTYPE 1				//语音任务点类型
 
 typedef struct StarMark{
 	int markID;
@@ -52,6 +53,10 @@ class MainGUI : public QMainWindow{
 public:
 	MainGUI(QWidget *parent = 0);
 	~MainGUI();
+	QPushButton* btnAutoGuide_MUSEUM;
+	QPushButton* btnPath1;
+	QPushButton* btnPath2;
+	QPushButton* btnPath3;
 	QPointF PosByStar1;		//首选星标得到的星标定位器的世界坐标，单位cm
 	QPointF PosByStar2;		//备选星标，单位cm
 	QPointF PosSafe;		//综合考虑电机和星标进而得出可靠的机器人中心点坐标结果，单位cm
@@ -61,7 +66,7 @@ public:
 	float AngleSafe;		//实际的机器人朝向（以x轴正方向为0°，逆时针为正方向，取值为[0~360)毕竟是浮点数不能这么整啦）
 	float Angle_face_Goal;	//站在当前的机器人本体世界坐标朝目标世界坐标看的角度，单位°
 	QString SpeakContent;	//机器人将要说的内容
-	int SpeakWaitTime;		//发出说话指令后，机器人本体等待时间
+	int SpeakWaitCycle;		//发出说话指令后，机器人在若干个指令周期内不分配任务
 private:
 	Ui::MainGUI ui;
 	RobotQ* m_RobotQ;
@@ -126,6 +131,9 @@ private slots:
 	int OnBtnManualControl();
 	int OnBtnDashBoard();
 	int OnBtnAutoGuide();
+	int OnBtnSelectPath1();
+	int OnBtnSelectPath2();
+	int OnBtnSelectPath3();
 	int On_MC_BtnForward();
 	int On_MC_BtnBackward();
 	int On_Auto_BtnTurnleft(int speedlevel);

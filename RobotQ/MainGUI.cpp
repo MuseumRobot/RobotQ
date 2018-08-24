@@ -52,11 +52,14 @@ void MainGUI::Init(){
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
 	InitAdjustGUI();				//调整界面适配使用者
-	InitTaskAssignment(1);			//默认分配路线一
+	InitTaskAssignment(2);			//默认分配路线一
 }
 void MainGUI::InitDataBase(){
-	if(m_dataManager.loadTask() == 1){	//数据库管理员对象读取任务文件
+	if(m_dataManager.loadTask() == 1){			//数据库管理员对象读取任务文件
 		m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
+	}
+	if(m_dataManager.loadSpeakContent() ==1){	//数据库管理员对象读取语料文件
+		m_DashBoard->ui.ck_isSpeakDataReady->setChecked(true);
 	}
 }
 int MainGUI::OnBtnAutoGuide(){
@@ -65,8 +68,13 @@ int MainGUI::OnBtnAutoGuide(){
 		if(MUSEUMMODE == 0){
 			m_DashBoard->ui.ck_Auto->setChecked(false);
 			ui.btnAutoGuide->setText("开启自动导航");
-			RobotQ::RobotQSpeak("自动导航已关闭！");
+		}else{
+			const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航.bmp");
+			btnAutoGuide_MUSEUM->setIcon(pic_AutoGuide_MainGUI);
 		}
+		RobotQ::OnStopSpeak();
+		QTest::qSleep(1000);
+		RobotQ::RobotQSpeak("自动导航已关闭！");
 	}else{
 		currentTodoListId = 0;
 		taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
@@ -75,9 +83,14 @@ int MainGUI::OnBtnAutoGuide(){
 		if(MUSEUMMODE == 0){
 			m_DashBoard->ui.ck_Auto->setChecked(true);
 			ui.btnAutoGuide->setText("关闭自动导航");
-			RobotQ::RobotQSpeak("自动导航已开启！");
-			Sleep(3000);
+		}else{
+			const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航_激活.bmp");
+			btnAutoGuide_MUSEUM->setIcon(pic_AutoGuide_MainGUI);
 		}
+		RobotQ::OnStopSpeak();
+		QTest::qSleep(200);
+		RobotQ::RobotQSpeak("自动导航已开启！");
+		SpeakWaitCycle = 3000/INSTRUCTION_CYCLE+1;
 	}
 	return 0;
 }
@@ -596,7 +609,7 @@ void MainGUI::InitDashBoardData(){
 	dodge_move_times = 0;
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
-	SpeakWaitTime = 0;		//默认发出说话指令后，机器人本体不等待
+	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
 }
 void MainGUI::AssignInstruction(){
 	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
@@ -604,31 +617,37 @@ void MainGUI::AssignInstruction(){
 		EmergencyMeasures();	//紧急情况下的措施
 	}else{						//非紧急情况下正常发配指令
 		if(is_project_accomplished == false){			//当项目未完成时（一个项目由若干个任务组成，而一个任务想要完成需要经过若干个指令周期）
-			if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
-				m_timer_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
-				AssignGoalPos(taskID);								//分配目标坐标
-				float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
-				QPointF d = PosGoal - PosSafe;
-				float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
-				if(dDistance > errorRange_Distance){				//如果还没有抵达当前任务目标点就继续执行任务
-					if(is_dodge_moment == true){	//一旦前路不通会进入闪避时刻，占用若干个指令周期，而闪避时刻有自己的退出条件
-						DodgeMeasures();							//如果处于闪避时刻就闪避
-					}else{
-						CommonMeasures();							//如果本指令周期没有处于闪避时刻，则正常向目标运行
+			if(SpeakWaitCycle>1){
+				//如果还需等待的指令周期大于1，则等它讲话
+			}else{
+				if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
+					m_timer_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
+					AssignGoalPos(taskID);								//分配目标坐标
+					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
+					QPointF d = PosGoal - PosSafe;
+					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
+					if(dDistance > errorRange_Distance){				//如果还没有抵达当前任务目标点就继续执行任务
+						if(is_dodge_moment == true){	//一旦前路不通会进入闪避时刻，占用若干个指令周期，而闪避时刻有自己的退出条件
+							DodgeMeasures();							//如果处于闪避时刻就闪避
+						}else{
+							CommonMeasures();							//如果本指令周期没有处于闪避时刻，则正常向目标运行
+						}
+					}else{												//如果已经抵达当前目标点
+						PathTaskFinishedMeasures();
+						JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 					}
-				}else{												//如果已经抵达当前目标点
-					PathTaskFinishedMeasures();
+				}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
+					AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
+					RobotQ::RobotQSpeak(SpeakContent);
+					SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;
+					m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "正在朗读:" + SpeakContent);
+					SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
 					JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
+				}else{		
+					ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 				}
-			}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
-				AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitTime
-				RobotQ::RobotQSpeak(SpeakContent);
-				Sleep(SpeakWaitTime);
-				SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
-				JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
-			}else{		
-				ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 			}
+			SpeakWaitCycle--;	//每过一个指令周期，接下来就少等一个周期，直到还需等待次数少于1就正常发配任务
 		}	
 	}
 }
@@ -698,10 +717,10 @@ void MainGUI::InitAdjustGUI(){
 
 		QLabel* MainBackGround = new QLabel(this);
 		QPushButton* btnRobotQ = new QPushButton(this);
-		QPushButton* btnAutoGuide = new QPushButton(this);
-		QPushButton* btnPath1 = new QPushButton(this);
-		QPushButton* btnPath2 = new QPushButton(this);
-		QPushButton* btnPath3 = new QPushButton(this);
+		btnAutoGuide_MUSEUM = new QPushButton(this);
+		btnPath1 = new QPushButton(this);
+		btnPath2 = new QPushButton(this);
+		btnPath3 = new QPushButton(this);
 		
 		const QIcon pic_RobotQ_MainGUI = QIcon("Resources/语音交互.bmp");
 		const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航.bmp");
@@ -720,10 +739,10 @@ void MainGUI::InitAdjustGUI(){
 		btnRobotQ->setIconSize(btnRobotQSize);
 		btnRobotQ->setIcon(pic_RobotQ_MainGUI);
 
-		btnAutoGuide->move(60,120);
-		btnAutoGuide->resize(btnRobotQSize);
-		btnAutoGuide->setIconSize(btnRobotQSize);
-		btnAutoGuide->setIcon(pic_AutoGuide_MainGUI);
+		btnAutoGuide_MUSEUM->move(60,120);
+		btnAutoGuide_MUSEUM->resize(btnRobotQSize);
+		btnAutoGuide_MUSEUM->setIconSize(btnRobotQSize);
+		btnAutoGuide_MUSEUM->setIcon(pic_AutoGuide_MainGUI);
 
 		btnPath1->move(360,280);
 		btnPath1->resize(btnPathSize);
@@ -744,21 +763,30 @@ void MainGUI::InitAdjustGUI(){
 		m_RobotQ->resize(RobotQSize);
 		
 		connect(btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
-		connect(btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
+		connect(btnAutoGuide_MUSEUM,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
+		connect(btnPath1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
+		connect(btnPath2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
+		connect(btnPath3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
 		
 	}else{	//进入开发者模式
 		OnBtnDashBoard();				//开启仪表盘面板
 		OnBtnManualControl();			//开启遥控器面板
-		//OnBtnRobotQ();					//开启语音对话面板
+		//OnBtnRobotQ();				//开启语音对话面板
 	}
 }
 void MainGUI::InitTaskAssignment(int n){
 	//初始化任务分配（路线X）
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
-	if(n ==1){	//路线一
-		QString str = "1,2,3";
-		ParseTodoList(str,todoList);
+	QString str;
+	if(n == 1){				//路线一
+		str = "2,5,9,11,13,15";
+		//str = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
+	}else if(n == 2){
+		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
+	}else if(n == 3){
+		str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
 	}
+	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
 }
 void MainGUI::AssignGoalPos(int taskID){		//根据任务代码（位移任务）分配目标位置
@@ -771,7 +799,8 @@ void MainGUI::AssignSpeakContent(int taskID){	//根据任务代码（语音任务）分配语音
 	TaskDataType* task = m_dataManager.findTask(taskID);
 	if(task != NULL){
 		int SpeakContentId = task->SpeakContentId;
-		qDebug()<<"语料编号为："<<SpeakContentId;
+		SpeakContentType* speakContent = m_dataManager.findSpeakContent(SpeakContentId);
+		SpeakContent = speakContent->content;
 	}
 }
 void MainGUI::JudgeEmergency(){
@@ -790,7 +819,7 @@ void MainGUI::EmergencyMeasures(){
 	Emergency_times++;
 	m_motor.stop();
 	RobotQ::RobotQSpeak("紧急制动!您挡到小灵啦!");
-	Sleep(5000);
+	SpeakWaitCycle = 5000/INSTRUCTION_CYCLE+1;
 	if(Emergency_times == 3){
 		Emergency_times = 0;
 		m_EMERGENCY_DISTANCE = 0;
@@ -815,7 +844,7 @@ void MainGUI::DodgeMeasures(){
 		m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 	}else{
 		float d = zTool_mod_360f(Angle_face_Goal-AngleSafe);
-		if(d<180.0){
+		if(d<45.0){
 			DodgeTurnLeft();	//目标在当前朝向的左手边则向左避障
 		}else{
 			DodgeTurnRight();	//目标在当前朝向的右手边则向右避障
@@ -849,7 +878,7 @@ void MainGUI::ProjectFinishedMeasures(){
 	is_project_accomplished = true;
 	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
 	RobotQ::RobotQSpeak("我已经完成整个项目");
-	Sleep(4000);
+	QTest::qSleep(4000);
 	is_Auto_Mode_Open = false;
 	m_DashBoard->ui.ck_Auto->setChecked(false);
 	ui.btnAutoGuide->setText("开启自动导航");
@@ -895,4 +924,19 @@ void MainGUI::ParseTodoList(QString str,int *todoList){
 	}
 	todoList[currentNum] = tempNum.toInt();
 	todoList[currentNum+1] = 0;
+}
+int MainGUI::OnBtnSelectPath1(){
+	InitTaskAssignment(1);
+	RobotQ::RobotQSpeak("已切换至路线一！");
+	return 0;
+}
+int MainGUI::OnBtnSelectPath2(){
+	InitTaskAssignment(2);
+	RobotQ::RobotQSpeak("已切换至路线二！");
+	return 0;
+}
+int MainGUI::OnBtnSelectPath3(){
+	InitTaskAssignment(3);
+	RobotQ::RobotQSpeak("已切换至路线三！");
+	return 0;
 }

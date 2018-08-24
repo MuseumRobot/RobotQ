@@ -430,7 +430,7 @@ void RobotQ::RobotQSpeak(QString str){
 	HciExampleComon::GBKToUTF8( (unsigned char*)str.toStdString().c_str(), &pszUTF8 );
 	string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
 	hci_tts_player_stop();	//后发的语音指令会将之前的语音指令覆盖
-	QTest::qSleep(50);		//发送stop指令后留有短暂时间以供stop命令执行完成，否则无法start下一句
+	QTest::qSleep(100);		//发送stop指令后留有短暂时间以供stop命令执行完成，否则无法start下一句
 	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
 }
 int RobotQ::Json_Explain (char buf[],char result[],char answer[]){  
