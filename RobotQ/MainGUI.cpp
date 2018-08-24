@@ -32,6 +32,9 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	connect(m_ManualControl->ui.btnTurnleft,SIGNAL(clicked()),this,SLOT(On_MC_BtnTurnleft()));
 	connect(m_ManualControl->ui.btnTurnright,SIGNAL(clicked()),this,SLOT(On_MC_BtnTurnright()));
 	connect(m_ManualControl->ui.btnStopmove,SIGNAL(clicked()),this,SLOT(On_MC_BtnStopmove()));
+	connect(m_ManualControl->ui.btn_MC_Path1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
+	connect(m_ManualControl->ui.btn_MC_Path2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
+	connect(m_ManualControl->ui.btn_MC_Path3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
 	connect(m_ManualControl->ui.btnStartSpeak,SIGNAL(clicked()),this,SLOT(On_MC_BtnRobotQSpeak()));
 	connect(m_ManualControl->ui.btnStopSpeak,SIGNAL(clicked()),m_RobotQ,SLOT(OnStopSpeak()));	
 	//connect(m_RobotQ,SIGNAL(TTS_Ready()),this,SLOT(check_TTS_Ready()));//在子窗口的初始化函数中发射信号无法被接受，而在初始化函数之外发射有效
@@ -46,20 +49,41 @@ MainGUI::~MainGUI(){
 }
 void MainGUI::Init(){
 	//InitStarMark();				//LED标签数组赋值(实验室)
-	InitDataBase();					//数据库初始化
+	//InitDataBase(1);				//数据库初始化
 	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
 	InitAdjustGUI();				//调整界面适配使用者
-	InitTaskAssignment(2);			//默认分配路线一
+	InitTaskAssignment(1);			//默认分配路线一(含数据库初始化)
 }
-void MainGUI::InitDataBase(){
-	if(m_dataManager.loadTask() == 1){			//数据库管理员对象读取任务文件
-		m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
+void MainGUI::InitDataBase(int n){
+	switch(n){
+	case 1:
+		if(m_dataManager.loadTask(1) == 1){			//数据库管理员对象读取任务文件
+			m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
+		}else{
+			m_DashBoard->ui.ck_isTaskDataReady->setChecked(false);
+		}
+		break;
+	case 2:
+		if(m_dataManager.loadTask(2) == 1){			//数据库管理员对象读取任务文件
+			m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
+		}else{
+			m_DashBoard->ui.ck_isTaskDataReady->setChecked(false);
+		}
+		break;
+	default:
+		if(m_dataManager.loadTask(3) == 1){			//数据库管理员对象读取任务文件
+			m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
+		}else{
+			m_DashBoard->ui.ck_isTaskDataReady->setChecked(false);
+		}
 	}
 	if(m_dataManager.loadSpeakContent() ==1){	//数据库管理员对象读取语料文件
 		m_DashBoard->ui.ck_isSpeakDataReady->setChecked(true);
+	}else{
+		m_DashBoard->ui.ck_isSpeakDataReady->setChecked(false);
 	}
 }
 int MainGUI::OnBtnAutoGuide(){
@@ -779,12 +803,15 @@ void MainGUI::InitTaskAssignment(int n){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	QString str;
 	if(n == 1){				//路线一
-		str = "2,5,9,11,13,15";
-		//str = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
+		//str = "2,5,9,11,13,15";
+		str = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
+		InitDataBase(1);
 	}else if(n == 2){
 		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
+		InitDataBase(2);
 	}else if(n == 3){
 		str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
+		InitDataBase(3);
 	}
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];

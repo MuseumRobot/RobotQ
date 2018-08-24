@@ -7,7 +7,7 @@ class DataManager{
 public:
 	DataManager(void);
 	~DataManager(void);
-	int loadTask();
+	int loadTask(int n);
 	int loadSpeakContent();
 	TaskDataType* findTask(int taskId);
 	SpeakContentType* findSpeakContent(int speakContentId);

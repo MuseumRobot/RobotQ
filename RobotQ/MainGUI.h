@@ -20,7 +20,7 @@
 #define PI 3.141592653
 #define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
 #define MARKNUM	31					//全局星标总数
-#define TODOLISTMAXNUM 20			//任务清单数目的上限
+#define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 5				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm
@@ -98,7 +98,7 @@ private:
 	void InitAdjustGUI();							//初始化调整界面（选择启动博物馆模式或开发者模式）
 	void InitStarMark();							//为LED定位标签数组赋值
 	void InitStarMarkMuseum();						//LED标签数组赋值(博物馆)
-	void InitDataBase();							//初始化数据库
+	void InitDataBase(int n);						//初始化数据库
 	void InitTaskAssignment(int n);					//初始化分配任务路线
 	void InitCommMotorAndStar();					//电机星标串口初始化
 	void InitDashBoardData();						//仪表盘数据初始化
