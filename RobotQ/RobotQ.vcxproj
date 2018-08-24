@@ -87,6 +87,7 @@
     <ClCompile Include="Comm_data_motor3.cpp" />
     <ClCompile Include="Comm_data_star.cpp" />
     <ClCompile Include="DashBoard.cpp" />
+    <ClCompile Include="DataManager.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_DashBoard.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -158,6 +159,8 @@
     <ClInclude Include="common\CommonTool.h" />
     <ClInclude Include="common\FileReader.h" />
     <ClInclude Include="common\GBK.h" />
+    <ClInclude Include="DataManager.h" />
+    <ClInclude Include="TaskDataType.h" />
     <CustomBuild Include="DashBoard.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing DashBoard.h...</Message>

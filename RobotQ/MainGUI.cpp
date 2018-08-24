@@ -46,13 +46,18 @@ MainGUI::~MainGUI(){
 }
 void MainGUI::Init(){
 	//InitStarMark();				//LED标签数组赋值(实验室)
+	InitDataBase();					//数据库初始化
 	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
 	InitAdjustGUI();				//调整界面适配使用者
 	InitTaskAssignment(1);			//默认分配路线一
-	
+}
+void MainGUI::InitDataBase(){
+	if(m_dataManager.loadTask() == 1){	//数据库管理员对象读取任务文件
+		m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
+	}
 }
 int MainGUI::OnBtnAutoGuide(){
 	if(is_Auto_Mode_Open == true){
@@ -71,6 +76,7 @@ int MainGUI::OnBtnAutoGuide(){
 			m_DashBoard->ui.ck_Auto->setChecked(true);
 			ui.btnAutoGuide->setText("关闭自动导航");
 			RobotQ::RobotQSpeak("自动导航已开启！");
+			Sleep(3000);
 		}
 	}
 	return 0;
@@ -137,11 +143,13 @@ void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
 		refreshDashboardData();			//刷新仪表盘数据
 	}else if(event->timerId()==m_timer_refresh_task){
-		m_timer_refresh_emergency_distance++;
 		if(m_timer_refresh_emergency_distance == EMERGENCY_RECOVER_CYCLE){
 			m_timer_refresh_emergency_distance = 0;
 			if(m_EMERGENCY_DISTANCE == 0){
 				m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;	//紧急制动恢复
+				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":紧急制动已恢复");
+				isBlockEMERGENCY = false;
+				m_DashBoard->ui.ck_isBlockEmergency->setChecked(false);
 			}
 		}
 		if(is_Auto_Mode_Open){
@@ -563,7 +571,7 @@ void MainGUI::refreshDashboardData(){
 	if(is_project_accomplished == false){
 		str = "任务序号:";str += QString("%2").arg(currentTodoListId);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
 	}else{
-		str = "当前没有任务";
+		str = "无";
 	}
 	m_DashBoard->ui.text_CurrentTaskId->setText(str);
 
@@ -584,9 +592,11 @@ void MainGUI::InitDashBoardData(){
 	is_path_clear = true;
 	is_dodge_moment = false;
 	isEMERGENCY = false;
+	isBlockEMERGENCY = false;
 	dodge_move_times = 0;
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
+	SpeakWaitTime = 0;		//默认发出说话指令后，机器人本体不等待
 }
 void MainGUI::AssignInstruction(){
 	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
@@ -594,8 +604,8 @@ void MainGUI::AssignInstruction(){
 		EmergencyMeasures();	//紧急情况下的措施
 	}else{						//非紧急情况下正常发配指令
 		if(is_project_accomplished == false){			//当项目未完成时（一个项目由若干个任务组成，而一个任务想要完成需要经过若干个指令周期）
-			taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
-			if (taskID<10){											//taskID<10意味着是路径点
+			if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
+				m_timer_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
 				AssignGoalPos(taskID);								//分配目标坐标
 				float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
 				QPointF d = PosGoal - PosSafe;
@@ -608,20 +618,16 @@ void MainGUI::AssignInstruction(){
 					}
 				}else{												//如果已经抵达当前目标点
 					PathTaskFinishedMeasures();
+					if(JudgeTaskType(taskID) == SPEAKTASKTYPE)?isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 				}
-			}else if(taskID>10){					//taskID>10意味着是语音播报点
-				QString str;
-				if(taskID == 11 ){
-					str="大家好，我是哈尔滨工业大学智能导览机器人小灵，我正在测试，请不要靠近我哦!"; 
-				}else{
-					str="呵呵呵";
-				}
-				Sleep(3000);
-				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + str);
-				RobotQ::RobotQSpeak(str);
-				currentTodoListId++;
+			}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
+				AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitTime
+				RobotQ::RobotQSpeak(SpeakContent);
+				Sleep(SpeakWaitTime);
+				SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
+				if(JudgeTaskType(taskID) == SPEAKTASKTYPE)?isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 			}else{		
-				ProjectFinishedMeasures();	//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
+				ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 			}
 		}	
 	}
@@ -748,34 +754,34 @@ void MainGUI::InitAdjustGUI(){
 }
 void MainGUI::InitTaskAssignment(int n){
 	//初始化任务分配（路线X）
-	if(n ==1 ){	//路线一
-		currentTodoListId = 0;	//初始化当前todolist的下标为0
-		todoList[0] = 1;	//(227,1514)
-		todoList[1] = 11;
-		todoList[2] = 2;	//(632,1418)
-		todoList[3] = 11;
-		todoList[4] = 3;	//(687,374)
-		todoList[5] = 11;	//语音点
-		todoList[6] = 4;	//(205,277)
-		todoList[7] = 1;	
-		todoList[8] = 0;	//休止符
+	currentTodoListId = 0;	//初始化当前todolist的下标为0
+	if(n ==1){	//路线一
+		QString str = "1,2,3";
+		ParseTodoList(str,todoList);
+	}
+	taskID = todoList[currentTodoListId];
+}
+void MainGUI::AssignGoalPos(int taskID){		//根据任务代码（位移任务）分配目标位置
+	TaskDataType* task = m_dataManager.findTask(taskID);
+	if(task != NULL){
+		PosGoal = QPointF(task->x,task->y);
 	}
 }
-void MainGUI::AssignGoalPos(int taskID){
-	switch(taskID){
-	case 1:PosGoal = QPointF(227.0,1514.0);break;
-	case 2:PosGoal = QPointF(632.0,1418.0);break;
-	case 3:PosGoal = QPointF(687.0,374.0);break;
-	case 4:PosGoal = QPointF(205.0,277.0);break;
-	default:{}
+void MainGUI::AssignSpeakContent(int taskID){	//根据任务代码（语音任务）分配语音内容和机器人等待时间
+	TaskDataType* task = m_dataManager.findTask(taskID);
+	if(task != NULL){
+		int SpeakContentId = task->SpeakContentId;
+		qDebug()<<"语料编号为："<<SpeakContentId;
 	}
 }
 void MainGUI::JudgeEmergency(){
 	isEMERGENCY = false;
 	for(int i=9;i<27;i++){
 		if(sectorObstacleDistance[i] > 0 && sectorObstacleDistance[i] < m_EMERGENCY_DISTANCE){
-			isEMERGENCY =true;
-			break;
+			if(isBlockEMERGENCY == false){	//紧急制动未被屏蔽
+				isEMERGENCY =true;
+				break;
+			}
 		}
 	}
 	m_DashBoard->ui.ck_isEmergency->setChecked(isEMERGENCY);
@@ -790,6 +796,9 @@ void MainGUI::EmergencyMeasures(){
 		m_EMERGENCY_DISTANCE = 0;
 		RobotQ::RobotQSpeak("紧急制动已解除，10秒后恢复");
 		m_timer_refresh_emergency_distance = 0;
+		isBlockEMERGENCY = true;
+		m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":紧急制动已解除");
+		m_DashBoard->ui.ck_isBlockEmergency->setChecked(true);
 	}
 }
 float MainGUI::zTool_mod_360f(float angle){
@@ -824,19 +833,27 @@ void MainGUI::CommonMeasures(){
 void MainGUI::PathTaskFinishedMeasures(){
 	QString TaskCode;
 	TaskCode.sprintf("任务代码%d",taskID);
-	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经到达目标点," + TaskCode);
-	RobotQ::RobotQSpeak("我已经到达目标点," + TaskCode);
-	Sleep(3000);
-	currentTodoListId++;	//一个任务完成后，准备执行下一个
+	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "完成位移任务," + TaskCode);
+	currentTodoListId++;									//一个任务完成后，准备执行下一个
+	taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
+
+}
+void MainGUI::SpeakTaskFinishedMeasures(){
+	QString TaskCode;
+	TaskCode.sprintf("任务代码%d",taskID);
+	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "完成语音任务," + TaskCode);
+	currentTodoListId++;									//一个任务完成后，准备执行下一个
+	taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
 }
 void MainGUI::ProjectFinishedMeasures(){
 	is_project_accomplished = true;
-	Sleep(2000);
 	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
 	RobotQ::RobotQSpeak("我已经完成整个项目");
+	Sleep(4000);
 	is_Auto_Mode_Open = false;
 	m_DashBoard->ui.ck_Auto->setChecked(false);
 	ui.btnAutoGuide->setText("开启自动导航");
+	RobotQ::RobotQSpeak("自动导航已关闭！");
 }
 float MainGUI::zTool_vector_angle(QPointF d){
 	float angle;
@@ -850,4 +867,32 @@ float MainGUI::zTool_vector_angle(QPointF d){
 		angle =360 + atan(d.y()/d.x())/PI/2*360.0;	//目标在第四象限
 	}
 	return angle;
+}
+int MainGUI::JudgeTaskType(int taskID){
+	//判断任务类型，位移任务类型为1，语音任务类型为0
+	TaskDataType* task = m_dataManager.findTask(taskID);
+	if(task != NULL){
+		return task->taskType;
+	}else{
+		return -1;	//返回异常值作为todoList的休止符
+	}
+}
+void MainGUI::ParseTodoList(QString str,int *todoList){
+	char* s;
+	QByteArray ba = str.toLatin1();
+	s = ba.data();
+	int currentNum = 0;
+	QString tempNum;
+	for(int i = 0;s[i] != '\0';i++){
+		char a = s[i];
+		if(a != ','){	//没有读到','就继续读数字添加到tempNum中暂存
+			tempNum.append(a);
+		}else{			//如果读到','就将暂存的数字导出到todoList中
+			todoList[currentNum] = tempNum.toInt();
+			currentNum++;
+			tempNum = "";
+		}
+	}
+	todoList[currentNum] = tempNum.toInt();
+	todoList[currentNum+1] = 0;
 }
