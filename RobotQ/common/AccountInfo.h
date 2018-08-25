@@ -4,8 +4,7 @@
 #include <string>
 using std::string;
 
-class AccountInfo
-{
+class AccountInfo{
 private:
     AccountInfo();
     ~AccountInfo();

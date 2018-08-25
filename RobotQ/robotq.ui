@@ -170,7 +170,7 @@
     <string>停止说话</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="comSpeaklist">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -186,6 +186,9 @@
      <weight>50</weight>
      <bold>false</bold>
     </font>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
    </property>
    <item>
     <property name="text">
@@ -233,7 +236,7 @@
   <zorder>btnQuery</zorder>
   <zorder>btnStart</zorder>
   <zorder>btnStopspeak</zorder>
-  <zorder>comboBox</zorder>
+  <zorder>comSpeaklist</zorder>
   <zorder>btnEnd</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

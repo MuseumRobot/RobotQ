@@ -32,6 +32,8 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	connect(m_ManualControl->ui.btnTurnleft,SIGNAL(clicked()),this,SLOT(On_MC_BtnTurnleft()));
 	connect(m_ManualControl->ui.btnTurnright,SIGNAL(clicked()),this,SLOT(On_MC_BtnTurnright()));
 	connect(m_ManualControl->ui.btnStopmove,SIGNAL(clicked()),this,SLOT(On_MC_BtnStopmove()));
+	connect(m_ManualControl->ui.btn_MC_GoHome,SIGNAL(clicked()),this,SLOT(On_MC_BtnGoHome()));
+	connect(m_ManualControl->ui.btnExeSelfTask,SIGNAL(clicked()),this,SLOT(On_MC_BtnExeSelfTask()));
 	connect(m_ManualControl->ui.btn_MC_Path1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
 	connect(m_ManualControl->ui.btn_MC_Path2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
 	connect(m_ManualControl->ui.btn_MC_Path3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
@@ -49,13 +51,14 @@ MainGUI::~MainGUI(){
 }
 void MainGUI::Init(){
 	//InitStarMark();				//LED标签数组赋值(实验室)
-	//InitDataBase(1);				//数据库初始化
+	InitDataBase(1);				//数据库初始化
+	InitTaskAssignment(1);			//默认分配路线一(任务字符串初始化)
 	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
 	InitAdjustGUI();				//调整界面适配使用者
-	InitTaskAssignment(1);			//默认分配路线一(含数据库初始化)
+
 }
 void MainGUI::InitDataBase(int n){
 	switch(n){
@@ -119,9 +122,6 @@ int MainGUI::OnBtnAutoGuide(){
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
-	if(MUSEUMMODE ==0 ){
-		m_RobotQ->move(800,460);
-	}
 	m_RobotQ->show();
 	return 0;
 }
@@ -606,7 +606,7 @@ void MainGUI::refreshDashboardData(){
 
 	//更新任务显示
 	if(is_project_accomplished == false){
-		str = "任务序号:";str += QString("%2").arg(currentTodoListId);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
+		str = "任务序号:";str += QString("%2").arg(currentTodoListId + 1);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
 	}else{
 		str = "无";
 	}
@@ -805,13 +805,10 @@ void MainGUI::InitTaskAssignment(int n){
 	if(n == 1){				//路线一
 		//str = "2,5,9,11,13,15";
 		str = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
-		InitDataBase(1);
 	}else if(n == 2){
 		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
-		InitDataBase(2);
 	}else if(n == 3){
 		str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
-		InitDataBase(3);
 	}
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
@@ -903,8 +900,8 @@ void MainGUI::SpeakTaskFinishedMeasures(){
 }
 void MainGUI::ProjectFinishedMeasures(){
 	is_project_accomplished = true;
-	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目");
-	RobotQ::RobotQSpeak("我已经完成整个项目");
+	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "我已经完成整个项目！");
+	RobotQ::RobotQSpeak("我已经完成整个项目！");
 	QTest::qSleep(4000);
 	is_Auto_Mode_Open = false;
 	m_DashBoard->ui.ck_Auto->setChecked(false);
@@ -953,17 +950,40 @@ void MainGUI::ParseTodoList(QString str,int *todoList){
 	todoList[currentNum+1] = 0;
 }
 int MainGUI::OnBtnSelectPath1(){
+	InitDataBase(1);
 	InitTaskAssignment(1);
 	RobotQ::RobotQSpeak("已切换至路线一！");
 	return 0;
 }
 int MainGUI::OnBtnSelectPath2(){
+	InitDataBase(2);
 	InitTaskAssignment(2);
 	RobotQ::RobotQSpeak("已切换至路线二！");
 	return 0;
 }
 int MainGUI::OnBtnSelectPath3(){
+	InitDataBase(3);
 	InitTaskAssignment(3);
 	RobotQ::RobotQSpeak("已切换至路线三！");
+	return 0;
+}
+int MainGUI::On_MC_BtnGoHome(){
+	currentTodoListId = 0;	//初始化当前todolist的下标为0
+	QString str = "0";
+	ParseTodoList(str,todoList);
+	taskID = todoList[currentTodoListId];
+	RobotQ::OnStopSpeak();
+	RobotQ::RobotQSpeak("准备回家！");
+	QTest::qSleep(3000);
+	SpeakWaitCycle = 3000/INSTRUCTION_CYCLE + 1;
+	OnBtnAutoGuide();
+	return 0;
+}
+int MainGUI::On_MC_BtnExeSelfTask(){
+	//任务字符串分配（路线X）
+	currentTodoListId = 0;	//初始化当前todolist的下标为0
+	QString str = m_ManualControl->ui.text_SelfTask->text();
+	ParseTodoList(str,todoList);
+	taskID = todoList[currentTodoListId];
 	return 0;
 }

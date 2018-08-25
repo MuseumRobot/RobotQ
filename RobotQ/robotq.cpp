@@ -60,11 +60,8 @@ int RobotQ::OnStopSpeak(){
 	return 0;
 }
 int RobotQ::OnQueryClicked(){
-	QString str="ÄãºÃÑ½ÄãºÃÑ½ÄãºÃÑ½ÄãºÃÑ½ÄãºÃÑ½ÄãºÃÑ½ÄãºÃÑ½ÄãºÃÑ½!";
-	unsigned char* pszUTF8 = NULL;
-	HciExampleComon::GBKToUTF8( (unsigned char*)str.toStdString().c_str(), &pszUTF8 );
-	string startConfig = "property=cn_xiaokun_common,tagmode=none,capkey=tts.cloud.wangjing";
-	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
+	QString str = ui.comSpeaklist->currentText();
+	RobotQSpeak(str);
 	return 0;
 }
 void RobotQ::timerEvent(QTimerEvent *event){

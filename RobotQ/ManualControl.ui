@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>240</width>
-    <height>446</height>
+    <height>477</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -325,6 +325,28 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="6" column="2">
+         <widget class="QPushButton" name="btn_MC_GoHome">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>回家</string>
+          </property>
+          <property name="shortcut">
+           <string>Down</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

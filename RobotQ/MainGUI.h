@@ -142,6 +142,8 @@ private slots:
 	int On_MC_BtnTurnright();
 	int On_MC_BtnStopmove();
 	int On_MC_BtnRobotQSpeak();
+	int On_MC_BtnGoHome();
+	int On_MC_BtnExeSelfTask();
 };
 
 #endif // MAINGUI_H
