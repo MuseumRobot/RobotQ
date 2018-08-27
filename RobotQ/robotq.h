@@ -6,6 +6,7 @@
 
 #include "ui_robotq.h"
 #include "stdafx.h"
+#include "popupdialog.h"
 
 using std::string;
 
@@ -65,6 +66,8 @@ public:
 	virtual void timerEvent(QTimerEvent *event);
 	static void RobotQSpeak(QString str);
 	static int Json_Explain (char buf[],char result[],char answer[]);
+	QString SearchQuery(QString question);
+	PopupDialog* m_popup_image;
 private:
 	AsrRecogType m_RecogType;
 	AsrRecogMode m_RecogMode;
