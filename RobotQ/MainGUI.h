@@ -3,8 +3,9 @@
 
 #include <QMainWindow>
 #include <QtGui/QApplication>
-#include <QCheckBox>
-#include <QPointF>
+#include <QtGui/QDesktopWidget>
+//#include <QCheckBox>
+//#include <QPointF>
 #include "ui_MainGUI.h"
 #include "robotq.h"
 #include "ManualControl.h"
@@ -18,15 +19,15 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
+#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 5				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
-#define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm
+#define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm，将紧急制动距离改为足够小，则相当于屏蔽了紧急制动
 #define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
 #define INSTRUCTION_CYCLE 1500		//指令周期，单位ms
-#define INFOREFRESH_CYCLE 300		//数据刷新周期，单位ms
+#define INFOREFRESH_CYCLE 600		//数据刷新周期，单位ms
 #define OBSTACLE_DISTANCE 400		//障碍物探测距离，单位mm
 #define ERRORANGLE 12.0				//选择角度的误差范围，单位°
 #define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm

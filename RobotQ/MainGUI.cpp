@@ -122,6 +122,9 @@ int MainGUI::OnBtnAutoGuide(){
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
+	//QDesktopWidget* desktop = QApplication::desktop();
+	//int N = desktop->screenCount();
+	//m_RobotQ->setGeometry(desktop->screenGeometry(1));
 	m_RobotQ->show();
 	return 0;
 }
@@ -573,7 +576,7 @@ void MainGUI::refreshDashboardData(){
 				AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
 				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
 				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
-				PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()+dy);
+				PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()-dy);
 				AngleSafe = 360.0 - AngleSafe;											//得到机器人本体朝向（逆时针）
 			}
 		}
@@ -587,7 +590,7 @@ void MainGUI::refreshDashboardData(){
 				AngleByStar2>0?AngleSafe=AngleByStar2:AngleSafe=AngleByStar2+360.0;		//得到机器人本体的朝向(顺时针)
 				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
 				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
-				PosSafe = QPointF(PosByStar2.x()+dx,PosByStar2.y()+dy);
+				PosSafe = QPointF(PosByStar2.x()+dx,PosByStar2.y()-dy);
 				AngleSafe = 360.0 - AngleSafe;
 			}
 		}
@@ -803,8 +806,7 @@ void MainGUI::InitTaskAssignment(int n){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	QString str;
 	if(n == 1){				//路线一
-		//str = "2,5,9,11,13,15";
-		str = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
+		str = "1,2,3,4,5,17,18,6,19,20,7,8,9,10,11,12,13,16,14,15";
 	}else if(n == 2){
 		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
 	}else if(n == 3){
