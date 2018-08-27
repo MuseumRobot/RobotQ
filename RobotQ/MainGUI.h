@@ -24,7 +24,7 @@
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 5				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
-#define EMERGENCY_DISTANCE 300		//紧急制动危险距离，单位mm，将紧急制动距离改为足够小，则相当于屏蔽了紧急制动
+#define EMERGENCY_DISTANCE 10		//紧急制动危险距离，单位mm，将紧急制动距离改为足够小，则相当于屏蔽了紧急制动
 #define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
 #define INSTRUCTION_CYCLE 1500		//指令周期，单位ms
 #define INFOREFRESH_CYCLE 600		//数据刷新周期，单位ms
@@ -84,6 +84,7 @@ private:
 	bool is_dodge_moment;							//是否进入闪避时刻
 	bool isEMERGENCY;								//是否是紧急制动时刻
 	bool isBlockEMERGENCY;							//是否屏蔽紧急制动（为了避免语音点紧急制动打断讲解词，在讲解任务时屏蔽紧急制动功能，所以在语音任务开始时解除紧急制动，在位移任务开始时恢复紧急制动）
+	int dodge_mode;									//为了使每次进入闪避时刻只会向一个方向闪避，需要在进入时给定闪避方向，1为左，2为右，退出闪避时为0，可供分配新的值
 	int dodge_move_times;							//开启闪避时刻后，闪避动作已执行的次数
 	int Emergency_times;							//连续紧急制动3次后拒绝紧急制动转而避障
 	int m_EMERGENCY_DISTANCE;						//紧急制动距离，单位mm

@@ -572,7 +572,7 @@ void MainGUI::refreshDashboardData(){
 			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
 			AngleByStar1 = m_StarGazer.starAngel;
 			//Star1未失灵情况下机器人本体的世界坐标与朝向由Star1确定
-			if(m_MARK[loop_mark].markID !=34 && m_MARK[loop_mark].markID !=64 && m_MARK[loop_mark].markID !=66){
+			if(m_StarGazer.starID !=34 && m_StarGazer.starID !=64 && m_StarGazer.starID !=66){
 				AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
 				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
 				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
@@ -586,7 +586,7 @@ void MainGUI::refreshDashboardData(){
 			PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
 			AngleByStar2 = m_StarGazer.starAngel;
 			//Star1失灵情况下机器人本体的世界坐标与朝向由Star2确定
-			if(m_MARK[loop_mark].markID ==34 || m_MARK[loop_mark].markID ==64 || m_MARK[loop_mark].markID ==66){
+			if(m_StarGazer.starID ==34 || m_StarGazer.starID ==64 || m_StarGazer.starID ==66){
 				AngleByStar2>0?AngleSafe=AngleByStar2:AngleSafe=AngleByStar2+360.0;		//得到机器人本体的朝向(顺时针)
 				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
 				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
@@ -634,6 +634,7 @@ void MainGUI::InitDashBoardData(){
 	isEMERGENCY = false;
 	isBlockEMERGENCY = false;
 	dodge_move_times = 0;
+	dodge_mode = 0;
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
 	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
@@ -806,7 +807,7 @@ void MainGUI::InitTaskAssignment(int n){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	QString str;
 	if(n == 1){				//路线一
-		str = "1,2,3,4,5,17,18,6,19,20,7,8,9,10,11,12,13,16,14,15";
+		str = "1,2,3,4,5,17,6,19,20,7,8,9,10,11,12,13,16,14,15";
 	}else if(n == 2){
 		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
 	}else if(n == 3){
@@ -867,13 +868,21 @@ float MainGUI::zTool_mod_360f(float angle){
 void MainGUI::DodgeMeasures(){
 	if((is_path_clear == true && dodge_move_times > DODGESTEPS-2) || dodge_move_times > DODGESTEPS){
 		is_dodge_moment = false;				//超出闪避有效步数后，如果当前前路通畅，则退出闪避时刻
+		dodge_mode = 0;							//闪避模式为0时可以接受新的闪避倾向策略
 		m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 	}else{
 		float d = zTool_mod_360f(Angle_face_Goal-AngleSafe);
-		if(d<45.0){
-			DodgeTurnLeft();	//目标在当前朝向的左手边则向左避障
+		if(dodge_mode == 0){
+			if(d<180.0){
+				dodge_mode = 1;	//目标在当前朝向的左手边则向左避障
+			}else{
+				dodge_mode = 2;	//目标在当前朝向的右手边则向右避障
+			}
+		}
+		if(dodge_mode == 1){
+			DodgeTurnLeft();	
 		}else{
-			DodgeTurnRight();	//目标在当前朝向的右手边则向右避障
+			DodgeTurnRight();	
 		}
 	}
 }
