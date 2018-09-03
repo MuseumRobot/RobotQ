@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
-//#include <QCheckBox>
-//#include <QPointF>
 #include "ui_MainGUI.h"
 #include "robotq.h"
 #include "ManualControl.h"
