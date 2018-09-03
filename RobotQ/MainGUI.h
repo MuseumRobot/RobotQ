@@ -24,7 +24,7 @@
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 10		//紧急制动危险距离，单位mm，将紧急制动距离改为足够小，则相当于屏蔽了紧急制动
 #define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
-#define INSTRUCTION_CYCLE 1500		//指令周期，单位ms
+#define INSTRUCTION_CYCLE 1600		//指令周期，单位ms
 #define INFOREFRESH_CYCLE 600		//数据刷新周期，单位ms
 #define OBSTACLE_DISTANCE 400		//障碍物探测距离，单位mm
 #define ERRORANGLE 12.0				//选择角度的误差范围，单位°
@@ -89,7 +89,8 @@ private:
 	int sectorObstacleDistance[36];					//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
-	int m_timer_refresh_emergency_distance;			//计数器刷新紧急制动距离
+	int m_counter_refresh_emergency_distance;		//计数器刷新紧急制动距离
+	//int m_status_lastrotatespeed;					//记录上一个旋转速度（用以解决旋转漂移问题）
 	int todoList[TODOLISTMAXNUM];					//任务清单
 	int taskID;										//当前任务代码
 	int currentTodoListId;							//当前任务在清单中的下标

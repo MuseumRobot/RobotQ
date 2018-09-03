@@ -19,7 +19,7 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_DashBoard=new DashBoard(this);
 	m_timer_refresh_task=startTimer(INSTRUCTION_CYCLE);					//计数器查询分配任务
 	m_timer_refresh_dashboard=startTimer(INFOREFRESH_CYCLE);			//计数器查询显示机器状态
-	m_timer_refresh_emergency_distance=0;								//依赖分配任务计数器查询刷新恢复制动距离，模20
+	m_counter_refresh_emergency_distance=0;								//依赖分配任务计数器查询刷新恢复制动距离，模20
 	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
 	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
 	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
@@ -139,7 +139,13 @@ int MainGUI::OnBtnDashBoard(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	m_motor.VectorMove(800,0);
+	float speed = 0.0f;
+	if(is_path_clear){
+		speed = 800;
+	}else{
+		speed = 500;
+	}
+	m_motor.VectorMove(speed,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
@@ -147,19 +153,25 @@ int MainGUI::On_MC_BtnBackward(){
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnleft(int level){
-	if(level == 0){
-		m_motor.VectorMove(0,0.8);
-	}else if(level == 1){
-		m_motor.VectorMove(0,1.5);
+	float speed = 0.0f;
+	switch(level){
+	case 0:speed = 0.6;break;
+	case 1:speed = 0.8;break;
+	case 2:speed = 1.0;break;
+	default: speed = 1.2;
 	}
+	m_motor.VectorMove(0,speed);
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnright(int level){
-	if(level == 0){
-		m_motor.VectorMove(0,-0.8);
-	}else if(level == 1){
-		m_motor.VectorMove(0,-1.5);
+	float speed = 0.0f;
+	switch(level){
+	case 0:speed = 0.6;break;
+	case 1:speed = 0.8;break;
+	case 2:speed = 1.0;break;
+	default: speed = 1.2;
 	}
+	m_motor.VectorMove(0,-1.0 * speed);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
@@ -183,8 +195,8 @@ void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
 		refreshDashboardData();			//刷新仪表盘数据
 	}else if(event->timerId()==m_timer_refresh_task){
-		if(m_timer_refresh_emergency_distance == EMERGENCY_RECOVER_CYCLE){
-			m_timer_refresh_emergency_distance = 0;
+		if(m_counter_refresh_emergency_distance == EMERGENCY_RECOVER_CYCLE){
+			m_counter_refresh_emergency_distance = 0;
 			if(m_EMERGENCY_DISTANCE == 0){
 				m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;	//紧急制动恢复
 				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":紧急制动已恢复");
@@ -649,7 +661,7 @@ void MainGUI::AssignInstruction(){
 				//如果还需等待的指令周期大于1，则等它讲话
 			}else{
 				if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
-					m_timer_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
+					m_counter_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
 					AssignGoalPos(taskID);								//分配目标坐标
 					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
 					QPointF d = PosGoal - PosSafe;
@@ -724,7 +736,7 @@ void MainGUI::DodgeTurnRight(){
 		On_MC_BtnForward();		//在向右转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
-		On_Auto_BtnTurnright(0);
+		On_Auto_BtnTurnright(1);
 	}
 }
 void MainGUI::DodgeTurnLeft(){
@@ -732,7 +744,7 @@ void MainGUI::DodgeTurnLeft(){
 		On_MC_BtnForward();		//在向左转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
-		On_Auto_BtnTurnleft(0);
+		On_Auto_BtnTurnleft(1);
 	}
 }
 void MainGUI::InitAdjustGUI(){
@@ -851,7 +863,7 @@ void MainGUI::EmergencyMeasures(){
 		Emergency_times = 0;
 		m_EMERGENCY_DISTANCE = 0;
 		RobotQ::RobotQSpeak("紧急制动已解除，10秒后恢复");
-		m_timer_refresh_emergency_distance = 0;
+		m_counter_refresh_emergency_distance = 0;
 		isBlockEMERGENCY = true;
 		m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":紧急制动已解除");
 		m_DashBoard->ui.ck_isBlockEmergency->setChecked(true);
