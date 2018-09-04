@@ -26,7 +26,8 @@
 #define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
 #define INSTRUCTION_CYCLE 1600		//指令周期，单位ms
 #define INFOREFRESH_CYCLE 600		//数据刷新周期，单位ms
-#define OBSTACLE_DISTANCE 400		//障碍物探测距离，单位mm
+#define OBSTACLE_DISTANCE 400		//近处障碍物探测距离，单位mm，用以判断前方道路是否通畅
+#define FAR_OBSTACLE_DISTANCE 800	//远处障碍物探测距离，单位mm，用以判断前方较远处是否通畅，从而控制前进速度
 #define ERRORANGLE 12.0				//选择角度的误差范围，单位°
 #define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm
 #define SPEAKWORDSPERSECOND 4		//王静每秒钟阅读的字数
@@ -79,6 +80,7 @@ private:
 	bool is_Auto_Mode_Open;
 	bool is_project_accomplished;					//当前项目是否完成
 	bool is_path_clear;								//当前视野下前方是否通畅
+	bool is_far_path_clear;							//判断当前视野下远处是否通畅
 	bool is_dodge_moment;							//是否进入闪避时刻
 	bool isEMERGENCY;								//是否是紧急制动时刻
 	bool isBlockEMERGENCY;							//是否屏蔽紧急制动（为了避免语音点紧急制动打断讲解词，在讲解任务时屏蔽紧急制动功能，所以在语音任务开始时解除紧急制动，在位移任务开始时恢复紧急制动）

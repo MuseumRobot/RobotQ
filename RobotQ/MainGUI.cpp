@@ -50,10 +50,10 @@ MainGUI::~MainGUI(){
 	m_cURG.SwitchOff();		//关闭激光
 }
 void MainGUI::Init(){
-	//InitStarMark();				//LED标签数组赋值(实验室)
+	InitStarMark();					//LED标签数组赋值(实验室)
+	//InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitDataBase(1);				//数据库初始化
 	InitTaskAssignment(1);			//默认分配路线一(任务字符串初始化)
-	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
@@ -140,10 +140,10 @@ int MainGUI::OnBtnDashBoard(){
 }
 int MainGUI::On_MC_BtnForward(){
 	float speed = 0.0f;
-	if(is_path_clear){
-		speed = 800;
+	if(is_far_path_clear){
+		speed = 1200;
 	}else{
-		speed = 500;
+		speed = 800;
 	}
 	m_motor.VectorMove(speed,0);
 	return 0;
@@ -481,7 +481,7 @@ void MainGUI::CalculateSectorDistance(){
 		int sum = 0.0;	//障碍物距离总值
 		for(int i=0;i<21;i++){
 			int k=sectorId*21+i+6;
-			if(m_laser_data_postpro[k]>0&&m_laser_data_postpro[k]<OBSTACLE_DISTANCE){
+			if(m_laser_data_postpro[k]>0&&m_laser_data_postpro[k]<FAR_OBSTACLE_DISTANCE){
 				sum += m_laser_data_postpro[k];
 				n++;
 			}
@@ -642,6 +642,7 @@ void MainGUI::InitDashBoardData(){
 	PosGoal=QPointF(00.00,00.00);
 	is_Auto_Mode_Open = false;
 	is_path_clear = true;
+	is_far_path_clear = true;
 	is_dodge_moment = false;
 	isEMERGENCY = false;
 	isBlockEMERGENCY = false;
@@ -714,6 +715,7 @@ void MainGUI::Rotate_to_GoalAngle(float AngleGoal){
 	}
 }
 void MainGUI::JudgeForwardSituation(){
+	//近距离障碍探测
 	int n=0;
 	for(int i=9;i<27;i++){
 		if(sectorObstacleDistance[i]>0 && sectorObstacleDistance[i] < OBSTACLE_DISTANCE){
@@ -729,6 +731,20 @@ void MainGUI::JudgeForwardSituation(){
 	}else{
 		is_path_clear = true;
 		m_DashBoard->ui.ck_isClear->setChecked(true);
+	}
+	//远距离障碍探测
+	n=0;
+	for(int i=9;i<27;i++){
+		if(sectorObstacleDistance[i]>0 && sectorObstacleDistance[i] < FAR_OBSTACLE_DISTANCE){
+			n++;
+		}
+	}
+	if(n>0){
+		is_far_path_clear = false;
+		m_DashBoard->ui.ck_isFarClear->setChecked(false);
+	}else{
+		is_far_path_clear = true;
+		m_DashBoard->ui.ck_isFarClear->setChecked(true);
 	}
 }
 void MainGUI::DodgeTurnRight(){
@@ -819,7 +835,8 @@ void MainGUI::InitTaskAssignment(int n){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	QString str;
 	if(n == 1){				//路线一
-		str = "1,2,3,4,5,17,6,19,20,7,8,9,10,11,12,13,16,14,15";
+		//str = "1,2,3,4,5,17,6,19,20,7,8,9,10,11,12,13,16,14,15";
+		str = "60,61,62";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
 	}else if(n == 2){
 		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
 	}else if(n == 3){
