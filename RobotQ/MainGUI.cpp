@@ -139,25 +139,29 @@ int MainGUI::OnBtnDashBoard(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	float speed = 0.0f;
-	if(is_far_path_clear){
-		speed = 1200;
-	}else{
-		speed = 800;
-	}
-	m_motor.VectorMove(speed,0);
+	m_motor.VectorMove(1600,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
 	m_motor.VectorMove(-800,0);
 	return 0;
 }
+int MainGUI::On_Auto_BtnForward(int speedlevel){
+	float speed = 0.0f;
+	if(is_far_path_clear){
+		speed = 600;
+	}else{
+		speed = 400;
+	}
+	m_motor.VectorMove(speed,0);
+	return 0;
+}
 int MainGUI::On_Auto_BtnTurnleft(int level){
 	float speed = 0.0f;
 	switch(level){
-	case 0:speed = 0.6;break;
-	case 1:speed = 0.8;break;
-	case 2:speed = 1.0;break;
+	case 0:speed = 1;break;
+	case 1:speed = 4;break;
+	case 2:speed = 0.5;break;
 	default: speed = 1.2;
 	}
 	m_motor.VectorMove(0,speed);
@@ -166,8 +170,8 @@ int MainGUI::On_Auto_BtnTurnleft(int level){
 int MainGUI::On_Auto_BtnTurnright(int level){
 	float speed = 0.0f;
 	switch(level){
-	case 0:speed = 0.6;break;
-	case 1:speed = 0.8;break;
+	case 0:speed = 1;break;
+	case 1:speed = 4;break;
 	case 2:speed = 1.0;break;
 	default: speed = 1.2;
 	}
@@ -175,11 +179,11 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
-	m_motor.VectorMove(0,1);
+	m_motor.VectorMove(0,4);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
-	m_motor.VectorMove(0,-1);
+	m_motor.VectorMove(0,-2);
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){

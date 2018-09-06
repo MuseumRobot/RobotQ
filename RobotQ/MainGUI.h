@@ -24,14 +24,14 @@
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 10		//紧急制动危险距离，单位mm，将紧急制动距离改为足够小，则相当于屏蔽了紧急制动
 #define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
-#define INSTRUCTION_CYCLE 1600		//指令周期，单位ms
-#define INFOREFRESH_CYCLE 600		//数据刷新周期，单位ms
+#define INSTRUCTION_CYCLE 300		//指令周期，单位ms
+#define INFOREFRESH_CYCLE 100		//数据刷新周期，单位ms
 #define OBSTACLE_DISTANCE 400		//近处障碍物探测距离，单位mm，用以判断前方道路是否通畅
 #define FAR_OBSTACLE_DISTANCE 800	//远处障碍物探测距离，单位mm，用以判断前方较远处是否通畅，从而控制前进速度
 #define ERRORANGLE 12.0				//选择角度的误差范围，单位°
 #define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm
 #define SPEAKWORDSPERSECOND 4		//王静每秒钟阅读的字数
-#define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
+#define Distance_Robot_forward_StarGazer -6		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 #define PATHTASKTYPE 0				//位移任务点类型
 #define SPEAKTASKTYPE 1				//语音任务点类型
 
@@ -141,6 +141,7 @@ private slots:
 	int On_MC_BtnBackward();
 	int On_Auto_BtnTurnleft(int speedlevel);
 	int On_Auto_BtnTurnright(int speedlevel);
+	int On_Auto_BtnForward(int speedlevel);
 	int On_MC_BtnTurnleft();
 	int On_MC_BtnTurnright();
 	int On_MC_BtnStopmove();
