@@ -62,10 +62,6 @@ public:
 	int move_rsp;
 	int move_zsp;
 
-	//xhy插值法
-	float m_speedslowchang;
-	float m_wlowchang;
-	
 	bool gomotor(int Lspeed, int Rspeed, int Zspeed);	//前进函数 Lspeed 左轮速度 Rspeed 右轮速度  单位cm/s
 	bool stop();	//停止
 	void VectorMove(float inLV,float inPSpeed); //左右前后移动控制，三个参数分别代表机器人坐标系与全局坐标系在水平方向的夹角，机器人运动的线速度，机器人运动的角速度

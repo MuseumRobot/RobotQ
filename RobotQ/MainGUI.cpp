@@ -147,35 +147,48 @@ int MainGUI::On_MC_BtnBackward(){
 	return 0;
 }
 int MainGUI::On_Auto_BtnForward(int speedlevel){
-	float speed = 0.0f;
+	float inLV = 0.0f;
+	float inPS = 0.0f;
 	if(is_far_path_clear){
-		speed = 600;
+		inLV = 1200;
 	}else{
-		speed = 400;
+		inLV = 800;
 	}
-	m_motor.VectorMove(speed,0);
+	inLV = CompromiseLV(inLV);
+	inPS = CompromisePS(inPS);
+	m_motor.VectorMove(inLV,inPS);
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnleft(int level){
-	float speed = 0.0f;
+	float factor = 0.0f;
+	float speed = 1.0f;
 	switch(level){
-	case 0:speed = 1;break;
-	case 1:speed = 4;break;
-	case 2:speed = 0.5;break;
-	default: speed = 1.2;
+	case 0:factor = 1;break;
+	case 1:factor = 4;break;
+	case 2:factor = 0.5;break;
+	default: factor = 1.2;
 	}
-	m_motor.VectorMove(0,speed);
+	float inLV = 0.0f;
+	float inPS = factor * speed;
+	inLV = CompromiseLV(inLV);
+	inPS = CompromisePS(inPS);
+	m_motor.VectorMove(inLV,inPS);
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnright(int level){
-	float speed = 0.0f;
+	float factor = 0.0f;
+	float speed = 1.0f;
 	switch(level){
-	case 0:speed = 1;break;
-	case 1:speed = 4;break;
-	case 2:speed = 1.0;break;
-	default: speed = 1.2;
+	case 0:factor = 1;break;
+	case 1:factor = 4;break;
+	case 2:factor = 0.5;break;
+	default: factor = 1.2;
 	}
-	m_motor.VectorMove(0,-1.0 * speed);
+	float inPS = -1* factor * speed;
+	float inLV = 0.0f;
+	inLV = CompromiseLV(inLV);
+	inPS = CompromisePS(inPS);
+	m_motor.VectorMove(inLV,inPS);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
@@ -655,7 +668,8 @@ void MainGUI::InitDashBoardData(){
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
 	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
-	m_LastMotorAction = 0;	//默认上一个状态为旋转
+	m_Last_inLV = 0.0f;		//默认线速度为0
+	m_Last_inPS = 0.0f;		//默认角速度为0
 }
 void MainGUI::AssignInstruction(){
 	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
@@ -754,7 +768,7 @@ void MainGUI::JudgeForwardSituation(){
 }
 void MainGUI::DodgeTurnRight(){
 	if(is_path_clear){
-		On_MC_BtnForward();		//在向右转到前方无障碍时前进一步
+		On_Auto_BtnForward(1);		//在向右转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
 		On_Auto_BtnTurnright(1);
@@ -762,7 +776,7 @@ void MainGUI::DodgeTurnRight(){
 }
 void MainGUI::DodgeTurnLeft(){
 	if(is_path_clear){
-		On_MC_BtnForward();		//在向左转到前方无障碍时前进一步
+		On_Auto_BtnForward(1);		//在向左转到前方无障碍时前进一步
 		dodge_move_times++;		//只有在躲避时刻中进行push操作才是有效操作，原地转圈没啥用
 	}else{
 		On_Auto_BtnTurnleft(1);
@@ -900,7 +914,7 @@ float MainGUI::zTool_mod_360f(float angle){
 	return angle;
 }
 void MainGUI::DodgeMeasures(){
-	if((is_path_clear == true && dodge_move_times > DODGESTEPS-2) || dodge_move_times > DODGESTEPS){
+	if((is_path_clear == true && dodge_move_times > DODGESTEPS * 0.6) || dodge_move_times > DODGESTEPS){
 		is_dodge_moment = false;				//超出闪避有效步数后，如果当前前路通畅，则退出闪避时刻
 		dodge_mode = 0;							//闪避模式为0时可以接受新的闪避倾向策略
 		m_DashBoard->ui.ck_isDodgetime->setChecked(false);
@@ -925,7 +939,7 @@ void MainGUI::CommonMeasures(){
 	if(abs(Angle_face_Goal-AngleSafe)>errorRange_Angle){		
 		Rotate_to_GoalAngle(Angle_face_Goal);	//如果和目标角度差距大就先看一眼目标
 	}else{
-		On_MC_BtnForward();						//转到想要的角度后就继续走
+		On_Auto_BtnForward(1);						//转到想要的角度后就继续走
 	}
 }
 void MainGUI::PathTaskFinishedMeasures(){
@@ -934,7 +948,6 @@ void MainGUI::PathTaskFinishedMeasures(){
 	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "完成位移任务," + TaskCode);
 	currentTodoListId++;									//一个任务完成后，准备执行下一个
 	taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
-
 }
 void MainGUI::SpeakTaskFinishedMeasures(){
 	QString TaskCode;
@@ -1031,4 +1044,18 @@ int MainGUI::On_MC_BtnExeSelfTask(){
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
 	return 0;
+}
+float MainGUI::CompromisePS(float inPS){
+	if(abs(inPS-m_Last_inPS)>0.5){
+		inPS = inPS/3 + 2*m_Last_inPS/3;
+		m_Last_inPS = inPS;
+	}
+	return inPS;
+}
+float MainGUI::CompromiseLV(float inLV){
+	if(abs(m_Last_inLV-inLV)>200.0){
+		inLV = inLV/3 + 2*m_Last_inLV/3;
+		m_Last_inLV = inLV;
+	}
+	return inLV;
 }

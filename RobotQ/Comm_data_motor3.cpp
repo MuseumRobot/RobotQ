@@ -38,15 +38,11 @@ CMotor::CMotor(void){
 	rdata_star = 'R';
 	zdata_star = 'Z';
 
-//	m_recvbuf = new char[100]; //new动态分配内存,数据包储存
 	m_databuf = new char[100]; //数据存储
 	m_nRecvindex = 0;       //数据写入位，m_recvbuf
 	m_nFrameLen = 0;        //存储数据包的长度
 	m_bFrameStart = false;  //数据包接收开始标志位，TRUE为已开始接收，FLASE为没有开始
 	m_right=false;
-
-	m_speedslowchang=0.0;
-	m_wlowchang=0.0;
 }
 
 
@@ -93,7 +89,6 @@ void CMotor::Parse(BYTE inData){
 			
 	}
 	m_lastChar = inData;//把上一个接收到的字符更改成inData
-	//memset(m_recvbuf,0x00,sizeof(m_recvbuf));
 }
 
 void CMotor::m_ParseFrame(void){
@@ -104,21 +99,18 @@ void CMotor::m_ParseFrame(void){
 			motor_timer=(motor_timer<<8)+m_recvbuf[i+2];
 			motor_timer=(motor_timer<<8)+m_recvbuf[i+3];
 			motor_timer=(motor_timer<<8)+m_recvbuf[i+4];
-//			fprintf(file,"\t\t recdatatime:		%d    \n",motor_timer);
 		}
 		if (m_recvbuf[i]==ldata_star&&m_recvbuf[i+5]==';'){
 			lift_num=m_recvbuf[i+1]; 
 			lift_num=(lift_num<<8)+m_recvbuf[i+2];
 			lift_num=(lift_num<<8)+m_recvbuf[i+3];
 			lift_num=(lift_num<<8)+m_recvbuf[i+4];
-			//lift_num = lift_num*(-1);
 		}
 		if (m_recvbuf[i]==rdata_star&&m_recvbuf[i+5]==';'){
 			right_num=m_recvbuf[i+1];
 			right_num=(right_num<<8)+m_recvbuf[i+2];
 			right_num=(right_num<<8)+m_recvbuf[i+3];
 			right_num=(right_num<<8)+m_recvbuf[i+4];
-		//	right_num = right_num*(-1);
 		}
 		if (m_recvbuf[i]==zdata_star&&m_recvbuf[i+5]==';'){
 			zhong_num=m_recvbuf[i+1];
@@ -126,19 +118,10 @@ void CMotor::m_ParseFrame(void){
 			zhong_num=(zhong_num<<8)+m_recvbuf[i+3];
 			zhong_num=(zhong_num<<8)+m_recvbuf[i+4];
 		}
-
-//		fprintf(file,"\t\t recdataspeed_l:		%d    ",lift_num);
-//		fprintf(file,"\t\t recdataspeed_r:		%d    \n",right_num);
-
 		if (m_recvbuf[i]==0x0d&&m_recvbuf[i+1]==0x0a){
 			return;
 		}
 	}
-	//out=fopen("re.txt","a+");
-	//fprintf(out,"\n motor_timer:%d...",motor_timer);
-	//fprintf(out,"lift_num:%d...",lift_num);
-	//fprintf(out,"right_num:%d...\n",right_num);
-	//fclose(out);
 }
 
 //机器人运动函数：直接通过给左右轮轮速控制机器人运动
@@ -182,13 +165,6 @@ bool CMotor::gomotor(int Lspeed, int Rspeed,int Zspeed){
 	if (Lspeed<0&&Rspeed>=0) Go_status=2;
 	if (Lspeed<0&&Rspeed<0) Go_status=3;
 
-	//if (Go_status_old!=Go_status) //本次状态与上次状态不同，则发送停止命令，返回false，需要再次发送命令达成目的
-	//{	
-	//	stop();
-	//	Go_status_old=Go_status;
-	//	Sleep(20);
-	////	return false;
-	//}
 	motor_str[16]='G';
 	Lspeed=abs(Lspeed);
 	Rspeed=abs(Rspeed);
@@ -206,25 +182,7 @@ bool CMotor::gomotor(int Lspeed, int Rspeed,int Zspeed){
 	motor_str[14]=(Zspeed%100)/10+0x30;
 	motor_str[15]=Zspeed%10+0x30;
 
-	
-	/*fprintf(file,"senddata:		%c",motor_str[0]);
-	fprintf(file,"%c",motor_str[1]);
-	fprintf(file,"%c",motor_str[2]);
-	fprintf(file,"%c",motor_str[3]);
-	fprintf(file,"%c",motor_str[4]);
-	fprintf(file,"%c",motor_str[5]);
-	fprintf(file,"%c",motor_str[6]);
-	fprintf(file,"%c",motor_str[7]);
-	fprintf(file,"%c",motor_str[8]);
-	fprintf(file,"%c",motor_str[9]);
-	fprintf(file,"%c",motor_str[10]);
-	fprintf(file,"%c",motor_str[11]);
-	fprintf(file,"%c",motor_str[12]);
-	fprintf(file,"%c",motor_str[13]);
-	fprintf(file,"%c\n",motor_str[14]);*/
-
 	ComSend(motor_str,18);
-//	ComSend(":LF010RF010ZF000G.",18);
 	memset(motor_str,0x00,sizeof(motor_str));
 	return true;
 }
@@ -237,16 +195,6 @@ bool CMotor::stop(){
 void CMotor::VectorMove(float inLV, float inPSpeed){	
 	//两个参数代表机器人运动的线速度，机器人运动的角速度
 	float Vx,Vy;
-	//if(m_speedslowchang-inLV>800||m_speedslowchang-inLV<-800){
-	//	inLV=inLV/3+2*m_speedslowchang/3;
-	//}
-	//m_speedslowchang=inLV;
-
-	//if(m_wlowchang-inPSpeed>1.0||m_wlowchang-inPSpeed<-1.0){
-	//	inPSpeed=inPSpeed/3+2*m_wlowchang/3;
-	//}
-	//m_wlowchang=inPSpeed;
-
 	float Radius_robot =     200.0;  // robot radius: 18cm
 	float Wheel_radius = 50.00; ////mm
 	double R_theta;

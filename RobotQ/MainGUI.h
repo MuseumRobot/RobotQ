@@ -17,18 +17,18 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 0d				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
+#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
-#define DODGESTEPS 5				//闪避时刻中最低有效步数
+#define DODGESTEPS 50				//闪避时刻中最低有效步数
 #define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
 #define EMERGENCY_DISTANCE 10		//紧急制动危险距离，单位mm，将紧急制动距离改为足够小，则相当于屏蔽了紧急制动
 #define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
-#define INSTRUCTION_CYCLE 300		//指令周期，单位ms
+#define INSTRUCTION_CYCLE 200		//指令周期，单位ms
 #define INFOREFRESH_CYCLE 100		//数据刷新周期，单位ms
 #define OBSTACLE_DISTANCE 400		//近处障碍物探测距离，单位mm，用以判断前方道路是否通畅
 #define FAR_OBSTACLE_DISTANCE 800	//远处障碍物探测距离，单位mm，用以判断前方较远处是否通畅，从而控制前进速度
-#define ERRORANGLE 12.0				//选择角度的误差范围，单位°
+#define ERRORANGLE 10.0				//选择角度的误差范围，单位°
 #define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm
 #define SPEAKWORDSPERSECOND 4		//王静每秒钟阅读的字数
 #define Distance_Robot_forward_StarGazer -6		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
@@ -92,7 +92,8 @@ private:
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
 	int m_counter_refresh_emergency_distance;		//计数器刷新紧急制动距离
-	int m_LastMotorAction;							//记录上一个电机动作，1为前进，0为旋转
+	float m_Last_inLV;								//上一个动作的线速度
+	float m_Last_inPS;								//上一个动作的角速度
 	int todoList[TODOLISTMAXNUM];					//任务清单
 	int taskID;										//当前任务代码
 	int currentTodoListId;							//当前任务在清单中的下标
@@ -123,6 +124,8 @@ private:
 	void SpeakTaskFinishedMeasures();				//完成语音任务后执行的动作
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
+	float CompromiseLV(float inLV);					//平滑线速度
+	float CompromisePS(float inPS);					//平滑角速度
 	float zTool_cos_angle(float angle);				//计算余弦值，参数单位为°
 	float zTool_sin_angle(float angle);				//计算正弦值，参数单位为°
 	float zTool_mod_360f(float angle);				//将角度范围归为(0,360)
