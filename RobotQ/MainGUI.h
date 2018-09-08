@@ -124,8 +124,6 @@ private:
 	void SpeakTaskFinishedMeasures();				//完成语音任务后执行的动作
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
-	float CompromiseLV(float inLV);					//平滑线速度
-	float CompromisePS(float inPS);					//平滑角速度
 	float zTool_cos_angle(float angle);				//计算余弦值，参数单位为°
 	float zTool_sin_angle(float angle);				//计算正弦值，参数单位为°
 	float zTool_mod_360f(float angle);				//将角度范围归为(0,360)

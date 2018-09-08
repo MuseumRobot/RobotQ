@@ -16,8 +16,6 @@ public:
 	int encoder_l; //左编码器光栅数
 	int encoder_r; //右编码器光栅数
 	int encoder_z; //中编码器光栅数
-	//extern int timer; //时间
-
 
 	int timer ;  //时间记录
 	int timerold ; //上一次时间
@@ -61,6 +59,12 @@ public:
 	int move_lsp;
 	int move_rsp;
 	int move_zsp;
+
+	float m_Last_inLV;								//上一个动作的线速度
+	float m_Last_inPS;								//上一个动作的角速度
+	float CompromiseLV(float inLV);					//平滑线速度
+	float CompromisePS(float inPS);					//平滑角速度
+	void CompromisedVectorMove(float inLV,float inPSpeed);		//妥协后的向量运动
 
 	bool gomotor(int Lspeed, int Rspeed, int Zspeed);	//前进函数 Lspeed 左轮速度 Rspeed 右轮速度  单位cm/s
 	bool stop();	//停止

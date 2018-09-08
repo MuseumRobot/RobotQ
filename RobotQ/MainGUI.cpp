@@ -154,9 +154,7 @@ int MainGUI::On_Auto_BtnForward(int speedlevel){
 	}else{
 		inLV = 800;
 	}
-	inLV = CompromiseLV(inLV);
-	inPS = CompromisePS(inPS);
-	m_motor.VectorMove(inLV,inPS);
+	m_motor.CompromisedVectorMove(inLV,inPS);
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnleft(int level){
@@ -170,9 +168,7 @@ int MainGUI::On_Auto_BtnTurnleft(int level){
 	}
 	float inLV = 0.0f;
 	float inPS = factor * speed;
-	inLV = CompromiseLV(inLV);
-	inPS = CompromisePS(inPS);
-	m_motor.VectorMove(inLV,inPS);
+	m_motor.CompromisedVectorMove(inLV,inPS);
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnright(int level){
@@ -186,9 +182,7 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	}
 	float inPS = -1* factor * speed;
 	float inLV = 0.0f;
-	inLV = CompromiseLV(inLV);
-	inPS = CompromisePS(inPS);
-	m_motor.VectorMove(inLV,inPS);
+	m_motor.CompromisedVectorMove(inLV,inPS);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
@@ -668,8 +662,6 @@ void MainGUI::InitDashBoardData(){
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
 	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
-	m_Last_inLV = 0.0f;		//默认线速度为0
-	m_Last_inPS = 0.0f;		//默认角速度为0
 }
 void MainGUI::AssignInstruction(){
 	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
@@ -1044,18 +1036,4 @@ int MainGUI::On_MC_BtnExeSelfTask(){
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
 	return 0;
-}
-float MainGUI::CompromisePS(float inPS){
-	if(abs(inPS-m_Last_inPS)>0.5){
-		inPS = inPS/3 + 2*m_Last_inPS/3;
-		m_Last_inPS = inPS;
-	}
-	return inPS;
-}
-float MainGUI::CompromiseLV(float inLV){
-	if(abs(m_Last_inLV-inLV)>200.0){
-		inLV = inLV/3 + 2*m_Last_inLV/3;
-		m_Last_inLV = inLV;
-	}
-	return inLV;
 }

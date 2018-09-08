@@ -43,6 +43,9 @@ CMotor::CMotor(void){
 	m_nFrameLen = 0;        //存储数据包的长度
 	m_bFrameStart = false;  //数据包接收开始标志位，TRUE为已开始接收，FLASE为没有开始
 	m_right=false;
+
+	m_Last_inLV = 0.0f;		//默认线速度为0
+	m_Last_inPS = 0.0f;		//默认角速度为0
 }
 
 
@@ -222,4 +225,26 @@ int CMotor::m_CalAngle(int angle1, int angle2){
 bool CMotor::open_com_motor(int CCommport){
 	//打开电机串口
 	return Create(CCommport);
+}
+
+float CMotor::CompromisePS(float inPS){
+	if(abs(inPS-m_Last_inPS)>0.5){
+		inPS = inPS/3 + 2*m_Last_inPS/3;
+		m_Last_inPS = inPS;
+	}
+	return inPS;
+}
+float CMotor::CompromiseLV(float inLV){
+	if(abs(m_Last_inLV-inLV)>200.0){
+		inLV = inLV/3 + 2*m_Last_inLV/3;
+		m_Last_inLV = inLV;
+	}
+	return inLV;
+}
+void CMotor::CompromisedVectorMove(float inLV,float inPS){
+	inLV = CompromiseLV(inLV);
+	inPS = CompromisePS(inPS);
+	VectorMove(inLV,inPS);
+	m_Last_inLV = inLV;
+	m_Last_inPS = inPS;
 }
