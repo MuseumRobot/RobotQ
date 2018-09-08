@@ -17,7 +17,7 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
+#define MUSEUMMODE 0d				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 5				//闪避时刻中最低有效步数
@@ -92,7 +92,7 @@ private:
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
 	int m_counter_refresh_emergency_distance;		//计数器刷新紧急制动距离
-	//int m_status_lastrotatespeed;					//记录上一个旋转速度（用以解决旋转漂移问题）
+	int m_LastMotorAction;							//记录上一个电机动作，1为前进，0为旋转
 	int todoList[TODOLISTMAXNUM];					//任务清单
 	int taskID;										//当前任务代码
 	int currentTodoListId;							//当前任务在清单中的下标

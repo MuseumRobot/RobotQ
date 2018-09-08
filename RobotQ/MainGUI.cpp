@@ -655,6 +655,7 @@ void MainGUI::InitDashBoardData(){
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
 	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
+	m_LastMotorAction = 0;	//默认上一个状态为旋转
 }
 void MainGUI::AssignInstruction(){
 	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
