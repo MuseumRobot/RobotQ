@@ -17,6 +17,7 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	m_RobotQ=new RobotQ(this);						//初始化这些成员对象需要在connect前
 	m_ManualControl=new ManualControl(this);
 	m_DashBoard=new DashBoard(this);
+	m_popup_secondScreen_image = new PopupDialog(this);	//初始化第二屏幕弹出窗口
 	m_timer_refresh_task=startTimer(INSTRUCTION_CYCLE);					//计数器查询分配任务
 	m_timer_refresh_dashboard=startTimer(INFOREFRESH_CYCLE);			//计数器查询显示机器状态
 	m_counter_refresh_emergency_distance=0;								//依赖分配任务计数器查询刷新恢复制动距离，模20
@@ -679,7 +680,7 @@ void MainGUI::AssignInstruction(){
 					QPointF d = PosGoal - PosSafe;
 					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
 					if(dDistance > errorRange_Distance){				//如果还没有抵达当前任务目标点就继续执行任务
-						if(is_dodge_moment == true){	//一旦前路不通会进入闪避时刻，占用若干个指令周期，而闪避时刻有自己的退出条件
+						if(is_dodge_moment == true){					//一旦前路不通会进入闪避时刻，占用若干个指令周期，而闪避时刻有自己的退出条件
 							DodgeMeasures();							//如果处于闪避时刻就闪避
 						}else{
 							CommonMeasures();							//如果本指令周期没有处于闪避时刻，则正常向目标运行
@@ -689,6 +690,14 @@ void MainGUI::AssignInstruction(){
 						JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 					}
 				}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
+					if(taskID == 123){		//如果是需要播放图片的语音点
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(1));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/最新无水印版二维码.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(600,400);
+					}
 					AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
 					RobotQ::RobotQSpeak(SpeakContent);
 					SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;

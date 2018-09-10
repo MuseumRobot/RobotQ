@@ -57,6 +57,7 @@ public:
 	QPushButton* btnPath1;
 	QPushButton* btnPath2;
 	QPushButton* btnPath3;
+	PopupDialog* m_popup_secondScreen_image;	//第二显示器弹出窗口
 	QPointF PosByStar1;		//首选星标得到的星标定位器的世界坐标，单位cm
 	QPointF PosByStar2;		//备选星标，单位cm
 	QPointF PosSafe;		//综合考虑电机和星标进而得出可靠的机器人中心点坐标结果，单位cm
