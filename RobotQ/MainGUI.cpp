@@ -1,4 +1,5 @@
 #include "MainGUI.h"
+#include <QMovie>
 
 //若干对象需要自始至终存在于主界面中
 CUPURG m_cURG;									//激光对象
@@ -108,6 +109,15 @@ int MainGUI::OnBtnAutoGuide(){
 		taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
 		is_project_accomplished = false;
 		is_Auto_Mode_Open = true;
+		/////////////////
+		/*
+		isfirst60=true;
+		num60=0;
+		isfirst61=true;
+		num61=0;
+		*/
+		isfirstzhongajin=true;
+		////////////////
 		if(MUSEUMMODE == 0){
 			m_DashBoard->ui.ck_Auto->setChecked(true);
 			ui.btnAutoGuide->setText("关闭自动导航");
@@ -140,18 +150,18 @@ int MainGUI::OnBtnDashBoard(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	m_motor.VectorMove(1600,0);
+	m_motor.CompromisedVectorMove(1600,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
-	m_motor.VectorMove(-800,0);
+	m_motor.CompromisedVectorMove(-1600,0);
 	return 0;
 }
 int MainGUI::On_Auto_BtnForward(int speedlevel){
 	float inLV = 0.0f;
 	float inPS = 0.0f;
 	if(is_far_path_clear){
-		inLV = 1200;
+		inLV = 800;
 	}else{
 		inLV = 800;
 	}
@@ -163,7 +173,7 @@ int MainGUI::On_Auto_BtnTurnleft(int level){
 	float speed = 1.0f;
 	switch(level){
 	case 0:factor = 1;break;
-	case 1:factor = 4;break;
+	case 1:factor = 2;break;
 	case 2:factor = 0.5;break;
 	default: factor = 1.2;
 	}
@@ -177,7 +187,7 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	float speed = 1.0f;
 	switch(level){
 	case 0:factor = 1;break;
-	case 1:factor = 4;break;
+	case 1:factor = 2;break;
 	case 2:factor = 0.5;break;
 	default: factor = 1.2;
 	}
@@ -187,11 +197,11 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
-	m_motor.VectorMove(0,4);
+	m_motor.CompromisedVectorMove(0,3);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
-	m_motor.VectorMove(0,-2);
+	m_motor.CompromisedVectorMove(0,-3);
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){
@@ -206,6 +216,7 @@ int MainGUI::On_MC_BtnRobotQSpeak(){
 void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
 		refreshDashboardData();			//刷新仪表盘数据
+
 	}else if(event->timerId()==m_timer_refresh_task){
 		if(m_counter_refresh_emergency_distance == EMERGENCY_RECOVER_CYCLE){
 			m_counter_refresh_emergency_distance = 0;
@@ -470,6 +481,15 @@ void MainGUI::InitStarMarkMuseum(){
 void MainGUI::InitCommMotorAndStar(){
 	if(m_motor.open_com_motor(COMM_MOTOR)){
 		m_DashBoard->ui.ck_Motor->setChecked(true);
+		///////////////
+		/*
+		m_motor.gomotor(0,0,0);
+		m_motor.gomotor(0,0,0);
+		m_motor.gomotor(0,0,0);
+		m_motor.gomotor(0,0,0);
+		m_motor.gomotor(0,0,0);
+		*/
+		///////////
 	}
 	if(m_StarGazer.open_com(COMM_STAR)){
 		m_DashBoard->ui.ck_Star->setChecked(true);
@@ -646,6 +666,11 @@ void MainGUI::refreshDashboardData(){
 	}
 	str.resize(str.length() - 1);		//修剪字符串尾部多余的","
 	m_DashBoard->ui.text_Todolist->setText(str);
+	/*FILE *alloutxhy;
+	alloutxhy = fopen("alloutxhy.txt","a+");
+	fprintf(alloutxhy,"  l:  %f  r:  %f  z:   %f   \n",m_motor.speed_l, m_motor.speed_r, m_motor.speed_z);
+	fclose(alloutxhy);*/
+
 }
 void MainGUI::InitDashBoardData(){
 	PosByStar1=QPointF(0.00,0.00);
@@ -663,6 +688,13 @@ void MainGUI::InitDashBoardData(){
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
 	Emergency_times = 0;
 	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
+	/*
+	isfirst60=true;
+	num60=0;
+	isfirst61=true;
+	num61=0;
+	*/
+	isfirstzhongajin=true;
 }
 void MainGUI::AssignInstruction(){
 	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
@@ -673,7 +705,57 @@ void MainGUI::AssignInstruction(){
 			if(SpeakWaitCycle>1){
 				//如果还需等待的指令周期大于1，则等它讲话
 			}else{
-				if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
+				if (JudgeTaskType(taskID) == PATHTASKTYPE){	
+					/*
+					if(taskID == 60&&isfirst60){		//如果是需要播放图片的语音点
+						if(num60==0){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/1、铁甲片.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						}
+						else if(num60>20)
+						{
+							isfirst60=false;
+							num60=-1;
+							isfirstzhongajin=true;
+						}
+						++num60;
+					}
+					else if(taskID == 61&&isfirst61){		//如果是需要播放图片的语音点
+						if(num61==0){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/2、铜马蹬.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						}
+						else if(num61>20)
+						{
+							isfirst61=false;
+							num61=-1;
+							isfirstzhongajin=true;
+						}
+						++num61;
+					}
+					*/
+					if(isfirstzhongajin)
+					{
+						isfirstzhongajin=false;
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						QMovie *movie = new QMovie("Resources/图片/七寸屏幕 .gif");
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/七寸屏幕 .gif"));
+						m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						movie->start();
+					}
+					//如果该任务是位移任务
 					m_counter_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
 					AssignGoalPos(taskID);								//分配目标坐标
 					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
@@ -689,14 +771,41 @@ void MainGUI::AssignInstruction(){
 						PathTaskFinishedMeasures();
 						JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 					}
+					
 				}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
-					if(taskID == 123){		//如果是需要播放图片的语音点
+					if(taskID == 63){		//如果是需要播放图片的语音点
 						QDesktopWidget* desktop = QApplication::desktop();
 						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(1));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/最新无水印版二维码.jpg"));
+						QMovie *movie = new QMovie("Resources/图片/1 2~1.gif");
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/七寸屏幕 .gif"));
+						m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
 						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(600,400);
+						m_popup_secondScreen_image->resize(800,600);
+						movie->start();
+						isfirstzhongajin=true;
+					}else if(taskID == 64){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						QMovie *movie = new QMovie("Resources/图片/3 4~1.gif");
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/七寸屏幕 .gif"));
+						m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						movie->start();
+						isfirstzhongajin=true;
+					}else if(taskID == 65){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						QMovie *movie = new QMovie("Resources/图片/6 7~1.gif");
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/七寸屏幕 .gif"));
+						m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						movie->start();
+						isfirstzhongajin=true;
 					}
 					AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
 					RobotQ::RobotQSpeak(SpeakContent);
@@ -856,12 +965,18 @@ void MainGUI::InitTaskAssignment(int n){
 	QString str;
 	if(n == 1){				//路线一
 		//str = "1,2,3,4,5,17,6,19,20,7,8,9,10,11,12,13,16,14,15";
-		str = "60,61,62";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
+		//str = "1.8.2.9.10.3.11.12.4.13.5.14.15.6.16.7.17.18";//新版路线0912
+		str = "60,63,61,64,62,65";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
 	}else if(n == 2){
 		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
+		//str = "1.5.2.6.7.3.8.4.9.10.11.12.13";//新版路线0912
 	}else if(n == 3){
 		str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
+		//str = "1.12.13.2.14.15.16.3.17.18.19.20.21.4.22.23.5.24.25.26.27.6.28.29.7.30.31.8.32.9.33.10.34.35.11.36.37.38.39";//新版路线0912
 	}
+	//else if(n == 4){
+	//	str = "1.21.2.22.23.3.24.25.4.26.5.27.28.6.29.7.30.31.8.32.33.9.34.10.35.36.37.38.39.40.11.41.42.43.12.44.45.46.47.48.13.49.50.51.52.14.53.54.55.56.57.58.59.15.60.61.16.62.63.17.64.18.65.66.67.68.69.70.71.72.73.74.75.19.20";//新版路线0912
+	//}
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
 }

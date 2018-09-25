@@ -31,7 +31,7 @@
 #define ERRORANGLE 10.0				//选择角度的误差范围，单位°
 #define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm
 #define SPEAKWORDSPERSECOND 4		//王静每秒钟阅读的字数
-#define Distance_Robot_forward_StarGazer -6		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
+#define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 #define PATHTASKTYPE 0				//位移任务点类型
 #define SPEAKTASKTYPE 1				//语音任务点类型
 
@@ -68,6 +68,14 @@ public:
 	float Angle_face_Goal;	//站在当前的机器人本体世界坐标朝目标世界坐标看的角度，单位°
 	QString SpeakContent;	//机器人将要说的内容
 	int SpeakWaitCycle;		//发出说话指令后，机器人在若干个指令周期内不分配任务
+/*
+	bool isfirst60;//第一次进入60
+	int num60;
+	bool isfirst61;//第一次进入61
+	int num61;
+	*/
+	bool isfirstzhongajin;//中间
+	
 private:
 	Ui::MainGUI ui;
 	RobotQ* m_RobotQ;

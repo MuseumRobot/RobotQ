@@ -198,7 +198,7 @@ bool CMotor::stop(){
 void CMotor::VectorMove(float inLV, float inPSpeed){	
 	//两个参数代表机器人运动的线速度，机器人运动的角速度
 	float Vx,Vy;
-	float Radius_robot =     200.0;  // robot radius: 18cm
+	float Radius_robot =200.0;  // robot radius: 18cm
 	float Wheel_radius = 50.00; ////mm
 	double R_theta;
 	R_theta=0.0;
@@ -207,6 +207,12 @@ void CMotor::VectorMove(float inLV, float inPSpeed){
 	move_lsp = int((sin(PIf/3 + R_theta) * (Vx) - cos(PIf/3 + R_theta) * (Vy) - Radius_robot * (inPSpeed))/Wheel_radius) ; 		
     move_zsp = int((-sin(R_theta) * (Vx) + cos(R_theta) * (Vy) -Radius_robot * (inPSpeed))/Wheel_radius) ;		
     move_rsp = int((-sin(PIf/3 - R_theta) * (Vx) - cos(PIf/3 - R_theta) * (Vy) - Radius_robot * (inPSpeed))/Wheel_radius); 
+	////
+	FILE *alloutxhy;
+	alloutxhy = fopen("alloutxhy.txt","a+");
+	fprintf(alloutxhy,"move_sp  l:  %d  r:  %d  z:   %d   \n",move_lsp, move_rsp, move_zsp);
+	fclose(alloutxhy);
+	////
 	gomotor(-move_lsp,-move_rsp,-move_zsp);//com345:负(如果方向全部相反一般是这里的问题)
 
 }
@@ -229,14 +235,14 @@ bool CMotor::open_com_motor(int CCommport){
 
 float CMotor::CompromisePS(float inPS){
 	if(abs(inPS-m_Last_inPS)>0.5){
-		inPS = inPS/3 + 2*m_Last_inPS/3;
+		inPS = inPS/6 + 5*m_Last_inPS/6;
 		m_Last_inPS = inPS;
 	}
 	return inPS;
 }
 float CMotor::CompromiseLV(float inLV){
 	if(abs(m_Last_inLV-inLV)>200.0){
-		inLV = inLV/3 + 2*m_Last_inLV/3;
+		inLV = inLV/6 + 5*m_Last_inLV/6;
 		m_Last_inLV = inLV;
 	}
 	return inLV;
@@ -244,6 +250,13 @@ float CMotor::CompromiseLV(float inLV){
 void CMotor::CompromisedVectorMove(float inLV,float inPS){
 	inLV = CompromiseLV(inLV);
 	inPS = CompromisePS(inPS);
+	/////
+	FILE *alloutxhy;
+	alloutxhy = fopen("alloutxhy.txt","a+");
+	fprintf(alloutxhy," l:  %f  r:  %f  z:   %f   \n",speed_l, speed_r, speed_z);
+	fprintf(alloutxhy,"++++++LV:%f  PS:  %f  \n",inLV, inPS);
+	fclose(alloutxhy);
+	//////
 	VectorMove(inLV,inPS);
 	m_Last_inLV = inLV;
 	m_Last_inPS = inPS;
