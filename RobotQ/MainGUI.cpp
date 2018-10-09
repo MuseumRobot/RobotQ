@@ -38,6 +38,8 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	connect(m_ManualControl->ui.btn_MC_Path1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
 	connect(m_ManualControl->ui.btn_MC_Path2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
 	connect(m_ManualControl->ui.btn_MC_Path3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
+	connect(m_ManualControl->ui.btn_MC_Path4,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath4()));
+	connect(m_ManualControl->ui.btn_MC_FastGuide,SIGNAL(clicked()),this,SLOT(OnBtnFastGuideMode()));
 	connect(m_ManualControl->ui.btnStartSpeak,SIGNAL(clicked()),this,SLOT(On_MC_BtnRobotQSpeak()));
 	connect(m_ManualControl->ui.btnStopSpeak,SIGNAL(clicked()),m_RobotQ,SLOT(OnStopSpeak()));	
 	//connect(m_RobotQ,SIGNAL(TTS_Ready()),this,SLOT(check_TTS_Ready()));//在子窗口的初始化函数中发射信号无法被接受，而在初始化函数之外发射有效
@@ -653,6 +655,7 @@ void MainGUI::InitDashBoardData(){
 	PosSafe=QPointF(0.00,0.00);
 	PosGoal=QPointF(00.00,00.00);
 	is_Auto_Mode_Open = false;
+	is_FastGuideMode = false;
 	is_path_clear = true;
 	is_far_path_clear = true;
 	is_dodge_moment = false;
@@ -861,8 +864,13 @@ void MainGUI::InitTaskAssignment(int n){
 		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
 	}else if(n == 3){
 		str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
+	}else if(n == 4){
+		str = "1,21,2";		//全路径
 	}
 	ParseTodoList(str,todoList);
+	if(is_FastGuideMode){
+		FastGuideTodolist();	//如果开启了快速模式则修剪任务队列
+	}
 	taskID = todoList[currentTodoListId];
 }
 void MainGUI::AssignGoalPos(int taskID){		//根据任务代码（位移任务）分配目标位置
@@ -1026,6 +1034,12 @@ int MainGUI::OnBtnSelectPath3(){
 	RobotQ::RobotQSpeak("已切换至路线三！");
 	return 0;
 }
+int MainGUI::OnBtnSelectPath4(){
+	InitDataBase(4);
+	InitTaskAssignment(4);
+	RobotQ::RobotQSpeak("已切换至路线四！");
+	return 0;
+}
 int MainGUI::On_MC_BtnGoHome(){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	QString str = "0";
@@ -1044,5 +1058,35 @@ int MainGUI::On_MC_BtnExeSelfTask(){
 	QString str = m_ManualControl->ui.text_SelfTask->text();
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
+	return 0;
+}
+void MainGUI::FastGuideTodolist(){
+	//修剪任务队列，剔除所有语音点
+	int i=0;
+	int n=0;
+	int fastList[99];
+	int currentfastindex = 0;	//快速导览队列的数组下标
+	while(todoList[i++]!=0)n++;
+	for(i=0;i<n;i++){
+		if(JudgeTaskType(todoList[i])==0){
+			fastList[currentfastindex++] = todoList[i];
+		}
+	}
+	fastList[currentfastindex] = 0;	//加上任务队列休止符
+	//接下来把fastList赋值给todoList
+	int j=0;
+	for(i=0;i<currentfastindex;i++){
+		todoList[j++] = fastList[i];
+	}
+	todoList[j] = 0;	//休止符
+}
+int MainGUI::OnBtnFastGuideMode(){
+	if(is_FastGuideMode){
+		is_FastGuideMode = !is_FastGuideMode;
+		m_ManualControl->ui.btn_MC_FastGuide->setText("开启快速模式");
+	}else{
+		is_FastGuideMode = !is_FastGuideMode;
+		m_ManualControl->ui.btn_MC_FastGuide->setText("关闭快速模式");
+	}
 	return 0;
 }
