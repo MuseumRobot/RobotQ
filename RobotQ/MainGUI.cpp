@@ -52,8 +52,8 @@ MainGUI::~MainGUI(){
 	m_cURG.SwitchOff();		//关闭激光
 }
 void MainGUI::Init(){
-	InitStarMark();					//LED标签数组赋值(实验室)
-	//InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
+	//InitStarMark();					//LED标签数组赋值(实验室)
+	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitDataBase(1);				//数据库初始化
 	InitTaskAssignment(1);			//默认分配路线一(任务字符串初始化)
 	InitCommMotorAndStar();			//串口初始化Motor/Star
@@ -161,7 +161,7 @@ int MainGUI::On_Auto_BtnForward(int speedlevel){
 	float inLV = 0.0f;
 	float inPS = 0.0f;
 	if(is_far_path_clear){
-		inLV = 800;
+		inLV = 1000;
 	}else{
 		inLV = 800;
 	}
@@ -773,6 +773,7 @@ void MainGUI::AssignInstruction(){
 					}
 					
 				}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
+					/*
 					if(taskID == 63){		//如果是需要播放图片的语音点
 						QDesktopWidget* desktop = QApplication::desktop();
 						int N = desktop->screenCount();
@@ -807,6 +808,90 @@ void MainGUI::AssignInstruction(){
 						movie->start();
 						isfirstzhongajin=true;
 					}
+					*/
+					////////////
+					if(taskID == 9){		//如果是需要播放图片的语音点
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/1、铁甲片.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 10){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/2、铜马蹬.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 11){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/3 、三足铜锅、三足铁锅（拼一张图）.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 12){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/4、胡里改路之印.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 13){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/5、兽面瓦当.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 14){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/6、金代铁刀.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 15){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/7、金代铁锏.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 16){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/8 油画：户部达岗战役.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					else if(taskID == 17){
+						QDesktopWidget* desktop = QApplication::desktop();
+						int N = desktop->screenCount();
+						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/9、玉壶春瓶.jpg"));
+						m_popup_secondScreen_image->show();
+						m_popup_secondScreen_image->resize(800,600);
+						isfirstzhongajin=true;
+					}
+					///////////
 					AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
 					RobotQ::RobotQSpeak(SpeakContent);
 					SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;
@@ -814,11 +899,23 @@ void MainGUI::AssignInstruction(){
 					SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
 					JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 				}else{		
+					////
+					isfirstzhongajin=false;
+					QDesktopWidget* desktop = QApplication::desktop();
+					int N = desktop->screenCount();
+					QMovie *movie = new QMovie("Resources/图片/七寸屏幕 .gif");
+					m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+					//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/七寸屏幕 .gif"));
+					m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
+					m_popup_secondScreen_image->show();
+					m_popup_secondScreen_image->resize(800,600);
+					movie->start();
+					////
 					ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 				}
 			}
 			SpeakWaitCycle--;	//每过一个指令周期，接下来就少等一个周期，直到还需等待次数少于1就正常发配任务
-		}	
+		}
 	}
 }
 float MainGUI::zTool_cos_angle(float angle){
@@ -965,14 +1062,17 @@ void MainGUI::InitTaskAssignment(int n){
 	QString str;
 	if(n == 1){				//路线一
 		//str = "1,2,3,4,5,17,6,19,20,7,8,9,10,11,12,13,16,14,15";
-		//str = "1.8.2.9.10.3.11.12.4.13.5.14.15.6.16.7.17.18";//新版路线0912
-		str = "60,63,61,64,62,65";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
+		str = "1,8,2,9,10,3,11,12,4,13,5,14,15,6,16,7,17,18";//新版路线0912
+		//str = "1,2,3,4,5,6,7";//新版路线0929
+		//str = "60,63,61,64,62,65";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
 	}else if(n == 2){
-		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
-		//str = "1.5.2.6.7.3.8.4.9.10.11.12.13";//新版路线0912
+		//str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
+		//str = "1,5,2,6,7,3,8,4,9,10,11,12,13";//新版路线0912
+		str = "1";//新版路线0929
 	}else if(n == 3){
-		str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
-		//str = "1.12.13.2.14.15.16.3.17.18.19.20.21.4.22.23.5.24.25.26.27.6.28.29.7.30.31.8.32.9.33.10.34.35.11.36.37.38.39";//新版路线0912
+		//str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
+		//str = "2,14,15,16,3,17,18,19,20,21,4,22,23,5,24,25,26,27,6,28,29,7,30,31,8,32,9,33,10,34,35,11,36,37,38,39";//新版路线0912
+		str = "2,3,4,5,6,7,9,10,11";//新版路线0929
 	}
 	//else if(n == 4){
 	//	str = "1.21.2.22.23.3.24.25.4.26.5.27.28.6.29.7.30.31.8.32.33.9.34.10.35.36.37.38.39.40.11.41.42.43.12.44.45.46.47.48.13.49.50.51.52.14.53.54.55.56.57.58.59.15.60.61.16.62.63.17.64.18.65.66.67.68.69.70.71.72.73.74.75.19.20";//新版路线0912
