@@ -66,6 +66,7 @@ public:
 	float AngleByStar2;		//备选星标得到的星标定位器的角度，单位°
 	float AngleSafe;		//实际的机器人朝向（以x轴正方向为0°，逆时针为正方向，取值为[0~360)毕竟是浮点数不能这么整啦）
 	float Angle_face_Goal;	//站在当前的机器人本体世界坐标朝目标世界坐标看的角度，单位°
+	float Angle_face_Audiance;	//抵达目的地后看向观众的角度
 	QString SpeakContent;	//机器人将要说的内容
 	int SpeakWaitCycle;		//发出说话指令后，机器人在若干个指令周期内不分配任务
 private:

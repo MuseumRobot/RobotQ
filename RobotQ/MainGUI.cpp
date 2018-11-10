@@ -654,6 +654,11 @@ void MainGUI::InitDashBoardData(){
 	PosByStar2=QPointF(0.00,0.00);
 	PosSafe=QPointF(0.00,0.00);
 	PosGoal=QPointF(00.00,00.00);
+	AngleByStar1 = 0.0;
+	AngleByStar2 = 0.0;
+	AngleSafe = 0.0;
+	Angle_face_Goal = 0.0;
+	Angle_face_Audiance = 0.0;
 	is_Auto_Mode_Open = false;
 	is_FastGuideMode = false;
 	is_path_clear = true;
@@ -678,7 +683,7 @@ void MainGUI::AssignInstruction(){
 			}else{
 				if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
 					m_counter_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
-					AssignGoalPos(taskID);								//分配目标坐标
+					AssignGoalPos(taskID);								//分配目标坐标和到达目标后的朝向
 					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
 					QPointF d = PosGoal - PosSafe;
 					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
@@ -688,9 +693,13 @@ void MainGUI::AssignInstruction(){
 						}else{
 							CommonMeasures();							//如果本指令周期没有处于闪避时刻，则正常向目标运行
 						}
-					}else{												//如果已经抵达当前目标点
-						PathTaskFinishedMeasures();
-						JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
+					}else{												//如果已经抵达当前目标点，还需要转向观众
+						if(abs(Angle_face_Audiance-AngleSafe)>ERRORANGLE){		
+							Rotate_to_GoalAngle(Angle_face_Audiance);
+						}else{											//如果已经转向观众，则结束本条位移任务
+							PathTaskFinishedMeasures();
+							JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
+						}		
 					}
 				}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
 					if(taskID == 123){		//如果是需要播放图片的语音点
@@ -873,10 +882,11 @@ void MainGUI::InitTaskAssignment(int n){
 	}
 	taskID = todoList[currentTodoListId];
 }
-void MainGUI::AssignGoalPos(int taskID){		//根据任务代码（位移任务）分配目标位置
+void MainGUI::AssignGoalPos(int taskID){		//根据任务代码（位移任务）分配目标位置及抵达目的地后的朝向
 	TaskDataType* task = m_dataManager.findTask(taskID);
 	if(task != NULL){
 		PosGoal = QPointF(task->x,task->y);
+		Angle_face_Audiance = task->FacingAngle;
 	}
 }
 void MainGUI::AssignSpeakContent(int taskID){	//根据任务代码（语音任务）分配语音内容和机器人等待时间
