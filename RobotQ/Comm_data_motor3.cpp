@@ -207,12 +207,6 @@ void CMotor::VectorMove(float inLV, float inPSpeed){
 	move_lsp = int((sin(PIf/3 + R_theta) * (Vx) - cos(PIf/3 + R_theta) * (Vy) - Radius_robot * (inPSpeed))/Wheel_radius) ; 		
     move_zsp = int((-sin(R_theta) * (Vx) + cos(R_theta) * (Vy) -Radius_robot * (inPSpeed))/Wheel_radius) ;		
     move_rsp = int((-sin(PIf/3 - R_theta) * (Vx) - cos(PIf/3 - R_theta) * (Vy) - Radius_robot * (inPSpeed))/Wheel_radius); 
-	////
-	FILE *alloutxhy;
-	alloutxhy = fopen("alloutxhy.txt","a+");
-	fprintf(alloutxhy,"move_sp  l:  %d  r:  %d  z:   %d   \n",move_lsp, move_rsp, move_zsp);
-	fclose(alloutxhy);
-	////
 	gomotor(-move_lsp,-move_rsp,-move_zsp);//com345:负(如果方向全部相反一般是这里的问题)
 
 }

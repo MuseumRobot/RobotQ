@@ -5,11 +5,11 @@ DataManager::~DataManager(void){}
 int DataManager::loadTask(int n){
 	FILE* fp;
 	if(n == 1){
-		fp = fopen("task1.data", "rb");
+		fp = fopen("task4.data", "rb");
 	}else if(n == 2){
-		fp = fopen("task2.data", "rb");
+		fp = fopen("task4.data", "rb");
 	}else{
-		fp = fopen("task3.data", "rb");
+		fp = fopen("task4.data", "rb");
 	}
 	if(!fp) return 0;
 	m_TaskDataRecords.clear(); // Çå¿Õ

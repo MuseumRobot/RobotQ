@@ -88,6 +88,7 @@ private:
 	StarMark m_MARK[MARKNUM];						//LED定位标签数组 - 每块边长455
 	bool is_Auto_Mode_Open;
 	bool is_project_accomplished;					//当前项目是否完成
+	bool is_FastGuideMode;							//当前是否是快速导览模式（无语音模式）
 	bool is_path_clear;								//当前视野下前方是否通畅
 	bool is_far_path_clear;							//判断当前视野下远处是否通畅
 	bool is_dodge_moment;							//是否进入闪避时刻
@@ -124,6 +125,7 @@ private:
 	void DodgeTurnRight();							//闪避时刻基础动作(向右闪避)
 	void DodgeTurnLeft();							//闪避时刻基础动作(向左闪避)
 	void EmergencyMeasures();						//触发紧急时刻后执行的紧急动作
+	void FastGuideTodolist();						//修剪任务队列，剔除所有语音点
 	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
 	void JudgeEmergency();							//判断当前指令周期是否触发了紧急制动时刻
 	void JudgeForwardSituation();					//判断前路是否通畅
@@ -138,6 +140,9 @@ private:
 	float zTool_mod_360f(float angle);				//将角度范围归为(0,360)
 	float zTool_vector_angle(QPointF d);			//求矢量角（范围(0,360)，单位°），参数单位为cm
 	virtual void timerEvent(QTimerEvent *event);
+	/////
+	void ShowPic(QString str);
+	void HeadPicID(int taskID);
 
 private slots:
 	int OnBtnRobotQ();
@@ -147,6 +152,8 @@ private slots:
 	int OnBtnSelectPath1();
 	int OnBtnSelectPath2();
 	int OnBtnSelectPath3();
+	int OnBtnSelectPath4();
+ 	int OnBtnFastGuideMode();
 	int On_MC_BtnForward();
 	int On_MC_BtnBackward();
 	int On_Auto_BtnTurnleft(int speedlevel);

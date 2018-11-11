@@ -13,6 +13,8 @@ CEvent wait_data;
 CEvent wait_laserpose;
 threadInfo_laser_data Info_laser_data;
 
+void HeadPicID(int taskID);
+
 MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	ui.setupUi(this);
 	m_RobotQ=new RobotQ(this);						//初始化这些成员对象需要在connect前
@@ -39,6 +41,8 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	connect(m_ManualControl->ui.btn_MC_Path1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
 	connect(m_ManualControl->ui.btn_MC_Path2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
 	connect(m_ManualControl->ui.btn_MC_Path3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
+	connect(m_ManualControl->ui.btn_MC_Path4,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath4()));
+ 	connect(m_ManualControl->ui.btn_MC_FastGuide,SIGNAL(clicked()),this,SLOT(OnBtnFastGuideMode()));
 	connect(m_ManualControl->ui.btnStartSpeak,SIGNAL(clicked()),this,SLOT(On_MC_BtnRobotQSpeak()));
 	connect(m_ManualControl->ui.btnStopSpeak,SIGNAL(clicked()),m_RobotQ,SLOT(OnStopSpeak()));	
 	//connect(m_RobotQ,SIGNAL(TTS_Ready()),this,SLOT(check_TTS_Ready()));//在子窗口的初始化函数中发射信号无法被接受，而在初始化函数之外发射有效
@@ -52,8 +56,8 @@ MainGUI::~MainGUI(){
 	m_cURG.SwitchOff();		//关闭激光
 }
 void MainGUI::Init(){
-	//InitStarMark();					//LED标签数组赋值(实验室)
-	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
+	InitStarMark();					//LED标签数组赋值(实验室)
+	//InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitDataBase(1);				//数据库初始化
 	InitTaskAssignment(1);			//默认分配路线一(任务字符串初始化)
 	InitCommMotorAndStar();			//串口初始化Motor/Star
@@ -150,11 +154,11 @@ int MainGUI::OnBtnDashBoard(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	m_motor.CompromisedVectorMove(1600,0);
+	m_motor.CompromisedVectorMove(1200,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
-	m_motor.CompromisedVectorMove(-1600,0);
+	m_motor.CompromisedVectorMove(-1200,0);
 	return 0;
 }
 int MainGUI::On_Auto_BtnForward(int speedlevel){
@@ -197,11 +201,11 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
-	m_motor.CompromisedVectorMove(0,3);
+	m_motor.CompromisedVectorMove(0,2);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
-	m_motor.CompromisedVectorMove(0,-3);
+	m_motor.CompromisedVectorMove(0,-2);
 	return 0;
 }
 int MainGUI::On_MC_BtnStopmove(){
@@ -678,6 +682,7 @@ void MainGUI::InitDashBoardData(){
 	PosSafe=QPointF(0.00,0.00);
 	PosGoal=QPointF(00.00,00.00);
 	is_Auto_Mode_Open = false;
+	is_FastGuideMode = false;
 	is_path_clear = true;
 	is_far_path_clear = true;
 	is_dodge_moment = false;
@@ -810,87 +815,8 @@ void MainGUI::AssignInstruction(){
 					}
 					*/
 					////////////
-					if(taskID == 9){		//如果是需要播放图片的语音点
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/1、铁甲片.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 10){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/2、铜马蹬.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 11){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/3 、三足铜锅、三足铁锅（拼一张图）.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 12){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/4、胡里改路之印.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 13){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/5、兽面瓦当.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 14){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/6、金代铁刀.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 15){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/7、金代铁锏.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 16){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/8 油画：户部达岗战役.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
-					else if(taskID == 17){
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/9、玉壶春瓶.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(800,600);
-						isfirstzhongajin=true;
-					}
+					HeadPicID(taskID);
+					//Rotate_to_GoalAngle(180);
 					///////////
 					AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
 					RobotQ::RobotQSpeak(SpeakContent);
@@ -1062,22 +988,28 @@ void MainGUI::InitTaskAssignment(int n){
 	QString str;
 	if(n == 1){				//路线一
 		//str = "1,2,3,4,5,17,6,19,20,7,8,9,10,11,12,13,16,14,15";
-		str = "1,8,2,9,10,3,11,12,4,13,5,14,15,6,16,7,17,18";//新版路线0912
+		//str = "1,8,2,9,10,3,11,12,4,13,5,14,15,6,16,7,17,18";//新版路线0912
 		//str = "1,2,3,4,5,6,7";//新版路线0929
-		//str = "60,63,61,64,62,65";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
+		str = "60,61,60,61,62";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
+		//str="1,21,2,22,23,3,24,25,4,26,5,27,28,6,29,7,30,75";//1107
 	}else if(n == 2){
 		//str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
 		//str = "1,5,2,6,7,3,8,4,9,10,11,12,13";//新版路线0912
-		str = "1";//新版路线0929
+		//str = "1";//新版路线0929
+		str="7,31,8,32,33,9,34,10,35,36,37,38,75";//1107
 	}else if(n == 3){
 		//str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
 		//str = "2,14,15,16,3,17,18,19,20,21,4,22,23,5,24,25,26,27,6,28,29,7,30,31,8,32,9,33,10,34,35,11,36,37,38,39";//新版路线0912
-		str = "2,3,4,5,6,7,9,10,11";//新版路线0929
+		//str = "2,3,4,5,6,7,9,10,11";//新版路线0929
+		str="10,39,40,11,41,42,43,12,44,45,46,47,13,49,51,14,53,54,55,58,15,60,61,16,62,63,17,64,18,65,19,66,67,20,69,72,73,75";//1107
 	}
-	//else if(n == 4){
-	//	str = "1.21.2.22.23.3.24.25.4.26.5.27.28.6.29.7.30.31.8.32.33.9.34.10.35.36.37.38.39.40.11.41.42.43.12.44.45.46.47.48.13.49.50.51.52.14.53.54.55.56.57.58.59.15.60.61.16.62.63.17.64.18.65.66.67.68.69.70.71.72.73.74.75.19.20";//新版路线0912
-	//}
+	else if(n == 4){
+		str = "1,21,2,22,23,3,24,25,4,26,5,27,28,6,29,7,30,31,8,32,33,9,34,10,35,36,37,38,39,40,11,41,42,43,12,44,45,46,47,48,13,49,50,51,52,14,53,54,55,56,57,58,59,15,60,61,16,62,63,17,64,18,65,66,67,68,69,70,71,72,73,74,75,19,20";//新版路线0912
+	}
 	ParseTodoList(str,todoList);
+	if(is_FastGuideMode){
+ 		FastGuideTodolist();	//如果开启了快速模式则修剪任务队列
+ 	}
 	taskID = todoList[currentTodoListId];
 }
 void MainGUI::AssignGoalPos(int taskID){		//根据任务代码（位移任务）分配目标位置
@@ -1241,6 +1173,12 @@ int MainGUI::OnBtnSelectPath3(){
 	RobotQ::RobotQSpeak("已切换至路线三！");
 	return 0;
 }
+int MainGUI::OnBtnSelectPath4(){
+ 	InitDataBase(4);
+ 	InitTaskAssignment(4);
+ 	RobotQ::RobotQSpeak("已切换至路线四！");
+ 	return 0;
+}
 int MainGUI::On_MC_BtnGoHome(){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	QString str = "0";
@@ -1253,6 +1191,36 @@ int MainGUI::On_MC_BtnGoHome(){
 	OnBtnAutoGuide();
 	return 0;
 }
+ void MainGUI::FastGuideTodolist(){
+ 	//修剪任务队列，剔除所有语音点
+ 	int i=0;
+ 	int n=0;
+ 	int fastList[99];
+ 	int currentfastindex = 0;	//快速导览队列的数组下标
+ 	while(todoList[i++]!=0)n++;
+ 	for(i=0;i<n;i++){
+ 		if(JudgeTaskType(todoList[i])==0){
+ 			fastList[currentfastindex++] = todoList[i];
+ 		}
+ 	}
+ 	fastList[currentfastindex] = 0;	//加上任务队列休止符
+ 	//接下来把fastList赋值给todoList
+ 	int j=0;
+ 	for(i=0;i<currentfastindex;i++){
+ 		todoList[j++] = fastList[i];
+ 	}
+ 	todoList[j] = 0;	//休止符
+ }
+ int MainGUI::OnBtnFastGuideMode(){
+ 	if(is_FastGuideMode){
+ 		is_FastGuideMode = !is_FastGuideMode;
+ 		m_ManualControl->ui.btn_MC_FastGuide->setText("开启快速模式");
+ 	}else{
+ 		is_FastGuideMode = !is_FastGuideMode;
+ 		m_ManualControl->ui.btn_MC_FastGuide->setText("关闭快速模式");
+ 	}
+ 	return 0;
+}
 int MainGUI::On_MC_BtnExeSelfTask(){
 	//任务字符串分配（路线X）
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
@@ -1260,4 +1228,66 @@ int MainGUI::On_MC_BtnExeSelfTask(){
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
 	return 0;
+}
+
+void MainGUI::ShowPic(QString str)
+{
+	QDesktopWidget* desktop = QApplication::desktop();
+	int N = desktop->screenCount();
+	m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+	m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap(str));
+	m_popup_secondScreen_image->show();
+	m_popup_secondScreen_image->resize(800,600);
+	isfirstzhongajin=true;
+}
+
+void MainGUI::HeadPicID(int taskID)
+{
+	switch(taskID)
+	{
+		//路线1
+	case 22:ShowPic("Resources/图片/1、铁甲片.jpg");break;
+	case 23:ShowPic("Resources/图片/2、铜马蹬.jpg");break;
+	case 24:ShowPic("Resources/图片/3 、三足铜锅、三足铁锅（拼一张图）.jpg");break;
+	case 25:ShowPic("Resources/图片/4、胡里改路之印.jpg");break;
+	case 26:ShowPic("Resources/图片/5、兽面瓦当.jpg");break;
+	case 27:ShowPic("Resources/图片/6、金代铁刀.jpg");break;
+	case 28:ShowPic("Resources/图片/7、金代铁锏.jpg");break;
+	case 29:ShowPic("Resources/图片/8 油画：户部达岗战役.jpg");break;
+	case 30:ShowPic("Resources/图片/9、玉壶春瓶.jpg");break;
+		//路线2
+	case 33:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
+	case 34:ShowPic("Resources/图片/12、银骨朵.jpg");break;
+	case 35:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
+//	case 36:ShowPic("Resources/图片/14、鱼形铁铡刀.jpg");break;
+	case 37:ShowPic("Resources/图片/15、承安宝货.jpg");break;
+	case 38:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
+		//路线3
+	case 41:ShowPic("Resources/图片/17、铜熨斗.jpg");break;
+	case 42:ShowPic("Resources/图片/18、鎏金边荷花盏.jpg");break;
+	case 44:ShowPic("Resources/图片/19、清酒肥羊四系瓶.jpg");break;
+	case 45:ShowPic("Resources/图片/20、盘花金带銙.jpg");break;
+	case 46:ShowPic("Resources/图片/21、鎏金铜带銙.jpg");break;
+	case 48:ShowPic("Resources/图片/22、人物故事镜.jpg");break;
+	case 47:ShowPic("Resources/图片/23、双鱼大铜镜.jpg");break;
+		//	case 40:ShowPic("Resources/图片/24、奔马飞禽镜.jpg");break;
+	case 49:ShowPic("Resources/图片/25、石雕飞天.jpg");break;
+	case 50:ShowPic("Resources/图片/26、“将”字象棋.jpg");break;
+	case 51:ShowPic("Resources/图片/27、三孔器、多孔器（拼一张图）.jpg");break;
+	case 52:ShowPic("Resources/图片/28、手印砖、脚印砖（拼一张图）.jpg");break;
+	case 55:ShowPic("Resources/图片/30、金握.jpg");break;
+	case 56:ShowPic("Resources/图片/31、海船菱花铜镜.jpg");break;
+	case 57:ShowPic("Resources/图片/32、玉具剑.jpg");break;
+	case 58:ShowPic("Resources/图片/33、银质铭牌.jpg");break;
+	case 59:ShowPic("Resources/图片/34、黄地朵花金锦大带.jpg");break;
+	case 60:ShowPic("Resources/图片/35、黄地散搭花金锦绵六合靴.jpg");break;
+	case 61:ShowPic("Resources/图片/36、素娟兜跟.jpg");break;
+	case 65:ShowPic("Resources/图片/40、铜坐龙.jpg");break;
+	case 66:ShowPic("Resources/图片/41、铜项圈.jpg");break;
+	case 67:ShowPic("Resources/图片/42、牙雕鱼饰件.jpg");break;
+	case 70:ShowPic("Resources/图片/44、环形金圈饰、桃形金圈饰、金花饰、金帽顶饰（拼一张图）.jpg");break;
+	case 72:ShowPic("Resources/图片/46、双鹿纹玉佩.jpg");break;
+	case 73:ShowPic("Resources/图片/47、玉天鹅.jpg");break;
+	case 74:ShowPic("Resources/图片/48、玉雕绶带鸟.jpg");break;
+	}
 }
