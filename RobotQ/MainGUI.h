@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QMovie>
 #include "ui_MainGUI.h"
 #include "robotq.h"
 #include "ManualControl.h"
@@ -31,7 +32,7 @@
 #define ERRORANGLE 10.0				//选择角度的误差范围，单位°
 #define ERRORDISTANCE 15.0			//抵达目标点距离误差半径范围，单位cm
 #define SPEAKWORDSPERSECOND 4		//王静每秒钟阅读的字数
-#define Distance_Robot_forward_StarGazer -6		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
+#define Distance_Robot_forward_StarGazer 32.5		//机器人中心点在星标定位器中心点前32.5cm，实测原地旋转一周仍存在8cm内误差（位置无法闭合）
 #define PATHTASKTYPE 0				//位移任务点类型
 #define SPEAKTASKTYPE 1				//语音任务点类型
 
@@ -87,6 +88,7 @@ private:
 	bool is_dodge_moment;							//是否进入闪避时刻
 	bool isEMERGENCY;								//是否是紧急制动时刻
 	bool isBlockEMERGENCY;							//是否屏蔽紧急制动（为了避免语音点紧急制动打断讲解词，在讲解任务时屏蔽紧急制动功能，所以在语音任务开始时解除紧急制动，在位移任务开始时恢复紧急制动）
+	bool is_advertisement_available;							//是否该显示广告
 	int dodge_mode;									//为了使每次进入闪避时刻只会向一个方向闪避，需要在进入时给定闪避方向，1为左，2为右，退出闪避时为0，可供分配新的值
 	int dodge_move_times;							//开启闪避时刻后，闪避动作已执行的次数
 	int Emergency_times;							//连续紧急制动3次后拒绝紧急制动转而避障
@@ -105,7 +107,7 @@ private:
 	void InitAdjustGUI();							//初始化调整界面（选择启动博物馆模式或开发者模式）
 	void InitStarMark();							//为LED定位标签数组赋值
 	void InitStarMarkMuseum();						//LED标签数组赋值(博物馆)
-	void InitDataBase(int n);						//初始化数据库
+	void InitDataBase();							//初始化数据库
 	void InitTaskAssignment(int n);					//初始化分配任务路线
 	void InitCommMotorAndStar();					//电机星标串口初始化
 	void InitDashBoardData();						//仪表盘数据初始化
@@ -119,13 +121,16 @@ private:
 	void DodgeTurnLeft();							//闪避时刻基础动作(向左闪避)
 	void EmergencyMeasures();						//触发紧急时刻后执行的紧急动作
 	void FastGuideTodolist();						//修剪任务队列，剔除所有语音点
-	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
 	void JudgeEmergency();							//判断当前指令周期是否触发了紧急制动时刻
 	void JudgeForwardSituation();					//判断前路是否通畅
 	void ProjectFinishedMeasures();					//完成当前项目后执行的动作
 	void PathTaskFinishedMeasures();				//完成位移任务后执行的动作
 	void ParseTodoList(QString str, int* todoList);	//解析QString格式的任务清单，赋值给todoList数组
+	void Rotate_to_GoalAngle(float AngleGoal);		//旋转到指定角度，参数单位°
 	void SpeakTaskFinishedMeasures();				//完成语音任务后执行的动作
+	void ShowPic(QString str);						//显示图片（参数为图片路径）
+	void ShowPicByTaskID(int taskID);				//显示图片（参数为任务代码）
+	void ShowAdvertisement();						//播放广告
 	void refreshDashboardSector();					//刷新仪表盘上的障碍分布图
 	void refreshDashboardData();					//刷新仪表盘上的普通数据
 	float zTool_cos_angle(float angle);				//计算余弦值，参数单位为°

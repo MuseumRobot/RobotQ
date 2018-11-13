@@ -55,36 +55,19 @@ MainGUI::~MainGUI(){
 void MainGUI::Init(){
 	InitStarMark();					//LED标签数组赋值(实验室)
 	//InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
-	InitDataBase(1);				//数据库初始化
-	InitTaskAssignment(1);			//默认分配路线一(任务字符串初始化)
+	InitDataBase();					//数据库初始化
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
+	InitTaskAssignment(1);			//默认分配路线一(任务字符串初始化)
 	InitAdjustGUI();				//调整界面适配使用者
-
+	
 }
-void MainGUI::InitDataBase(int n){
-	switch(n){
-	case 1:
-		if(m_dataManager.loadTask(1) == 1){			//数据库管理员对象读取任务文件
-			m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
-		}else{
-			m_DashBoard->ui.ck_isTaskDataReady->setChecked(false);
-		}
-		break;
-	case 2:
-		if(m_dataManager.loadTask(2) == 1){			//数据库管理员对象读取任务文件
-			m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
-		}else{
-			m_DashBoard->ui.ck_isTaskDataReady->setChecked(false);
-		}
-		break;
-	default:
-		if(m_dataManager.loadTask(3) == 1){			//数据库管理员对象读取任务文件
-			m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
-		}else{
-			m_DashBoard->ui.ck_isTaskDataReady->setChecked(false);
-		}
+void MainGUI::InitDataBase(){
+	if(m_dataManager.loadTask() == 1){			//数据库管理员对象读取任务文件
+		m_DashBoard->ui.ck_isTaskDataReady->setChecked(true);
+	}else{
+		m_DashBoard->ui.ck_isTaskDataReady->setChecked(false);
 	}
 	if(m_dataManager.loadSpeakContent() ==1){	//数据库管理员对象读取语料文件
 		m_DashBoard->ui.ck_isSpeakDataReady->setChecked(true);
@@ -110,6 +93,7 @@ int MainGUI::OnBtnAutoGuide(){
 		taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
 		is_project_accomplished = false;
 		is_Auto_Mode_Open = true;
+		is_advertisement_available=true;
 		if(MUSEUMMODE == 0){
 			m_DashBoard->ui.ck_Auto->setChecked(true);
 			ui.btnAutoGuide->setText("关闭自动导航");
@@ -666,6 +650,7 @@ void MainGUI::InitDashBoardData(){
 	is_dodge_moment = false;
 	isEMERGENCY = false;
 	isBlockEMERGENCY = false;
+	is_advertisement_available=true;
 	dodge_move_times = 0;
 	dodge_mode = 0;
 	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
@@ -682,6 +667,10 @@ void MainGUI::AssignInstruction(){
 				//如果还需等待的指令周期大于1，则等它讲话
 			}else{
 				if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
+					if(is_advertisement_available){
+						is_advertisement_available=false;
+						ShowAdvertisement();
+					}
 					m_counter_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
 					AssignGoalPos(taskID);								//分配目标坐标和到达目标后的朝向
 					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
@@ -702,21 +691,16 @@ void MainGUI::AssignInstruction(){
 						}		
 					}
 				}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
-					if(taskID == 123){		//如果是需要播放图片的语音点
-						QDesktopWidget* desktop = QApplication::desktop();
-						int N = desktop->screenCount();
-						m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(1));
-						m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/最新无水印版二维码.jpg"));
-						m_popup_secondScreen_image->show();
-						m_popup_secondScreen_image->resize(600,400);
-					}
+					ShowPicByTaskID(taskID);
 					AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
 					RobotQ::RobotQSpeak(SpeakContent);
 					SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;
 					m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "正在朗读:" + SpeakContent);
 					SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
 					JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
-				}else{		
+				}else{
+					is_advertisement_available=false;
+					ShowAdvertisement();
 					ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 				}
 			}
@@ -860,6 +844,7 @@ void MainGUI::InitAdjustGUI(){
 		OnBtnDashBoard();				//开启仪表盘面板
 		OnBtnManualControl();			//开启遥控器面板
 		//OnBtnRobotQ();				//开启语音对话面板
+		ShowAdvertisement();			//播放广告
 	}
 }
 void MainGUI::InitTaskAssignment(int n){
@@ -867,14 +852,14 @@ void MainGUI::InitTaskAssignment(int n){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
 	QString str;
 	if(n == 1){				//路线一
-		//str = "1,2,3,4,5,17,6,19,20,7,8,9,10,11,12,13,16,14,15";
-		str = "60,61,62";	//这里是实验室三个路径点，如果想在博物馆运行，记得更换对应的task1.data
+		//str = "60,61,60,61,62";	//这里是实验室三个路径点
+		str="1,21,2,22,23,3,24,25,4,26,5,27,28,6,29,7,30,75";
 	}else if(n == 2){
-		str = "1,2,3,20,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19";
+		str="7,31,8,32,33,9,34,10,35,36,37,38,75";
 	}else if(n == 3){
-		str = "1,21,2,22,23,24,3,25,26,27,4,28,5,29,30,6,54,7,31,32,8,33,34,35,36,9,37,38,39,40,41,42,10,43,44,45,46,11,12,13,47,14,48,15,49,16,50,17,51,52,18,53";
+		str="10,39,40,11,41,42,43,12,44,45,46,47,13,49,51,14,53,54,55,58,15,60,61,16,62,63,17,64,18,65,19,66,67,20,69,72,73,75";
 	}else if(n == 4){
-		str = "1,21,2";		//全路径
+		str = "1,21,2,22,23,3,24,25,4,26,5,27,28,6,29,7,30,31,8,32,33,9,34,10,35,36,37,38,39,40,11,41,42,43,12,44,45,46,47,48,13,49,50,51,52,14,53,54,55,56,57,58,59,15,60,61,16,62,63,17,64,18,65,66,67,68,69,70,71,72,73,74,75,19,20";
 	}
 	ParseTodoList(str,todoList);
 	if(is_FastGuideMode){
@@ -1027,25 +1012,21 @@ void MainGUI::ParseTodoList(QString str,int *todoList){
 	todoList[currentNum+1] = 0;
 }
 int MainGUI::OnBtnSelectPath1(){
-	InitDataBase(1);
 	InitTaskAssignment(1);
 	RobotQ::RobotQSpeak("已切换至路线一！");
 	return 0;
 }
 int MainGUI::OnBtnSelectPath2(){
-	InitDataBase(2);
 	InitTaskAssignment(2);
 	RobotQ::RobotQSpeak("已切换至路线二！");
 	return 0;
 }
 int MainGUI::OnBtnSelectPath3(){
-	InitDataBase(3);
 	InitTaskAssignment(3);
 	RobotQ::RobotQSpeak("已切换至路线三！");
 	return 0;
 }
 int MainGUI::OnBtnSelectPath4(){
-	InitDataBase(4);
 	InitTaskAssignment(4);
 	RobotQ::RobotQSpeak("已切换至路线四！");
 	return 0;
@@ -1099,4 +1080,72 @@ int MainGUI::OnBtnFastGuideMode(){
 		m_ManualControl->ui.btn_MC_FastGuide->setText("关闭快速模式");
 	}
 	return 0;
+}
+void MainGUI::ShowPic(QString str){				//显示图片
+	QDesktopWidget* desktop = QApplication::desktop();
+	int N = desktop->screenCount();
+	m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+	m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap(str));
+	m_popup_secondScreen_image->show();
+	m_popup_secondScreen_image->resize(800,600);
+	is_advertisement_available=true;
+}
+void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
+	switch(taskID){
+	//路线1
+	case 22:ShowPic("Resources/图片/1、铁甲片.jpg");break;
+	case 23:ShowPic("Resources/图片/2、铜马蹬.jpg");break;
+	case 24:ShowPic("Resources/图片/3 、三足铜锅、三足铁锅（拼一张图）.jpg");break;
+	case 25:ShowPic("Resources/图片/4、胡里改路之印.jpg");break;
+	case 26:ShowPic("Resources/图片/5、兽面瓦当.jpg");break;
+	case 27:ShowPic("Resources/图片/6、金代铁刀.jpg");break;
+	case 28:ShowPic("Resources/图片/7、金代铁锏.jpg");break;
+	case 29:ShowPic("Resources/图片/8 油画：户部达岗战役.jpg");break;
+	case 30:ShowPic("Resources/图片/9、玉壶春瓶.jpg");break;
+	//路线2
+	case 33:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
+	case 34:ShowPic("Resources/图片/12、银骨朵.jpg");break;
+	case 35:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
+	//	case 36:ShowPic("Resources/图片/14、鱼形铁铡刀.jpg");break;
+	case 37:ShowPic("Resources/图片/15、承安宝货.jpg");break;
+	case 38:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
+	//路线3
+	case 41:ShowPic("Resources/图片/17、铜熨斗.jpg");break;
+	case 42:ShowPic("Resources/图片/18、鎏金边荷花盏.jpg");break;
+	case 44:ShowPic("Resources/图片/19、清酒肥羊四系瓶.jpg");break;
+	case 45:ShowPic("Resources/图片/20、盘花金带銙.jpg");break;
+	case 46:ShowPic("Resources/图片/21、鎏金铜带銙.jpg");break;
+	case 48:ShowPic("Resources/图片/22、人物故事镜.jpg");break;
+	case 47:ShowPic("Resources/图片/23、双鱼大铜镜.jpg");break;
+	//	case 40:ShowPic("Resources/图片/24、奔马飞禽镜.jpg");break;
+	case 49:ShowPic("Resources/图片/25、石雕飞天.jpg");break;
+	case 50:ShowPic("Resources/图片/26、“将”字象棋.jpg");break;
+	case 51:ShowPic("Resources/图片/27、三孔器、多孔器（拼一张图）.jpg");break;
+	case 52:ShowPic("Resources/图片/28、手印砖、脚印砖（拼一张图）.jpg");break;
+	case 55:ShowPic("Resources/图片/30、金握.jpg");break;
+	case 56:ShowPic("Resources/图片/31、海船菱花铜镜.jpg");break;
+	case 57:ShowPic("Resources/图片/32、玉具剑.jpg");break;
+	case 58:ShowPic("Resources/图片/33、银质铭牌.jpg");break;
+	case 59:ShowPic("Resources/图片/34、黄地朵花金锦大带.jpg");break;
+	case 60:ShowPic("Resources/图片/35、黄地散搭花金锦绵六合靴.jpg");break;
+	case 61:ShowPic("Resources/图片/36、素娟兜跟.jpg");break;
+	case 65:ShowPic("Resources/图片/40、铜坐龙.jpg");break;
+	case 66:ShowPic("Resources/图片/41、铜项圈.jpg");break;
+	case 67:ShowPic("Resources/图片/42、牙雕鱼饰件.jpg");break;
+	case 70:ShowPic("Resources/图片/44、环形金圈饰、桃形金圈饰、金花饰、金帽顶饰（拼一张图）.jpg");break;
+	case 72:ShowPic("Resources/图片/46、双鹿纹玉佩.jpg");break;
+	case 73:ShowPic("Resources/图片/47、玉天鹅.jpg");break;
+	case 74:ShowPic("Resources/图片/48、玉雕绶带鸟.jpg");break;
+	}
+}				
+void MainGUI::ShowAdvertisement(){
+	QDesktopWidget* desktop = QApplication::desktop();
+	int N = desktop->screenCount();
+	QMovie *movie = new QMovie("Resources/图片/七寸屏幕 .gif");
+	m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+	//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/七寸屏幕 .gif"));
+	m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
+	m_popup_secondScreen_image->show();
+	m_popup_secondScreen_image->resize(800,600);
+	movie->start();
 }

@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QFileDialog>
-#include <GBK.h>
+#include <common/GBK.h>
 #include <QString>
 #include <QTime>
 #include <QDateTime>
