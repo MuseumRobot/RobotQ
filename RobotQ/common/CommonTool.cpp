@@ -1,5 +1,6 @@
+#include "stdafx.h"
 #include "CommonTool.h"
-#include <stdio.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #endif

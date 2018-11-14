@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "popupdialog.h"
 
 PopupDialog::PopupDialog(QWidget *parent):QDialog(parent){

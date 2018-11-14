@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "ManualControl.h"
 
 ManualControl::ManualControl(QWidget *parent):QDialog(parent){

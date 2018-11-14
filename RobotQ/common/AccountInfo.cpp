@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "AccountInfo.h"
 #include <vector>
 #include <fstream>

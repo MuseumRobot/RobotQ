@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "DataManager.h"
 
 DataManager::DataManager(void){}

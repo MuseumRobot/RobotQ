@@ -4,17 +4,25 @@
 
 #pragma once
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string>
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
 #include <QtGui/QMainWindow>
-#include <QMessageBox>
-#include <QString>
-#include <QTime>
+#include <QtGui/QMovie>
+#include <QtTest/Qtest>
+#include <QCheckBox>
+#include <QDateTime>
 #include <QDebug>
 #include <QDialog>
-#include <QtTest/Qtest>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QPlainTextEdit>
+#include <QString>
+#include <QTime>
 #include "targetver.h"
 #include "common/GBK.h"
 #include "common/AccountInfo.h"
@@ -22,8 +30,9 @@
 #include "common/FileReader.h"
 #include "include/hci_asr_recorder.h"
 #include "include/hci_tts_player.h"
-#include <math.h>
-
+#include "include/Comm_data_motor3.h"
+#include "include/Comm_data_star.h"
+#include "include/UPURG.h"
 
 
 #ifndef _SECURE_ATL

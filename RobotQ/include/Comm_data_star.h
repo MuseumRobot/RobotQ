@@ -1,11 +1,10 @@
 #pragma once
 
 #include "stdafx.h"
-#include "include/SerialCom.h"
-#include <WinSock2.h>
 #include <afxwin.h>
 #include <math.h>
-
+#include <WinSock2.h>
+#include "include/SerialCom.h"
 class Cstar : public CSerialCom{
 public:
 	Cstar(void);

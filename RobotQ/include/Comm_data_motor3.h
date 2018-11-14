@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "include/SerialCom.h"
 #include <math.h>
-
 #define Drobot_wheel_spacing 359//ÂÖ¼ä¾à
 
 class CMotor:public CSerialCom{

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MainGUI.h"
 
 //Èô¸É¶ÔÏóÐèÒª×ÔÊ¼ÖÁÖÕ´æÔÚÓÚÖ÷½çÃæÖÐ
@@ -149,7 +150,7 @@ int MainGUI::On_Auto_BtnTurnleft(int level){
 	float speed = 1.0f;
 	switch(level){
 	case 0:factor = 1;break;
-	case 1:factor = 4;break;
+	case 1:factor = 2;break;
 	case 2:factor = 0.5;break;
 	default: factor = 1.2;
 	}
@@ -1106,7 +1107,6 @@ void MainGUI::ShowPicByTaskID(int taskID){		//ÏÔÊ¾Í¼Æ¬£¨²ÎÊýÎªÈÎÎñ´úÂë£©
 	case 33:ShowPic("Resources/Í¼Æ¬/11¡¢¾íÔÆÁúÎÆ³¤·½×©.jpg");break;
 	case 34:ShowPic("Resources/Í¼Æ¬/12¡¢Òø¹Ç¶ä.jpg");break;
 	case 35:ShowPic("Resources/Í¼Æ¬/13¡¢Ìúîü¡¢Àç¾µ¡¢ÌúÇÂ¡¢ÌúÁ­£¨Æ´Ò»ÕÅÍ¼£©.jpg");break;
-	//	case 36:ShowPic("Resources/Í¼Æ¬/14¡¢ÓãÐÎÌúÕ¡µ¶.jpg");break;
 	case 37:ShowPic("Resources/Í¼Æ¬/15¡¢³Ð°²±¦»õ.jpg");break;
 	case 38:ShowPic("Resources/Í¼Æ¬/16¡¢µÔ¼Ò¼ÇÕæ»¨Òø.jpg");break;
 	//Â·Ïß3
@@ -1117,7 +1117,6 @@ void MainGUI::ShowPicByTaskID(int taskID){		//ÏÔÊ¾Í¼Æ¬£¨²ÎÊýÎªÈÎÎñ´úÂë£©
 	case 46:ShowPic("Resources/Í¼Æ¬/21¡¢öÌ½ðÍ­´øã’.jpg");break;
 	case 48:ShowPic("Resources/Í¼Æ¬/22¡¢ÈËÎï¹ÊÊÂ¾µ.jpg");break;
 	case 47:ShowPic("Resources/Í¼Æ¬/23¡¢Ë«Óã´óÍ­¾µ.jpg");break;
-	//	case 40:ShowPic("Resources/Í¼Æ¬/24¡¢±¼Âí·ÉÇÝ¾µ.jpg");break;
 	case 49:ShowPic("Resources/Í¼Æ¬/25¡¢Ê¯µñ·ÉÌì.jpg");break;
 	case 50:ShowPic("Resources/Í¼Æ¬/26¡¢¡°½«¡±×ÖÏóÆå.jpg");break;
 	case 51:ShowPic("Resources/Í¼Æ¬/27¡¢Èý¿×Æ÷¡¢¶à¿×Æ÷£¨Æ´Ò»ÕÅÍ¼£©.jpg");break;
@@ -1143,7 +1142,6 @@ void MainGUI::ShowAdvertisement(){
 	int N = desktop->screenCount();
 	QMovie *movie = new QMovie("Resources/Í¼Æ¬/Æß´çÆÁÄ» .gif");
 	m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-	//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/Í¼Æ¬/Æß´çÆÁÄ» .gif"));
 	m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
 	m_popup_secondScreen_image->show();
 	m_popup_secondScreen_image->resize(800,600);
