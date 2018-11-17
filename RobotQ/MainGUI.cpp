@@ -53,8 +53,8 @@ MainGUI::~MainGUI(){
 	m_cURG.SwitchOff();		//关闭激光
 }
 void MainGUI::Init(){
-	InitStarMark();					//LED标签数组赋值(实验室)
-	//InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
+	//InitStarMark();					//LED标签数组赋值(实验室)
+	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitDataBase();					//数据库初始化
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
@@ -126,7 +126,7 @@ int MainGUI::OnBtnDashBoard(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	m_motor.VectorMove(1600,0);
+	m_motor.VectorMove(1000,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
@@ -137,7 +137,7 @@ int MainGUI::On_Auto_BtnForward(int speedlevel){
 	float inLV = 0.0f;
 	float inPS = 0.0f;
 	if(is_far_path_clear){
-		inLV = 1200;
+		inLV = 1000;
 	}else{
 		inLV = 800;
 	}
@@ -149,7 +149,7 @@ int MainGUI::On_Auto_BtnTurnleft(int level){
 	float speed = 1.0f;
 	switch(level){
 	case 0:factor = 1;break;
-	case 1:factor = 4;break;
+	case 1:factor = 2;break;
 	case 2:factor = 0.5;break;
 	default: factor = 1.2;
 	}
@@ -163,7 +163,7 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	float speed = 1.0f;
 	switch(level){
 	case 0:factor = 1;break;
-	case 1:factor = 4;break;
+	case 1:factor = 2;break;
 	case 2:factor = 0.5;break;
 	default: factor = 1.2;
 	}
@@ -173,7 +173,7 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
-	m_motor.VectorMove(0,4);
+	m_motor.VectorMove(0,2);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
@@ -853,11 +853,11 @@ void MainGUI::InitTaskAssignment(int n){
 	QString str;
 	if(n == 1){				//路线一
 		//str = "60,61,60,61,62";	//这里是实验室三个路径点
-		str="1,21,2,22,23,3,24,25,4,26,5,27,28,6,29,7,30,75";
+		str="1,22,2,23,24,3,25,26,4,27,5,28,6,29,30,7,31,76";
 	}else if(n == 2){
-		str="7,31,8,32,33,9,34,10,35,36,37,38,75";
+		str="8,32,9,33,34,10,35,11,37,38,39,76";
 	}else if(n == 3){
-		str="10,39,40,11,41,42,43,12,44,45,46,47,13,49,51,14,53,54,55,58,15,60,61,16,62,63,17,64,18,65,19,66,67,20,69,72,73,75";
+		str="12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,52,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
 	}else if(n == 4){
 		str = "1,21,2,22,23,3,24,25,4,26,5,27,28,6,29,7,30,31,8,32,33,9,34,10,35,36,37,38,39,40,11,41,42,43,12,44,45,46,47,48,13,49,50,51,52,14,53,54,55,56,57,58,59,15,60,61,16,62,63,17,64,18,65,66,67,68,69,70,71,72,73,74,75,19,20";
 	}
@@ -1093,49 +1093,59 @@ void MainGUI::ShowPic(QString str){				//显示图片
 void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	switch(taskID){
 	//路线1
-	case 22:ShowPic("Resources/图片/1、铁甲片.jpg");break;
-	case 23:ShowPic("Resources/图片/2、铜马蹬.jpg");break;
-	case 24:ShowPic("Resources/图片/3 、三足铜锅、三足铁锅（拼一张图）.jpg");break;
-	case 25:ShowPic("Resources/图片/4、胡里改路之印.jpg");break;
-	case 26:ShowPic("Resources/图片/5、兽面瓦当.jpg");break;
-	case 27:ShowPic("Resources/图片/6、金代铁刀.jpg");break;
-	case 28:ShowPic("Resources/图片/7、金代铁锏.jpg");break;
-	case 29:ShowPic("Resources/图片/8 油画：户部达岗战役.jpg");break;
-	case 30:ShowPic("Resources/图片/9、玉壶春瓶.jpg");break;
+	case 23:ShowPic("Resources/图片/1、铁甲片.jpg");break;
+	case 24:ShowPic("Resources/图片/2、铜马蹬.jpg");break;
+	case 25:ShowPic("Resources/图片/3 、三足铜锅、三足铁锅（拼一张图）.jpg");break;
+	case 26:ShowPic("Resources/图片/4、胡里改路之印.jpg");break;
+	case 27:ShowPic("Resources/图片/5、兽面瓦当.jpg");break;
+	case 28:ShowPic("Resources/图片/6、金代铁刀.jpg");break;
+	case 29:ShowPic("Resources/图片/7、金代铁锏.jpg");break;
+	case 30:ShowPic("Resources/图片/8 油画：户部达岗战役.jpg");break;
+	case 31:ShowPic("Resources/图片/9.jpg");break;
+	case 32:ShowPic("Resources/图片/10.jpg");break;
+
+
 	//路线2
-	case 33:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
-	case 34:ShowPic("Resources/图片/12、银骨朵.jpg");break;
-	case 35:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
+	case 34:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
+	case 35:ShowPic("Resources/图片/12、银骨朵.jpg");break;
+	case 37:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
 	//	case 36:ShowPic("Resources/图片/14、鱼形铁铡刀.jpg");break;
-	case 37:ShowPic("Resources/图片/15、承安宝货.jpg");break;
-	case 38:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
+	case 38:ShowPic("Resources/图片/15、承安宝货.jpg");break;
+	case 39:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
 	//路线3
-	case 41:ShowPic("Resources/图片/17、铜熨斗.jpg");break;
-	case 42:ShowPic("Resources/图片/18、鎏金边荷花盏.jpg");break;
-	case 44:ShowPic("Resources/图片/19、清酒肥羊四系瓶.jpg");break;
-	case 45:ShowPic("Resources/图片/20、盘花金带銙.jpg");break;
-	case 46:ShowPic("Resources/图片/21、鎏金铜带銙.jpg");break;
+	case 42:ShowPic("Resources/图片/17、铜熨斗.jpg");break;
+	case 43:ShowPic("Resources/图片/18、鎏金边荷花盏.jpg");break;
+	case 45:ShowPic("Resources/图片/19、清酒肥羊四系瓶.jpg");break;
+	case 46:ShowPic("Resources/图片/20、盘花金带銙.jpg");break;
+	case 47:ShowPic("Resources/图片/21、鎏金铜带銙.jpg");break;
 	case 48:ShowPic("Resources/图片/22、人物故事镜.jpg");break;
-	case 47:ShowPic("Resources/图片/23、双鱼大铜镜.jpg");break;
+	case 49:ShowPic("Resources/图片/23、双鱼大铜镜.jpg");break;
 	//	case 40:ShowPic("Resources/图片/24、奔马飞禽镜.jpg");break;
-	case 49:ShowPic("Resources/图片/25、石雕飞天.jpg");break;
-	case 50:ShowPic("Resources/图片/26、“将”字象棋.jpg");break;
-	case 51:ShowPic("Resources/图片/27、三孔器、多孔器（拼一张图）.jpg");break;
-	case 52:ShowPic("Resources/图片/28、手印砖、脚印砖（拼一张图）.jpg");break;
-	case 55:ShowPic("Resources/图片/30、金握.jpg");break;
-	case 56:ShowPic("Resources/图片/31、海船菱花铜镜.jpg");break;
-	case 57:ShowPic("Resources/图片/32、玉具剑.jpg");break;
-	case 58:ShowPic("Resources/图片/33、银质铭牌.jpg");break;
-	case 59:ShowPic("Resources/图片/34、黄地朵花金锦大带.jpg");break;
-	case 60:ShowPic("Resources/图片/35、黄地散搭花金锦绵六合靴.jpg");break;
-	case 61:ShowPic("Resources/图片/36、素娟兜跟.jpg");break;
-	case 65:ShowPic("Resources/图片/40、铜坐龙.jpg");break;
-	case 66:ShowPic("Resources/图片/41、铜项圈.jpg");break;
-	case 67:ShowPic("Resources/图片/42、牙雕鱼饰件.jpg");break;
-	case 70:ShowPic("Resources/图片/44、环形金圈饰、桃形金圈饰、金花饰、金帽顶饰（拼一张图）.jpg");break;
-	case 72:ShowPic("Resources/图片/46、双鹿纹玉佩.jpg");break;
-	case 73:ShowPic("Resources/图片/47、玉天鹅.jpg");break;
-	case 74:ShowPic("Resources/图片/48、玉雕绶带鸟.jpg");break;
+	case 50:ShowPic("Resources/图片/25、石雕飞天.jpg");break;
+	case 51:ShowPic("Resources/图片/26、“将”字象棋.jpg");break;
+	case 52:ShowPic("Resources/图片/27、三孔器、多孔器（拼一张图）.jpg");break;
+	case 53:ShowPic("Resources/图片/28、手印砖、脚印砖（拼一张图）.jpg");break;
+	case 54:ShowPic("Resources/图片/29.jpg");break;
+	case 56:ShowPic("Resources/图片/30、金握.jpg");break;
+	case 57:ShowPic("Resources/图片/31、海船菱花铜镜.jpg");break;
+	case 58:ShowPic("Resources/图片/32、玉具剑.jpg");break;
+	case 59:ShowPic("Resources/图片/33、银质铭牌.jpg");break;
+	case 60:ShowPic("Resources/图片/34、黄地朵花金锦大带.jpg");break;
+	case 61:ShowPic("Resources/图片/35、黄地散搭花金锦绵六合靴.jpg");break;
+	case 62:ShowPic("Resources/图片/36、素娟兜跟.jpg");break;
+	case 63:ShowPic("Resources/图片/37.jpg");break;
+	case 64:ShowPic("Resources/图片/38.jpg");break;
+	case 65:ShowPic("Resources/图片/39.jpg");break;	
+	case 66:ShowPic("Resources/图片/40、铜坐龙.jpg");break;
+	case 67:ShowPic("Resources/图片/41、铜项圈.jpg");break;
+	case 68:ShowPic("Resources/图片/42、牙雕鱼饰件.jpg");break;
+	case 69:ShowPic("Resources/图片/43.jpg");break;
+	case 71:ShowPic("Resources/图片/44、环形金圈饰、桃形金圈饰、金花饰、金帽顶饰（拼一张图）.jpg");break;
+	case 72:ShowPic("Resources/图片/45.jpg");break;
+	case 73:ShowPic("Resources/图片/46、双鹿纹玉佩.jpg");break;
+	case 74:ShowPic("Resources/图片/47、玉天鹅.jpg");break;
+	case 75:ShowPic("Resources/图片/48、玉雕绶带鸟.jpg");break;
+	default:ShowAdvertisement();
 	}
 }				
 void MainGUI::ShowAdvertisement(){

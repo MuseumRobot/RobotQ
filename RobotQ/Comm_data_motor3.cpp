@@ -229,14 +229,14 @@ bool CMotor::open_com_motor(int CCommport){
 
 float CMotor::CompromisePS(float inPS){
 	if(abs(inPS-m_Last_inPS)>0.5){
-		inPS = inPS/3 + 2*m_Last_inPS/3;
+		inPS = inPS/5 + 4*m_Last_inPS/5;
 		m_Last_inPS = inPS;
 	}
 	return inPS;
 }
 float CMotor::CompromiseLV(float inLV){
 	if(abs(m_Last_inLV-inLV)>200.0){
-		inLV = inLV/3 + 2*m_Last_inLV/3;
+		inLV = inLV/5 + 4*m_Last_inLV/5;
 		m_Last_inLV = inLV;
 	}
 	return inLV;
