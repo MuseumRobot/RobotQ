@@ -1,4 +1,5 @@
-﻿#include "robotq.h"
+﻿#include "stdafx.h"
+#include "robotq.h"
 
 //静态全局变量
 QString RobotQ::GLOBAL_strMessage;

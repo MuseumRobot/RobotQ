@@ -1,24 +1,18 @@
 #ifndef MAINGUI_H
 #define MAINGUI_H
 
-#include <QMainWindow>
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QMovie>
+#include "stdafx.h"
 #include "ui_MainGUI.h"
 #include "robotq.h"
 #include "ManualControl.h"
 #include "DashBoard.h"
 #include "DataManager.h"
-#include "include/Comm_data_motor3.h"
-#include "include/Comm_data_star.h"
-#include "include/UPURG.h"
 
 #define COMM_MOTOR 3				//底部电机串口号
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
+#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 50				//闪避时刻中最低有效步数

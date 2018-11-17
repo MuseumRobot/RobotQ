@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MainGUI.h"
 
 //若干对象需要自始至终存在于主界面中
@@ -1106,12 +1107,20 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 
 
 	//路线2
+<<<<<<< HEAD
 	case 34:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
 	case 35:ShowPic("Resources/图片/12、银骨朵.jpg");break;
 	case 37:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
 	//	case 36:ShowPic("Resources/图片/14、鱼形铁铡刀.jpg");break;
 	case 38:ShowPic("Resources/图片/15、承安宝货.jpg");break;
 	case 39:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
+=======
+	case 33:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
+	case 34:ShowPic("Resources/图片/12、银骨朵.jpg");break;
+	case 35:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
+	case 37:ShowPic("Resources/图片/15、承安宝货.jpg");break;
+	case 38:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
+>>>>>>> 386728fb84fbd245761edac2e6206d335e43a7b2
 	//路线3
 	case 42:ShowPic("Resources/图片/17、铜熨斗.jpg");break;
 	case 43:ShowPic("Resources/图片/18、鎏金边荷花盏.jpg");break;
@@ -1119,6 +1128,7 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	case 46:ShowPic("Resources/图片/20、盘花金带銙.jpg");break;
 	case 47:ShowPic("Resources/图片/21、鎏金铜带銙.jpg");break;
 	case 48:ShowPic("Resources/图片/22、人物故事镜.jpg");break;
+<<<<<<< HEAD
 	case 49:ShowPic("Resources/图片/23、双鱼大铜镜.jpg");break;
 	//	case 40:ShowPic("Resources/图片/24、奔马飞禽镜.jpg");break;
 	case 50:ShowPic("Resources/图片/25、石雕飞天.jpg");break;
@@ -1146,6 +1156,27 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	case 74:ShowPic("Resources/图片/47、玉天鹅.jpg");break;
 	case 75:ShowPic("Resources/图片/48、玉雕绶带鸟.jpg");break;
 	default:ShowAdvertisement();
+=======
+	case 47:ShowPic("Resources/图片/23、双鱼大铜镜.jpg");break;
+	case 49:ShowPic("Resources/图片/25、石雕飞天.jpg");break;
+	case 50:ShowPic("Resources/图片/26、“将”字象棋.jpg");break;
+	case 51:ShowPic("Resources/图片/27、三孔器、多孔器（拼一张图）.jpg");break;
+	case 52:ShowPic("Resources/图片/28、手印砖、脚印砖（拼一张图）.jpg");break;
+	case 55:ShowPic("Resources/图片/30、金握.jpg");break;
+	case 56:ShowPic("Resources/图片/31、海船菱花铜镜.jpg");break;
+	case 57:ShowPic("Resources/图片/32、玉具剑.jpg");break;
+	case 58:ShowPic("Resources/图片/33、银质铭牌.jpg");break;
+	case 59:ShowPic("Resources/图片/34、黄地朵花金锦大带.jpg");break;
+	case 60:ShowPic("Resources/图片/35、黄地散搭花金锦绵六合靴.jpg");break;
+	case 61:ShowPic("Resources/图片/36、素娟兜跟.jpg");break;
+	case 65:ShowPic("Resources/图片/40、铜坐龙.jpg");break;
+	case 66:ShowPic("Resources/图片/41、铜项圈.jpg");break;
+	case 67:ShowPic("Resources/图片/42、牙雕鱼饰件.jpg");break;
+	case 70:ShowPic("Resources/图片/44、环形金圈饰、桃形金圈饰、金花饰、金帽顶饰（拼一张图）.jpg");break;
+	case 72:ShowPic("Resources/图片/46、双鹿纹玉佩.jpg");break;
+	case 73:ShowPic("Resources/图片/47、玉天鹅.jpg");break;
+	case 74:ShowPic("Resources/图片/48、玉雕绶带鸟.jpg");break;
+>>>>>>> 386728fb84fbd245761edac2e6206d335e43a7b2
 	}
 }				
 void MainGUI::ShowAdvertisement(){
@@ -1153,7 +1184,6 @@ void MainGUI::ShowAdvertisement(){
 	int N = desktop->screenCount();
 	QMovie *movie = new QMovie("Resources/图片/七寸屏幕 .gif");
 	m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-	//m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap("Resources/图片/七寸屏幕 .gif"));
 	m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
 	m_popup_secondScreen_image->show();
 	m_popup_secondScreen_image->resize(800,600);

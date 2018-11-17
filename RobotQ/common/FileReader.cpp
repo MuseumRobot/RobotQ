@@ -1,5 +1,5 @@
+#include "stdafx.h"
 #include "FileReader.h"
-#include <stdio.h>
 #include <malloc.h>
 #include <memory.h>
 

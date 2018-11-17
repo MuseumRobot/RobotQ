@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "DashBoard.h"
 
 DashBoard::DashBoard(QWidget *parent):QDialog(parent){

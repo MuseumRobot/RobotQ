@@ -1,14 +1,7 @@
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
 
-#include <QDialog>
-#include <QCheckBox>
-#include <QFileDialog>
-#include <common/GBK.h>
-#include <QString>
-#include <QTime>
-#include <QDateTime>
-#include <QPlainTextEdit>
+#include "stdafx.h"
 #include "ui_DashBoard.h"
 
 class DashBoard : public QDialog{

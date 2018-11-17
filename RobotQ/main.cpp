@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MainGUI.h"
 #include <QtGui/QApplication>
 #include <QTextCodec>
