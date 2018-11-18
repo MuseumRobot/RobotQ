@@ -110,9 +110,6 @@ int MainGUI::OnBtnAutoGuide(){
 	return 0;
 }
 int MainGUI::OnBtnRobotQ(){
-	//QDesktopWidget* desktop = QApplication::desktop();
-	//int N = desktop->screenCount();
-	//m_RobotQ->setGeometry(desktop->screenGeometry(1));
 	m_RobotQ->show();
 	return 0;
 }
@@ -659,56 +656,51 @@ void MainGUI::InitDashBoardData(){
 	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
 }
 void MainGUI::AssignInstruction(){
-	JudgeEmergency();			//判断当前指令周期是否触发了紧急制动时刻
-	if(isEMERGENCY){			//当前指令周期为紧急状态
-		EmergencyMeasures();	//紧急情况下的措施
-	}else{						//非紧急情况下正常发配指令
-		if(is_project_accomplished == false){			//当项目未完成时（一个项目由若干个任务组成，而一个任务想要完成需要经过若干个指令周期）
-			if(SpeakWaitCycle>1){
-				//如果还需等待的指令周期大于1，则等它讲话，除非开启了快速模式
-				if(is_FastGuideMode)SpeakWaitCycle/=2;
-			}else{
-				if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
-					if(is_advertisement_available){
-						is_advertisement_available=false;
-						ShowAdvertisement();
-					}
-					m_counter_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
-					AssignGoalPos(taskID);								//分配目标坐标和到达目标后的朝向
-					float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
-					QPointF d = PosGoal - PosSafe;
-					float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
-					if(dDistance > errorRange_Distance){				//如果还没有抵达当前任务目标点就继续执行任务
-						if(is_dodge_moment == true){					//一旦前路不通会进入闪避时刻，占用若干个指令周期，而闪避时刻有自己的退出条件
-							DodgeMeasures();							//如果处于闪避时刻就闪避
-						}else{
-							CommonMeasures();							//如果本指令周期没有处于闪避时刻，则正常向目标运行
-						}
-					}else{												//如果已经抵达当前目标点，还需要转向观众
-						if(abs(Angle_face_Audiance-AngleSafe)>ERRORANGLE){		
-							Rotate_to_GoalAngle(Angle_face_Audiance);
-						}else{											//如果已经转向观众，则结束本条位移任务
-							PathTaskFinishedMeasures();
-							JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
-						}		
-					}
-				}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
-					ShowPicByTaskID(taskID);
-					AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
-					RobotQ::RobotQSpeak(SpeakContent);
-					SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;
-					m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "正在朗读:" + SpeakContent);
-					SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
-					JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
-				}else{
+	if(is_project_accomplished == false){			//当项目未完成时（一个项目由若干个任务组成，而一个任务想要完成需要经过若干个指令周期）
+		if(SpeakWaitCycle>1){
+			//如果还需等待的指令周期大于1，则等它讲话，除非开启了快速模式
+			if(is_FastGuideMode)SpeakWaitCycle/=2;
+		}else{
+			if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
+				if(is_advertisement_available){
 					is_advertisement_available=false;
 					ShowAdvertisement();
-					ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 				}
+				m_counter_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
+				AssignGoalPos(taskID);								//分配目标坐标和到达目标后的朝向
+				float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
+				QPointF d = PosGoal - PosSafe;
+				float dDistance = sqrt(pow(d.x(),2)+pow(d.y(),2));	//机器人中心到目标点的距离，单位cm
+				if(dDistance > errorRange_Distance){				//如果还没有抵达当前任务目标点就继续执行任务
+					if(is_dodge_moment == true){					//一旦前路不通会进入闪避时刻，占用若干个指令周期，而闪避时刻有自己的退出条件
+						DodgeMeasures();							//如果处于闪避时刻就闪避
+					}else{
+						CommonMeasures();							//如果本指令周期没有处于闪避时刻，则正常向目标运行
+					}
+				}else{												//如果已经抵达当前目标点，还需要转向观众
+					if(abs(Angle_face_Audiance-AngleSafe)>ERRORANGLE){		
+						Rotate_to_GoalAngle(Angle_face_Audiance);
+					}else{											//如果已经转向观众，则结束本条位移任务
+						PathTaskFinishedMeasures();
+						JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
+					}		
+				}
+			}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
+				ShowPicByTaskID(taskID);
+				AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
+				RobotQ::RobotQSpeak(SpeakContent);
+				SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;
+				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "正在朗读:" + SpeakContent);
+				SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
+				JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
+			}else{
+				is_advertisement_available=false;
+				ShowAdvertisement();
+				ProjectFinishedMeasures();		//如果查询任务代码发现既不是语音任务也不是位移任务，则认为是项目结束符
 			}
-			SpeakWaitCycle--;	//每过一个指令周期，接下来就少等一个周期，直到还需等待次数少于1就正常发配任务
-		}	
-	}
+		}
+		SpeakWaitCycle--;	//每过一个指令周期，接下来就少等一个周期，直到还需等待次数少于1就正常发配任务
+	}	
 }
 float MainGUI::zTool_cos_angle(float angle){
 	return cos(angle/360.0*2*PI);
@@ -896,21 +888,6 @@ void MainGUI::JudgeEmergency(){
 	}
 	m_DashBoard->ui.ck_isEmergency->setChecked(isEMERGENCY);
 }
-void MainGUI::EmergencyMeasures(){
-	Emergency_times++;
-	m_motor.stop();
-	RobotQ::RobotQSpeak("紧急制动!您挡到小灵啦!");
-	SpeakWaitCycle = 5000/INSTRUCTION_CYCLE+1;
-	if(Emergency_times == 3){
-		Emergency_times = 0;
-		m_EMERGENCY_DISTANCE = 0;
-		RobotQ::RobotQSpeak("紧急制动已解除，10秒后恢复");
-		m_counter_refresh_emergency_distance = 0;
-		isBlockEMERGENCY = true;
-		m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":紧急制动已解除");
-		m_DashBoard->ui.ck_isBlockEmergency->setChecked(true);
-	}
-}
 float MainGUI::zTool_mod_360f(float angle){
 	if(angle>360.0){
 		angle -=360;
@@ -1035,7 +1012,7 @@ int MainGUI::OnBtnSelectPath4(){
 }
 int MainGUI::On_MC_BtnGoHome(){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
-	QString str = "7";
+	QString str = "8";
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
 	RobotQ::OnStopSpeak();

@@ -16,9 +16,6 @@
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 50				//闪避时刻中最低有效步数
-#define EMERGENCY_TIMES 3			//紧急制动N次后暂时解除制动
-#define EMERGENCY_DISTANCE 10		//紧急制动危险距离，单位mm，将紧急制动距离改为足够小，则相当于屏蔽了紧急制动
-#define EMERGENCY_RECOVER_CYCLE 6	//紧急制动解除后将于N个指令周期后恢复
 #define INSTRUCTION_CYCLE 200		//指令周期，单位ms
 #define INFOREFRESH_CYCLE 100		//数据刷新周期，单位ms
 #define OBSTACLE_DISTANCE 400		//近处障碍物探测距离，单位mm，用以判断前方道路是否通畅
@@ -113,7 +110,6 @@ private:
 	void DodgeMeasures();							//触发闪避时刻后的动作（在向左和向右两个基础动作中选择合适的执行）
 	void DodgeTurnRight();							//闪避时刻基础动作(向右闪避)
 	void DodgeTurnLeft();							//闪避时刻基础动作(向左闪避)
-	void EmergencyMeasures();						//触发紧急时刻后执行的紧急动作
 	void FastGuideTodolist();						//修剪任务队列，剔除所有语音点
 	void JudgeEmergency();							//判断当前指令周期是否触发了紧急制动时刻
 	void JudgeForwardSituation();					//判断前路是否通畅
