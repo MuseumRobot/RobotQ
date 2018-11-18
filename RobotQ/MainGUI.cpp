@@ -1035,7 +1035,7 @@ int MainGUI::OnBtnSelectPath4(){
 }
 int MainGUI::On_MC_BtnGoHome(){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
-	QString str = "0";
+	QString str = "7";
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
 	RobotQ::OnStopSpeak();
@@ -1104,10 +1104,11 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	case 29:ShowPic("Resources/图片/7、金代铁锏.jpg");break;
 	case 30:ShowPic("Resources/图片/8 油画：户部达岗战役.jpg");break;
 	case 31:ShowPic("Resources/图片/9.jpg");break;
-	case 32:ShowPic("Resources/图片/10.jpg");break;
+	
 
 
 	//路线2
+	case 33:ShowPic("Resources/图片/10.jpg");break;
 	case 34:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
 	case 35:ShowPic("Resources/图片/12、银骨朵.jpg");break;
 	case 37:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
@@ -1127,7 +1128,7 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	case 51:ShowPic("Resources/图片/26、“将”字象棋.jpg");break;
 	case 52:ShowPic("Resources/图片/27、三孔器、多孔器（拼一张图）.jpg");break;
 	case 53:ShowPic("Resources/图片/28、手印砖、脚印砖（拼一张图）.jpg");break;
-	case 54:ShowPic("Resources/图片/29.jpg");break;
+	case 55:ShowPic("Resources/图片/29.jpg");break;
 	case 56:ShowPic("Resources/图片/30、金握.jpg");break;
 	case 57:ShowPic("Resources/图片/31、海船菱花铜镜.jpg");break;
 	case 58:ShowPic("Resources/图片/32、玉具剑.jpg");break;
