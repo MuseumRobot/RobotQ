@@ -665,7 +665,8 @@ void MainGUI::AssignInstruction(){
 	}else{						//非紧急情况下正常发配指令
 		if(is_project_accomplished == false){			//当项目未完成时（一个项目由若干个任务组成，而一个任务想要完成需要经过若干个指令周期）
 			if(SpeakWaitCycle>1){
-				//如果还需等待的指令周期大于1，则等它讲话
+				//如果还需等待的指令周期大于1，则等它讲话，除非开启了快速模式
+				if(is_FastGuideMode)SpeakWaitCycle/=2;
 			}else{
 				if (JudgeTaskType(taskID) == PATHTASKTYPE){				//如果该任务是位移任务
 					if(is_advertisement_available){
