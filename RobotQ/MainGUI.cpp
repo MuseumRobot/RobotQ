@@ -13,18 +13,15 @@ CEvent wait_data;
 CEvent wait_laserpose;
 threadInfo_laser_data Info_laser_data;
 
-MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
+MainGUI::MainGUI(QWidget *parent): QDialog(parent){
 	ui.setupUi(this);
-	m_RobotQ=new RobotQ(this);						//初始化这些成员对象需要在connect前
-	m_ManualControl=new ManualControl(this);
-	m_DashBoard=new DashBoard(this);
+	m_RobotQ = new RobotQ(this);						//初始化这些成员对象需要在connect前
+	m_ManualControl = new ManualControl(this);
+	m_DashBoard = new DashBoard(this);
+	m_MuseumGUI = new MuseumGUI(this);
 	m_popup_secondScreen_image = new PopupDialog(this);	//初始化第二屏幕弹出窗口
-	m_timer_refresh_task=startTimer(INSTRUCTION_CYCLE);					//计数器查询分配任务
-	m_timer_refresh_dashboard=startTimer(INFOREFRESH_CYCLE);			//计数器查询显示机器状态
-	m_counter_refresh_emergency_distance=0;								//依赖分配任务计数器查询刷新恢复制动距离，模20
-	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
-	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
-	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
+	m_timer_refresh_task = startTimer(INSTRUCTION_CYCLE);					//计数器查询分配任务
+	m_timer_refresh_dashboard = startTimer(INFOREFRESH_CYCLE);			//计数器查询显示机器状态
 	connect(ui.btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
 	connect(ui.btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
 	connect(ui.btnManualControl,SIGNAL(clicked()),this,SLOT(OnBtnManualControl()));
@@ -43,6 +40,12 @@ MainGUI::MainGUI(QWidget *parent): QMainWindow(parent){
 	connect(m_ManualControl->ui.btn_MC_FastGuide,SIGNAL(clicked()),this,SLOT(OnBtnFastGuideMode()));
 	connect(m_ManualControl->ui.btnStartSpeak,SIGNAL(clicked()),this,SLOT(On_MC_BtnRobotQSpeak()));
 	connect(m_ManualControl->ui.btnStopSpeak,SIGNAL(clicked()),m_RobotQ,SLOT(OnStopSpeak()));	
+	connect(m_MuseumGUI->ui.btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
+	connect(m_MuseumGUI->ui.btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
+	connect(m_MuseumGUI->ui.btnHome,SIGNAL(clicked()),this,SLOT(On_MC_BtnGoHome()));
+	connect(m_MuseumGUI->ui.btnPath1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
+	connect(m_MuseumGUI->ui.btnPath2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
+	connect(m_MuseumGUI->ui.btnPath3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
 	//connect(m_RobotQ,SIGNAL(TTS_Ready()),this,SLOT(check_TTS_Ready()));//在子窗口的初始化函数中发射信号无法被接受，而在初始化函数之外发射有效
 	//因为初始化函数为静态函数
 	Init();
@@ -51,18 +54,22 @@ MainGUI::~MainGUI(){
 	delete m_RobotQ;
 	delete m_ManualControl;
 	delete m_DashBoard;
+	delete m_MuseumGUI;
 	m_cURG.SwitchOff();		//关闭激光
 }
 void MainGUI::Init(){
-	//InitStarMark();					//LED标签数组赋值(实验室)
+	//InitStarMark();				//LED标签数组赋值(实验室)
 	InitStarMarkMuseum();			//LED标签数组赋值(博物馆)
 	InitDataBase();					//数据库初始化
 	InitCommMotorAndStar();			//串口初始化Motor/Star
 	InitCommLaser();				//串口初始化URG
 	InitDashBoardData();			//仪表盘数据初始化
-	InitTaskAssignment(1);			//默认分配路线一(任务字符串初始化)
+	InitTaskAssignment(1);			//任务字符串初始化(默认分配路线一)
 	InitAdjustGUI();				//调整界面适配使用者
-	
+}
+void MainGUI::closeEvent(QCloseEvent *event){
+	RobotQ::OnStopSpeak();
+	QTest::qSleep(100);
 }
 void MainGUI::InitDataBase(){
 	if(m_dataManager.loadTask() == 1){			//数据库管理员对象读取任务文件
@@ -84,10 +91,10 @@ int MainGUI::OnBtnAutoGuide(){
 			ui.btnAutoGuide->setText("开启自动导航");
 		}else{
 			const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航.bmp");
-			btnAutoGuide_MUSEUM->setIcon(pic_AutoGuide_MainGUI);
+			m_MuseumGUI->ui.btnAutoGuide->setIcon(pic_AutoGuide_MainGUI);
 		}
 		RobotQ::OnStopSpeak();
-		QTest::qSleep(1000);
+		QTest::qSleep(100);
 		RobotQ::RobotQSpeak("自动导航已关闭！");
 	}else{
 		currentTodoListId = 0;
@@ -100,27 +107,13 @@ int MainGUI::OnBtnAutoGuide(){
 			ui.btnAutoGuide->setText("关闭自动导航");
 		}else{
 			const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航_激活.bmp");
-			btnAutoGuide_MUSEUM->setIcon(pic_AutoGuide_MainGUI);
+			m_MuseumGUI->ui.btnAutoGuide->setIcon(pic_AutoGuide_MainGUI);
 		}
 		RobotQ::OnStopSpeak();
-		QTest::qSleep(200);
+		QTest::qSleep(100);
 		RobotQ::RobotQSpeak("自动导航已开启！");
 		SpeakWaitCycle = 3000/INSTRUCTION_CYCLE+1;
 	}
-	return 0;
-}
-int MainGUI::OnBtnRobotQ(){
-	m_RobotQ->show();
-	return 0;
-}
-int MainGUI::OnBtnManualControl(){
-	m_ManualControl->move(300,20);
-	m_ManualControl->show();
-	return 0;
-}
-int MainGUI::OnBtnDashBoard(){
-	m_DashBoard->move(750,20);
-	m_DashBoard->show();
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
@@ -191,15 +184,6 @@ void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
 		refreshDashboardData();			//刷新仪表盘数据
 	}else if(event->timerId()==m_timer_refresh_task){
-		if(m_counter_refresh_emergency_distance == EMERGENCY_RECOVER_CYCLE){
-			m_counter_refresh_emergency_distance = 0;
-			if(m_EMERGENCY_DISTANCE == 0){
-				m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;	//紧急制动恢复
-				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":紧急制动已恢复");
-				isBlockEMERGENCY = false;
-				m_DashBoard->ui.ck_isBlockEmergency->setChecked(false);
-			}
-		}
 		if(is_Auto_Mode_Open){
 			AssignInstruction();		//分配下一步指令
 		}
@@ -646,14 +630,13 @@ void MainGUI::InitDashBoardData(){
 	is_path_clear = true;
 	is_far_path_clear = true;
 	is_dodge_moment = false;
-	isEMERGENCY = false;
-	isBlockEMERGENCY = false;
 	is_advertisement_available=true;
 	dodge_move_times = 0;
 	dodge_mode = 0;
-	m_EMERGENCY_DISTANCE = EMERGENCY_DISTANCE;
-	Emergency_times = 0;
 	SpeakWaitCycle = 0;		//默认发出说话指令后，机器人本体不等待
+	if(m_RobotQ->isAuthReady)m_DashBoard->ui.ck_Auth->setChecked(true);
+	if(m_RobotQ->isASRReady)m_DashBoard->ui.ck_ASR->setChecked(true);
+	if(m_RobotQ->isTTSReady)m_DashBoard->ui.ck_TTS->setChecked(true);
 }
 void MainGUI::AssignInstruction(){
 	if(is_project_accomplished == false){			//当项目未完成时（一个项目由若干个任务组成，而一个任务想要完成需要经过若干个指令周期）
@@ -666,7 +649,6 @@ void MainGUI::AssignInstruction(){
 					is_advertisement_available=false;
 					ShowAdvertisement();
 				}
-				m_counter_refresh_emergency_distance++;				//在位移任务中才累加紧急制动恢复计数器
 				AssignGoalPos(taskID);								//分配目标坐标和到达目标后的朝向
 				float errorRange_Distance = ERRORDISTANCE;			//抵达目标点的距离误差范围，单位cm
 				QPointF d = PosGoal - PosSafe;
@@ -682,7 +664,6 @@ void MainGUI::AssignInstruction(){
 						Rotate_to_GoalAngle(Angle_face_Audiance);
 					}else{											//如果已经转向观众，则结束本条位移任务
 						PathTaskFinishedMeasures();
-						JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 					}		
 				}
 			}else if(JudgeTaskType(taskID) == SPEAKTASKTYPE){		//如果该任务是语音任务
@@ -692,7 +673,6 @@ void MainGUI::AssignInstruction(){
 				SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;
 				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "正在朗读:" + SpeakContent);
 				SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
-				JudgeTaskType(taskID) == SPEAKTASKTYPE ? isBlockEMERGENCY = true:isBlockEMERGENCY = false;	//语音点解除制动
 			}else{
 				is_advertisement_available=false;
 				ShowAdvertisement();
@@ -775,65 +755,7 @@ void MainGUI::DodgeTurnLeft(){
 }
 void MainGUI::InitAdjustGUI(){
 	if(MUSEUMMODE == 1){
-		delete ui.centralWidget;		//清除所有开发者界面控件重新编写布局
-		QSize MainGUISize(640,480);		//主界面尺寸
-		QSize RobotQSize(540,380);		//语音交互截面尺寸
-		QSize btnRobotQSize(150,50);	//语音交互按钮尺寸
-		QSize btnPathSize(180,36);
-
-		QLabel* MainBackGround = new QLabel(this);
-		QPushButton* btnRobotQ = new QPushButton(this);
-		btnAutoGuide_MUSEUM = new QPushButton(this);
-		btnPath1 = new QPushButton(this);
-		btnPath2 = new QPushButton(this);
-		btnPath3 = new QPushButton(this);
-		
-		const QIcon pic_RobotQ_MainGUI = QIcon("Resources/语音交互.bmp");
-		const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航.bmp");
-		const QIcon pic_Path1_MainGUI = QIcon("Resources/路线1.bmp");
-		const QIcon pic_Path2_MainGUI = QIcon("Resources/路线2.bmp");
-		const QIcon pic_Path3_MainGUI = QIcon("Resources/路线3.bmp");
-		const QPixmap pic_BG_MainGUI = QPixmap("Resources/博物馆背景.bmp");
-
-		resize(MainGUISize);
-		MainBackGround->resize(MainGUISize);
-		MainBackGround->setPixmap(pic_BG_MainGUI);
-		MainBackGround->setScaledContents(true);
-
-		btnRobotQ->move(60,50);
-		btnRobotQ->resize(btnRobotQSize);
-		btnRobotQ->setIconSize(btnRobotQSize);
-		btnRobotQ->setIcon(pic_RobotQ_MainGUI);
-
-		btnAutoGuide_MUSEUM->move(60,120);
-		btnAutoGuide_MUSEUM->resize(btnRobotQSize);
-		btnAutoGuide_MUSEUM->setIconSize(btnRobotQSize);
-		btnAutoGuide_MUSEUM->setIcon(pic_AutoGuide_MainGUI);
-
-		btnPath1->move(360,280);
-		btnPath1->resize(btnPathSize);
-		btnPath1->setIconSize(btnPathSize);
-		btnPath1->setIcon(pic_Path1_MainGUI);
-
-		btnPath2->move(360,330);
-		btnPath2->resize(btnPathSize);
-		btnPath2->setIconSize(btnPathSize);
-		btnPath2->setIcon(pic_Path2_MainGUI);
-
-		btnPath3->move(360,380);
-		btnPath3->resize(btnPathSize);
-		btnPath3->setIconSize(btnPathSize);
-		btnPath3->setIcon(pic_Path3_MainGUI);
-
-		m_RobotQ->move(130,110);
-		m_RobotQ->resize(RobotQSize);
-		
-		connect(btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
-		connect(btnAutoGuide_MUSEUM,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
-		connect(btnPath1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
-		connect(btnPath2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
-		connect(btnPath3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
-		
+		OnBtnMuseumGUI();
 	}else{	//进入开发者模式
 		OnBtnDashBoard();				//开启仪表盘面板
 		OnBtnManualControl();			//开启遥控器面板
@@ -875,18 +797,6 @@ void MainGUI::AssignSpeakContent(int taskID){	//根据任务代码（语音任务）分配语音
 		SpeakContentType* speakContent = m_dataManager.findSpeakContent(SpeakContentId);
 		SpeakContent = speakContent->content;
 	}
-}
-void MainGUI::JudgeEmergency(){
-	isEMERGENCY = false;
-	for(int i=9;i<27;i++){
-		if(sectorObstacleDistance[i] > 0 && sectorObstacleDistance[i] < m_EMERGENCY_DISTANCE){
-			if(isBlockEMERGENCY == false){	//紧急制动未被屏蔽
-				isEMERGENCY =true;
-				break;
-			}
-		}
-	}
-	m_DashBoard->ui.ck_isEmergency->setChecked(isEMERGENCY);
 }
 float MainGUI::zTool_mod_360f(float angle){
 	if(angle>360.0){

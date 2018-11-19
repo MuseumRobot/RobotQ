@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "ui_MainGUI.h"
+#include "MuseumGUI.h"
 #include "robotq.h"
 #include "ManualControl.h"
 #include "DashBoard.h"
@@ -12,7 +13,7 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
+#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 50				//闪避时刻中最低有效步数
@@ -39,16 +40,12 @@ struct threadInfo_laser_data{
 	int	m_Laser_Data_Point;
 };
 
-class MainGUI : public QMainWindow{
+class MainGUI : public QDialog{
 	Q_OBJECT
 
 public:
 	MainGUI(QWidget *parent = 0);
 	~MainGUI();
-	QPushButton* btnAutoGuide_MUSEUM;
-	QPushButton* btnPath1;
-	QPushButton* btnPath2;
-	QPushButton* btnPath3;
 	PopupDialog* m_popup_secondScreen_image;	//第二显示器弹出窗口
 	QPointF PosByStar1;		//首选星标得到的星标定位器的世界坐标，单位cm
 	QPointF PosByStar2;		//备选星标，单位cm
@@ -63,6 +60,7 @@ public:
 	int SpeakWaitCycle;		//发出说话指令后，机器人在若干个指令周期内不分配任务
 private:
 	Ui::MainGUI ui;
+	MuseumGUI* m_MuseumGUI;
 	RobotQ* m_RobotQ;
 	ManualControl* m_ManualControl;
 	DashBoard* m_DashBoard;
@@ -77,17 +75,12 @@ private:
 	bool is_path_clear;								//当前视野下前方是否通畅
 	bool is_far_path_clear;							//判断当前视野下远处是否通畅
 	bool is_dodge_moment;							//是否进入闪避时刻
-	bool isEMERGENCY;								//是否是紧急制动时刻
-	bool isBlockEMERGENCY;							//是否屏蔽紧急制动（为了避免语音点紧急制动打断讲解词，在讲解任务时屏蔽紧急制动功能，所以在语音任务开始时解除紧急制动，在位移任务开始时恢复紧急制动）
-	bool is_advertisement_available;							//是否该显示广告
+	bool is_advertisement_available;				//是否该显示广告
 	int dodge_mode;									//为了使每次进入闪避时刻只会向一个方向闪避，需要在进入时给定闪避方向，1为左，2为右，退出闪避时为0，可供分配新的值
 	int dodge_move_times;							//开启闪避时刻后，闪避动作已执行的次数
-	int Emergency_times;							//连续紧急制动3次后拒绝紧急制动转而避障
-	int m_EMERGENCY_DISTANCE;						//紧急制动距离，单位mm
 	int sectorObstacleDistance[36];					//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
-	int m_counter_refresh_emergency_distance;		//计数器刷新紧急制动距离
 	float m_Last_inLV;								//上一个动作的线速度
 	float m_Last_inPS;								//上一个动作的角速度
 	int todoList[TODOLISTMAXNUM];					//任务清单
@@ -111,7 +104,6 @@ private:
 	void DodgeTurnRight();							//闪避时刻基础动作(向右闪避)
 	void DodgeTurnLeft();							//闪避时刻基础动作(向左闪避)
 	void FastGuideTodolist();						//修剪任务队列，剔除所有语音点
-	void JudgeEmergency();							//判断当前指令周期是否触发了紧急制动时刻
 	void JudgeForwardSituation();					//判断前路是否通畅
 	void ProjectFinishedMeasures();					//完成当前项目后执行的动作
 	void PathTaskFinishedMeasures();				//完成位移任务后执行的动作
@@ -128,11 +120,13 @@ private:
 	float zTool_mod_360f(float angle);				//将角度范围归为(0,360)
 	float zTool_vector_angle(QPointF d);			//求矢量角（范围(0,360)，单位°），参数单位为cm
 	virtual void timerEvent(QTimerEvent *event);
+	void closeEvent(QCloseEvent *event);			//关闭主界面后的动作
 
 private slots:
-	int OnBtnRobotQ();
-	int OnBtnManualControl();
-	int OnBtnDashBoard();
+	inline int OnBtnRobotQ(){m_RobotQ->show();return 0;}
+	inline int OnBtnManualControl(){m_ManualControl->move(300,20);m_ManualControl->show();return 0;}
+	inline int OnBtnMuseumGUI(){m_MuseumGUI->move(80,50);m_MuseumGUI->show();return 0;}
+	inline int OnBtnDashBoard(){m_DashBoard->move(750,20);m_DashBoard->show();return 0;}
 	int OnBtnAutoGuide();
 	int OnBtnSelectPath1();
 	int OnBtnSelectPath2();
