@@ -46,6 +46,7 @@ MainGUI::MainGUI(QWidget *parent): QDialog(parent){
 	connect(m_MuseumGUI->ui.btnPath1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
 	connect(m_MuseumGUI->ui.btnPath2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
 	connect(m_MuseumGUI->ui.btnPath3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
+	connect(m_MuseumGUI->ui.btnPath4,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath4()));
 	//connect(m_RobotQ,SIGNAL(TTS_Ready()),this,SLOT(check_TTS_Ready()));//在子窗口的初始化函数中发射信号无法被接受，而在初始化函数之外发射有效
 	//因为初始化函数为静态函数
 	Init();

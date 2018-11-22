@@ -104,7 +104,7 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>280</y>
+     <y>265</y>
      <width>180</width>
      <height>36</height>
     </rect>
@@ -133,7 +133,7 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>330</y>
+     <y>315</y>
      <width>180</width>
      <height>36</height>
     </rect>
@@ -162,7 +162,7 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>380</y>
+     <y>365</y>
      <width>180</width>
      <height>36</height>
     </rect>
@@ -217,6 +217,38 @@
    </property>
    <property name="flat">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnPath4">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>415</y>
+     <width>180</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset resource="robotq.qrc">
+     <normaloff>:/MuseumGUI/Resources/路线4.png</normaloff>:/MuseumGUI/Resources/路线4.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>180</width>
+     <height>36</height>
+    </size>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
