@@ -769,9 +769,9 @@ void MainGUI::InitTaskAssignment(int n){
 	QString str;
 	if(n == 1){				//路线一
 		//str = "60,61,60,61,62";	//这里是实验室三个路径点
-		str="1,22,2,23,24,3,25,26,4,27,5,28,6,29,30,7,31,76";
+		str="1,22,2,23,24,3,25,26,4,27,5,28,29,6,30,7,31,76";
 	}else if(n == 2){
-		str="8,32,9,33,34,10,35,11,37,38,39,76";
+		str="8,32,9,33,34,10,35,11,36,37,38,39,76";
 	}else if(n == 3){
 		str="12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,52,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
 	}else if(n == 4){
@@ -998,7 +998,8 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	case 33:ShowPic("Resources/图片/10.jpg");break;
 	case 34:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
 	case 35:ShowPic("Resources/图片/12、银骨朵.jpg");break;
-	case 37:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
+	case 37:
+	case 36:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
 	//	case 36:ShowPic("Resources/图片/14、鱼形铁铡刀.jpg");break;
 	case 38:ShowPic("Resources/图片/15、承安宝货.jpg");break;
 	case 39:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
