@@ -87,10 +87,9 @@ void MainGUI::InitDataBase(){
 int MainGUI::OnBtnAutoGuide(){
 	if(is_Auto_Mode_Open == true){
 		is_Auto_Mode_Open = false;
-		if(MUSEUMMODE == 0){
-			m_DashBoard->ui.ck_Auto->setChecked(false);
-			ui.btnAutoGuide->setText("开启自动导航");
-		}else{
+		m_DashBoard->ui.ck_Auto->setChecked(false);
+		ui.btnAutoGuide->setText("开启自动导航");
+		if(MUSEUMMODE == 1){
 			const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航.bmp");
 			m_MuseumGUI->ui.btnAutoGuide->setIcon(pic_AutoGuide_MainGUI);
 		}
@@ -103,10 +102,9 @@ int MainGUI::OnBtnAutoGuide(){
 		is_project_accomplished = false;
 		is_Auto_Mode_Open = true;
 		is_advertisement_available=true;
-		if(MUSEUMMODE == 0){
-			m_DashBoard->ui.ck_Auto->setChecked(true);
-			ui.btnAutoGuide->setText("关闭自动导航");
-		}else{
+		m_DashBoard->ui.ck_Auto->setChecked(true);
+		ui.btnAutoGuide->setText("关闭自动导航");
+		if(MUSEUMMODE == 1){
 			const QIcon pic_AutoGuide_MainGUI = QIcon("Resources/自动导航_激活.bmp");
 			m_MuseumGUI->ui.btnAutoGuide->setIcon(pic_AutoGuide_MainGUI);
 		}
@@ -842,6 +840,8 @@ void MainGUI::PathTaskFinishedMeasures(){
 	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "完成位移任务," + TaskCode);
 	currentTodoListId++;									//一个任务完成后，准备执行下一个
 	taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
+	is_dodge_moment = false;								//一个位移任务结束，则退出闪避时刻
+	m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 }
 void MainGUI::SpeakTaskFinishedMeasures(){
 	QString TaskCode;
@@ -849,6 +849,8 @@ void MainGUI::SpeakTaskFinishedMeasures(){
 	m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "完成语音任务," + TaskCode);
 	currentTodoListId++;									//一个任务完成后，准备执行下一个
 	taskID=todoList[currentTodoListId];						//从todoList中获取当前任务代码
+	is_dodge_moment = false;								//一个语音任务结束，则退出闪避时刻
+	m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 }
 void MainGUI::ProjectFinishedMeasures(){
 	is_project_accomplished = true;
@@ -923,6 +925,8 @@ int MainGUI::OnBtnSelectPath4(){
 }
 int MainGUI::On_MC_BtnGoHome(){
 	currentTodoListId = 0;	//初始化当前todolist的下标为0
+	is_dodge_moment = false;
+	m_DashBoard->ui.ck_isDodgetime->setChecked(false);
 	QString str = "8";
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
@@ -1043,10 +1047,12 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 void MainGUI::ShowAdvertisement(){
 	QDesktopWidget* desktop = QApplication::desktop();
 	int N = desktop->screenCount();
-	QMovie *movie = new QMovie("Resources/图片/七寸屏幕 .gif");
-	m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-	m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
-	m_popup_secondScreen_image->show();
-	m_popup_secondScreen_image->resize(800,600);
-	movie->start();
+	if(N>1){
+		QMovie *movie = new QMovie("Resources/图片/七寸屏幕 .gif");
+		m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
+		m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
+		m_popup_secondScreen_image->show();
+		m_popup_secondScreen_image->resize(800,600);
+		movie->start();
+	}
 }
