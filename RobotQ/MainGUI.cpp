@@ -671,7 +671,7 @@ void MainGUI::AssignInstruction(){
 				ShowPicByTaskID(taskID);
 				AssignSpeakContent(taskID);		//将对应任务的语料赋值给SpeakContent，将对应语料的等待时间赋给SpeakWaitCycle
 				RobotQ::RobotQSpeak(SpeakContent);
-				SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+1;
+				SpeakWaitCycle = SpeakContent.length()/SPEAKWORDSPERSECOND*1000/INSTRUCTION_CYCLE+10;
 				m_DashBoard->AppendMessage(m_DashBoard->m_time.toString("hh:mm:ss")+ ":" + "正在朗读:" + SpeakContent);
 				SpeakTaskFinishedMeasures();	//完成语音任务的善后操作
 			}else{
@@ -774,9 +774,9 @@ void MainGUI::InitTaskAssignment(int n){
 	}else if(n == 2){
 		str="8,32,9,33,34,10,35,11,36,37,38,39,76";
 	}else if(n == 3){
-		str="12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,52,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
+		str="12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
 	}else if(n == 4){
-		str = "1,22,2,23,24,3,25,26,4,27,5,28,6,29,30,7,31,32,9,33,34,10,35,11,37,38,39,12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,52,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
+		str = "1,22,2,23,24,3,25,26,4,27,5,28,6,29,30,7,31,32,9,33,34,10,35,11,37,38,39,12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
 	}
 	ParseTodoList(str,todoList);
 	if(is_FastGuideMode){
