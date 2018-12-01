@@ -43,6 +43,7 @@ MainGUI::MainGUI(QWidget *parent): QDialog(parent){
 	connect(m_MuseumGUI->ui.btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
 	connect(m_MuseumGUI->ui.btnRobotQ,SIGNAL(clicked()),this,SLOT(OnBtnRobotQ()));
 	connect(m_MuseumGUI->ui.btnHome,SIGNAL(clicked()),this,SLOT(On_MC_BtnGoHome()));
+	connect(m_MuseumGUI->ui.btnExit,SIGNAL(clicked()),this,SLOT(On_MC_BtnExit()));
 	connect(m_MuseumGUI->ui.btnPath1,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath1()));
 	connect(m_MuseumGUI->ui.btnPath2,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath2()));
 	connect(m_MuseumGUI->ui.btnPath3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
@@ -755,6 +756,7 @@ void MainGUI::DodgeTurnLeft(){
 void MainGUI::InitAdjustGUI(){
 	if(MUSEUMMODE == 1){
 		OnBtnMuseumGUI();
+		m_MuseumGUI->showFullScreen();
 	}else{	//进入开发者模式
 		OnBtnDashBoard();				//开启仪表盘面板
 		OnBtnManualControl();			//开启遥控器面板
@@ -943,6 +945,11 @@ int MainGUI::On_MC_BtnExeSelfTask(){
 	QString str = m_ManualControl->ui.text_SelfTask->text();
 	ParseTodoList(str,todoList);
 	taskID = todoList[currentTodoListId];
+	return 0;
+}
+int MainGUI::On_MC_BtnExit(){
+	QApplication *app;
+	app->quit();
 	return 0;
 }
 void MainGUI::FastGuideTodolist(){

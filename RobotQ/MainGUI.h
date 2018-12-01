@@ -143,6 +143,7 @@ private slots:
 	int On_MC_BtnStopmove();
 	int On_MC_BtnRobotQSpeak();
 	int On_MC_BtnGoHome();
+	int On_MC_BtnExit();
 	int On_MC_BtnExeSelfTask();
 };
 
