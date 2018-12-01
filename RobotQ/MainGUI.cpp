@@ -772,9 +772,9 @@ void MainGUI::InitTaskAssignment(int n){
 	}else if(n == 2){
 		str="8,32,9,33,34,10,35,11,36,37,38,39,76";
 	}else if(n == 3){
-		str="12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
+		str="12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,52,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
 	}else if(n == 4){
-		str = "1,22,2,23,24,3,25,26,4,27,5,28,6,29,30,7,31,32,9,33,34,10,35,11,37,38,39,12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
+		str = "1,22,2,23,24,3,25,26,4,27,5,28,29,6,30,7,31,32,9,33,34,10,35,11,36,37,38,39,12,40,41,42,43,13,44,45,14,46,47,48,49,15,50,51,52,53,63,64,16,54,55,56,57,58,59,60,17,61,62,18,65,70,71,72,73,74,75,19,66,20,67,68,69,76";
 	}
 	ParseTodoList(str,todoList);
 	if(is_FastGuideMode){
@@ -1003,9 +1003,9 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	case 33:ShowPic("Resources/图片/10.jpg");break;
 	case 34:ShowPic("Resources/图片/11、卷云龙纹长方砖.jpg");break;
 	case 35:ShowPic("Resources/图片/12、银骨朵.jpg");break;
-	case 37:
 	case 36:ShowPic("Resources/图片/13、铁铧、犁镜、铁锹、铁镰（拼一张图）.jpg");break;
 	//	case 36:ShowPic("Resources/图片/14、鱼形铁铡刀.jpg");break;
+	case 37:
 	case 38:ShowPic("Resources/图片/15、承安宝货.jpg");break;
 	case 39:ShowPic("Resources/图片/16、翟家记真花银.jpg");break;
 	//路线3
@@ -1036,7 +1036,8 @@ void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
 	case 67:ShowPic("Resources/图片/41、铜项圈.jpg");break;
 	case 68:ShowPic("Resources/图片/42、牙雕鱼饰件.jpg");break;
 	case 69:ShowPic("Resources/图片/43.jpg");break;
-	case 71:ShowPic("Resources/图片/44、环形金圈饰、桃形金圈饰、金花饰、金帽顶饰（拼一张图）.jpg");break;
+	case 71:
+		//ShowPic("Resources/图片/44、环形金圈饰、桃形金圈饰、金花饰、金帽顶饰（拼一张图）.jpg");break;
 	case 72:ShowPic("Resources/图片/45.jpg");break;
 	case 73:ShowPic("Resources/图片/46、双鹿纹玉佩.jpg");break;
 	case 74:ShowPic("Resources/图片/47、玉天鹅.jpg");break;
