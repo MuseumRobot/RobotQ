@@ -10,8 +10,6 @@ int main(int argc, char *argv[]){
 	MainGUI w;
 	if(MUSEUMMODE == 0){
 		w.move(20,20);
-	}else{
-		w.move(80,50);
 	}
 	w.show();
 	return a.exec();
