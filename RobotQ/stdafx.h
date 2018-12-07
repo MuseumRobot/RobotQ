@@ -18,8 +18,10 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDialog>
+#include <QFrame>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPainter>
 #include <QPlainTextEdit>
 #include <QString>
 #include <QTime>

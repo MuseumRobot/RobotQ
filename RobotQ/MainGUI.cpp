@@ -38,6 +38,7 @@ MainGUI::MainGUI(QWidget *parent): QDialog(parent){
 	connect(m_ManualControl->ui.btn_MC_Path3,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath3()));
 	connect(m_ManualControl->ui.btn_MC_Path4,SIGNAL(clicked()),this,SLOT(OnBtnSelectPath4()));
 	connect(m_ManualControl->ui.btn_MC_FastGuide,SIGNAL(clicked()),this,SLOT(OnBtnFastGuideMode()));
+	connect(m_ManualControl->ui.btn_MC_Simulate,SIGNAL(clicked()),this,SLOT(OnBtnSimualte()));
 	connect(m_ManualControl->ui.btnStartSpeak,SIGNAL(clicked()),this,SLOT(On_MC_BtnRobotQSpeak()));
 	connect(m_ManualControl->ui.btnStopSpeak,SIGNAL(clicked()),m_RobotQ,SLOT(OnStopSpeak()));	
 	connect(m_MuseumGUI->ui.btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
@@ -117,7 +118,11 @@ int MainGUI::OnBtnAutoGuide(){
 	return 0;
 }
 int MainGUI::On_MC_BtnForward(){
-	m_motor.VectorMove(1000,0);
+	if(is_SimulateMode){
+		m_DashBoard->ui.m_Overview->m_pos+= QPointF(1,1);
+	}else{
+		m_motor.VectorMove(1000,0);
+	}
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
@@ -182,7 +187,11 @@ int MainGUI::On_MC_BtnRobotQSpeak(){
 }
 void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
-		refreshDashboardData();			//刷新仪表盘数据
+		if(is_SimulateMode){
+
+		}else{
+			refreshDashboardData();			//刷新真实仪表盘数据
+		}
 	}else if(event->timerId()==m_timer_refresh_task){
 		if(is_Auto_Mode_Open){
 			AssignInstruction();		//分配下一步指令
@@ -551,69 +560,71 @@ void MainGUI::refreshDashboardSector(){
 	if(sectorObstacleDistance[N-35]<threshold && sectorObstacleDistance[N-35] >0)m_DashBoard->ui.r180->setChecked(flag);
 }
 void MainGUI::refreshDashboardData(){
-	CalculateSectorDistance();		//计算扇区内障碍物距离
-	JudgeForwardSituation();		//判断前方是否畅通无阻
-	refreshDashboardSector();		//刷新障碍物分布图
-	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
-	PosByStar1=QPointF(0.00,0.00);
-	PosByStar2=QPointF(0.00,0.00);
-	for (int loop_mark = 0; loop_mark < MARKNUM - 1; loop_mark++){
-		if (m_MARK[loop_mark].markID == m_StarGazer.starID){
-			//采集原始Star1数据
-			PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
-			PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
-			AngleByStar1 = m_StarGazer.starAngel;
-			//Star1未失灵情况下机器人本体的世界坐标与朝向由Star1确定
-			if(m_StarGazer.starID !=34 && m_StarGazer.starID !=64 && m_StarGazer.starID !=66){
-				AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
-				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
-				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
-				PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()-dy);
-				AngleSafe = 360.0 - AngleSafe;											//得到机器人本体朝向（逆时针）
-			}
-		}
-		if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
-			//采集原始Star2数据
-			PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
-			PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
-			AngleByStar2 = m_StarGazer.starAngel;
-			//Star1失灵情况下机器人本体的世界坐标与朝向由Star2确定
-			if(m_StarGazer.starID ==34 || m_StarGazer.starID ==64 || m_StarGazer.starID ==66){
-				AngleByStar2>0?AngleSafe=AngleByStar2:AngleSafe=AngleByStar2+360.0;		//得到机器人本体的朝向(顺时针)
-				float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
-				float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
-				PosSafe = QPointF(PosByStar2.x()+dx,PosByStar2.y()-dy);
-				AngleSafe = 360.0 - AngleSafe;
-			}
-		}
-	}
-
-	Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
-	QString str;
-	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
-	m_DashBoard->ui.posStar1->setText(str);
-	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
-	m_DashBoard->ui.posStar2->setText(str);
-	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosSafe.x(),PosSafe.y(),AngleSafe);
-	m_DashBoard->ui.posSafe->setText(str);
-	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosGoal.x(),PosGoal.y(),Angle_face_Goal);
-	m_DashBoard->ui.posGoal->setText(str);
-
-	//更新任务显示
-	if(is_project_accomplished == false){
-		str = "任务序号:";str += QString("%2").arg(currentTodoListId + 1);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
+	if(is_SimulateMode){
+		m_DashBoard->ui.m_Overview->m_pos.setX(PosSafe.x());
+		m_DashBoard->ui.m_Overview->m_pos.setY(PosSafe.y());
 	}else{
-		str = "无";
+		CalculateSectorDistance();		//计算扇区内障碍物距离
+		JudgeForwardSituation();		//判断前方是否畅通无阻
+		refreshDashboardSector();		//刷新障碍物分布图
+		if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
+		PosByStar1=QPointF(0.00,0.00);
+		PosByStar2=QPointF(0.00,0.00);
+		for (int loop_mark = 0; loop_mark < MARKNUM - 1; loop_mark++){
+			if (m_MARK[loop_mark].markID == m_StarGazer.starID){
+				//采集原始Star1数据
+				PosByStar1.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX);
+				PosByStar1.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY);
+				AngleByStar1 = m_StarGazer.starAngel;
+				//Star1未失灵情况下机器人本体的世界坐标与朝向由Star1确定
+				if(m_StarGazer.starID !=34 && m_StarGazer.starID !=64 && m_StarGazer.starID !=66){
+					AngleByStar1>0?AngleSafe=AngleByStar1:AngleSafe=AngleByStar1+360.0;		//得到机器人本体的朝向(顺时针)
+					float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
+					float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
+					PosSafe = QPointF(PosByStar1.x()+dx,PosByStar1.y()-dy);
+					AngleSafe = 360.0 - AngleSafe;											//得到机器人本体朝向（逆时针）
+				}
+			}
+			if (m_MARK[loop_mark].markID == m_StarGazer.starID2){
+				//采集原始Star2数据
+				PosByStar2.setX(m_MARK[loop_mark].mark_x + m_StarGazer.starX2);
+				PosByStar2.setY(m_MARK[loop_mark].mark_y + m_StarGazer.starY2);
+				AngleByStar2 = m_StarGazer.starAngel;
+				//Star1失灵情况下机器人本体的世界坐标与朝向由Star2确定
+				if(m_StarGazer.starID ==34 || m_StarGazer.starID ==64 || m_StarGazer.starID ==66){
+					AngleByStar2>0?AngleSafe=AngleByStar2:AngleSafe=AngleByStar2+360.0;		//得到机器人本体的朝向(顺时针)
+					float dx = Distance_Robot_forward_StarGazer * zTool_cos_angle(AngleSafe);
+					float dy = Distance_Robot_forward_StarGazer * zTool_sin_angle(AngleSafe);
+					PosSafe = QPointF(PosByStar2.x()+dx,PosByStar2.y()-dy);
+					AngleSafe = 360.0 - AngleSafe;
+				}
+			}
+		}
+		Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
+		QString str;
+		str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
+		m_DashBoard->ui.posStar1->setText(str);
+		str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
+		m_DashBoard->ui.posStar2->setText(str);
+		str.sprintf("(%.2f,%.2f)-(%.2f°)",PosSafe.x(),PosSafe.y(),AngleSafe);
+		m_DashBoard->ui.posSafe->setText(str);
+		str.sprintf("(%.2f,%.2f)-(%.2f°)",PosGoal.x(),PosGoal.y(),Angle_face_Goal);
+		m_DashBoard->ui.posGoal->setText(str);
+		//更新任务显示
+		if(is_project_accomplished == false){
+			str = "任务序号:";str += QString("%2").arg(currentTodoListId + 1);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
+		}else{
+			str = "无";
+		}
+		m_DashBoard->ui.text_CurrentTaskId->setText(str);
+		int i=0;
+		str = "";
+		while(todoList[i] != 0){
+			QString a =QString("%2").arg(todoList[i]);str += a;str += ",";i++;
+		}
+		str.resize(str.length() - 1);		//修剪字符串尾部多余的","
+		m_DashBoard->ui.text_Todolist->setText(str);
 	}
-	m_DashBoard->ui.text_CurrentTaskId->setText(str);
-
-	int i=0;
-	str = "";
-	while(todoList[i] != 0){
-		QString a =QString("%2").arg(todoList[i]);str += a;str += ",";i++;
-	}
-	str.resize(str.length() - 1);		//修剪字符串尾部多余的","
-	m_DashBoard->ui.text_Todolist->setText(str);
 }
 void MainGUI::InitDashBoardData(){
 	PosByStar1=QPointF(0.00,0.00);
@@ -627,6 +638,7 @@ void MainGUI::InitDashBoardData(){
 	Angle_face_Audiance = 0.0;
 	is_Auto_Mode_Open = false;
 	is_FastGuideMode = false;
+	is_SimulateMode = false;
 	is_path_clear = true;
 	is_far_path_clear = true;
 	is_dodge_moment = false;
@@ -760,7 +772,6 @@ void MainGUI::InitAdjustGUI(){
 	}else{	//进入开发者模式
 		OnBtnDashBoard();				//开启仪表盘面板
 		OnBtnManualControl();			//开启遥控器面板
-		//OnBtnRobotQ();				//开启语音对话面板
 		ShowAdvertisement();			//播放广告
 	}
 }
@@ -975,10 +986,38 @@ void MainGUI::FastGuideTodolist(){
 int MainGUI::OnBtnFastGuideMode(){
 	if(is_FastGuideMode){
 		is_FastGuideMode = !is_FastGuideMode;
+		m_DashBoard->ui.ck_isFastGuideMode->setChecked(false);
 		m_ManualControl->ui.btn_MC_FastGuide->setText("开启快速模式");
 	}else{
 		is_FastGuideMode = !is_FastGuideMode;
+		m_DashBoard->ui.ck_isFastGuideMode->setChecked(true);
 		m_ManualControl->ui.btn_MC_FastGuide->setText("关闭快速模式");
+	}
+	return 0;
+}
+int MainGUI::OnBtnSimualte(){
+	if(is_SimulateMode){
+		m_DashBoard->ui.ck_isSimulateMode->setChecked(false);
+		m_DashBoard->ui.ck_Star->setChecked(false);
+		m_DashBoard->ui.ck_URG->setChecked(false);
+		m_DashBoard->ui.ck_Motor->setChecked(false);
+		InitCommMotorAndStar();
+		InitCommLaser();
+		is_SimulateMode = false;
+		m_ManualControl->ui.btn_MC_Simulate->setText("开启模拟模式");
+	}else{
+		m_DashBoard->ui.ck_isSimulateMode->setChecked(true);
+		m_StarGazer.Close();
+		m_motor.Close();
+		m_cURG.Close();
+		key_laser = false;			//退出激光线程
+		is_Comm_URG_Open = false;	
+		InitDashBoardData();
+		m_DashBoard->ui.ck_Star->setChecked(true);
+		m_DashBoard->ui.ck_URG->setChecked(true);
+		m_DashBoard->ui.ck_Motor->setChecked(true);
+		is_SimulateMode = true;
+		m_ManualControl->ui.btn_MC_Simulate->setText("关闭模拟模式");
 	}
 	return 0;
 }

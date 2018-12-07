@@ -13,7 +13,7 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面，值为2则开启带有虚拟机的混合现实开发者界面
+#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 50				//闪避时刻中最低有效步数
@@ -71,7 +71,8 @@ private:
 	StarMark m_MARK[MARKNUM];						//LED定位标签数组 - 每块边长455
 	bool is_Auto_Mode_Open;
 	bool is_project_accomplished;					//当前项目是否完成
-	bool is_FastGuideMode;							//当前是否是快速导览模式（无语音模式）
+	bool is_FastGuideMode;							//当前是否是快速导览模式（快速跳过语音等待时间）
+	bool is_SimulateMode;							//当前是否是模拟模式
 	bool is_path_clear;								//当前视野下前方是否通畅
 	bool is_far_path_clear;							//判断当前视野下远处是否通畅
 	bool is_dodge_moment;							//是否进入闪避时刻
@@ -81,8 +82,6 @@ private:
 	int sectorObstacleDistance[36];					//每五度划分一个扇区
 	int m_timer_refresh_dashboard;					//计数器查询将机器人数据显示在仪表盘中
 	int m_timer_refresh_task;						//计数器查询刷新当前任务
-	float m_Last_inLV;								//上一个动作的线速度
-	float m_Last_inPS;								//上一个动作的角速度
 	int todoList[TODOLISTMAXNUM];					//任务清单
 	int taskID;										//当前任务代码
 	int currentTodoListId;							//当前任务在清单中的下标
@@ -126,13 +125,14 @@ private slots:
 	inline int OnBtnRobotQ(){m_RobotQ->show();return 0;}
 	inline int OnBtnManualControl(){m_ManualControl->move(300,20);m_ManualControl->show();return 0;}
 	inline int OnBtnMuseumGUI(){m_MuseumGUI->move(80,50);m_MuseumGUI->show();return 0;}
-	inline int OnBtnDashBoard(){m_DashBoard->move(750,20);m_DashBoard->show();return 0;}
+	inline int OnBtnDashBoard(){m_DashBoard->move(575,20);m_DashBoard->show();return 0;}
 	int OnBtnAutoGuide();
 	int OnBtnSelectPath1();
 	int OnBtnSelectPath2();
 	int OnBtnSelectPath3();
 	int OnBtnSelectPath4();
 	int OnBtnFastGuideMode();
+	int OnBtnSimualte();
 	int On_MC_BtnForward();
 	int On_MC_BtnBackward();
 	int On_Auto_BtnTurnleft(int speedlevel);
