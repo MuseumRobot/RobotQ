@@ -192,37 +192,62 @@
    </property>
    <item>
     <property name="text">
-     <string>黑龙江省博物馆开闭馆时间</string>
+     <string>龙博概况</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>黑龙江省博物馆有几层，都有哪些展厅</string>
+     <string>开放时间</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>黑龙江省博物馆镇馆之宝有哪些？</string>
+     <string>获取门票的方法</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>免费讲解</string>
+     <string>到达黑龙江省博物馆的方式/交通/地理位置</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>洗手间位于哪里？</string>
+     <string>参观导览/陈列布局/楼层分布</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>便民服务</string>
+     <string>免费讲解时间安排</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>文创天地</string>
+     <string>免费服务/便民服务</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>镇馆之宝展示/藏品欣赏/藏品展示/馆藏精品</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>黑龙江省博物馆志愿者基地</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>文创产品/文创天地/纪念品</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>黑龙江省博物馆休息区/座椅</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>黑龙江省博物馆厕所/洗手间/卫生间</string>
     </property>
    </item>
    <item>
@@ -232,12 +257,12 @@
    </item>
    <item>
     <property name="text">
-     <string>黑龙江省博物馆有哪些活动？</string>
+     <string>黑龙江省博物馆活动</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>黑龙江省博物馆“相约龙博”课堂</string>
+     <string>黑龙江省博物馆“相约龙博”课堂/科普教育活动</string>
     </property>
    </item>
    <item>
@@ -257,12 +282,27 @@
    </item>
    <item>
     <property name="text">
-     <string>黑龙江省文博志愿者基地</string>
+     <string>黑龙江省博物馆分馆/枫叶小镇奥特莱斯分馆</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>博物馆简介</string>
+     <string>哈尔滨简介</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>哈尔滨景区/景点介绍</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>哈尔滨餐饮/饮食/特产推荐介绍</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>哈尔滨学府</string>
     </property>
    </item>
   </widget>

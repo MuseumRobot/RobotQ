@@ -67,6 +67,7 @@ public:
 	static void RobotQSpeak(QString str);
 	static int Json_Explain (char buf[],char result[],char answer[]);
 	QString SearchQuery(QString question);
+	void ShowGif(QString filepath);
 	PopupDialog* m_popup_image;
 private:
 	AsrRecogType m_RecogType;

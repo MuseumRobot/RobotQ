@@ -1029,9 +1029,9 @@ int MainGUI::OnBtnSimualte(){
 		m_ManualControl->ui.btn_MC_Simulate->setText("开启模拟模式");
 	}else{
 		m_DashBoard->ui.ck_isSimulateMode->setChecked(true);
-		m_StarGazer.Close();
-		m_motor.Close();
-		m_cURG.Close();
+		//m_StarGazer.Close();
+		//m_motor.Close();
+		//m_cURG.Close();
 		key_laser = false;			//退出激光线程
 		is_Comm_URG_Open = false;	
 		InitDashBoardData();
