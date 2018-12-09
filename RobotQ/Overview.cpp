@@ -3,11 +3,14 @@
 
 Overview::Overview(QWidget *parent):QFrame(parent){
 	m_timerId = startTimer(100);
+	this->setFixedSize(800,1000);
+	m_robotImg.load("Resources/yellowCar.png");
+	m_goalImg.load("Resources/redFlag.png");
+	m_angleRobot = 0;
 }
 Overview::~Overview(){}
 void Overview::paintEvent (QPaintEvent* event){
 	QPainter painter(this);
-
 	int width = this->width();
 	int height = this->height();
 
@@ -29,8 +32,11 @@ void Overview::paintEvent (QPaintEvent* event){
 		m_times = 0;
 	}
 
-	painter.drawEllipse(m_pos.x(),m_pos.y(),40,40);
-
+	painter.drawEllipse(0,0,40,40);
+	QMatrix matrix;
+	matrix.rotate(360-m_angleRobot);
+	painter.drawImage(m_posRobot*0.5,m_robotImg.scaled(40,40).transformed(matrix,Qt::FastTransformation));
+	painter.drawImage(m_posGoal*0.5,m_goalImg);
 
 }
 void Overview::timerEvent(QTimerEvent *event){

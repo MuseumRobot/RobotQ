@@ -5,6 +5,8 @@ DashBoard::DashBoard(QWidget *parent):QDialog(parent){
 	ui.setupUi(this);
 	connect(ui.btnSaveLog,SIGNAL(clicked()),this,SLOT(OnBtnSaveLog()));
 	m_timerId=startTimer(1000);	//每秒钟更新一次即可(事实上由于处理也需要时间，可能会略过一秒)
+	m_Overview = new Overview(parent);
+	ui.m_scrollArea->setWidget(m_Overview);
 }
 DashBoard::~DashBoard(){
 

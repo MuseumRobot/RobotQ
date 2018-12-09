@@ -119,13 +119,17 @@ int MainGUI::OnBtnAutoGuide(){
 }
 int MainGUI::On_MC_BtnForward(){
 	if(is_SimulateMode){
-		m_DashBoard->ui.m_Overview->m_pos+= QPointF(1,1);
-	}else{
-		m_motor.VectorMove(1000,0);
+		PosSafe.setX(PosSafe.x()+10*zTool_cos_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()-10*zTool_sin_angle(AngleSafe));
 	}
+	m_motor.VectorMove(1000,0);
 	return 0;
 }
 int MainGUI::On_MC_BtnBackward(){
+	if(is_SimulateMode){
+		PosSafe.setX(PosSafe.x()-10*zTool_cos_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()+10*zTool_sin_angle(AngleSafe));
+	}
 	m_motor.VectorMove(-800,0);
 	return 0;
 }
@@ -138,6 +142,10 @@ int MainGUI::On_Auto_BtnForward(int speedlevel){
 		inLV = 800;
 	}
 	m_motor.CompromisedVectorMove(inLV,inPS);
+	if(is_SimulateMode){
+		PosSafe.setX(PosSafe.x()+10*zTool_cos_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()-10*zTool_sin_angle(AngleSafe));
+	}
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnleft(int level){
@@ -152,6 +160,9 @@ int MainGUI::On_Auto_BtnTurnleft(int level){
 	float inLV = 0.0f;
 	float inPS = factor * speed;
 	m_motor.CompromisedVectorMove(inLV,inPS);
+	if(is_SimulateMode){
+		AngleSafe = zTool_mod_360f(AngleSafe+2);
+	}
 	return 0;
 }
 int MainGUI::On_Auto_BtnTurnright(int level){
@@ -166,13 +177,22 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	float inPS = -1* factor * speed;
 	float inLV = 0.0f;
 	m_motor.CompromisedVectorMove(inLV,inPS);
+	if(is_SimulateMode){
+		AngleSafe = zTool_mod_360f(AngleSafe-2);
+	}
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
+	if(is_SimulateMode){
+		AngleSafe = zTool_mod_360f(AngleSafe+2);
+	}
 	m_motor.VectorMove(0,2);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
+	if(is_SimulateMode){
+		AngleSafe = zTool_mod_360f(AngleSafe-2);
+	}
 	m_motor.VectorMove(0,-2);
 	return 0;
 }
@@ -187,11 +207,7 @@ int MainGUI::On_MC_BtnRobotQSpeak(){
 }
 void MainGUI::timerEvent(QTimerEvent *event){
 	if(event->timerId()==m_timer_refresh_dashboard){
-		if(is_SimulateMode){
-
-		}else{
-			refreshDashboardData();			//刷新真实仪表盘数据
-		}
+		refreshDashboardData();
 	}else if(event->timerId()==m_timer_refresh_task){
 		if(is_Auto_Mode_Open){
 			AssignInstruction();		//分配下一步指令
@@ -560,14 +576,19 @@ void MainGUI::refreshDashboardSector(){
 	if(sectorObstacleDistance[N-35]<threshold && sectorObstacleDistance[N-35] >0)m_DashBoard->ui.r180->setChecked(flag);
 }
 void MainGUI::refreshDashboardData(){
+	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
 	if(is_SimulateMode){
-		m_DashBoard->ui.m_Overview->m_pos.setX(PosSafe.x());
-		m_DashBoard->ui.m_Overview->m_pos.setY(PosSafe.y());
+		m_DashBoard->m_Overview->m_posRobot.setX(PosSafe.x());
+		m_DashBoard->m_Overview->m_posRobot.setY(PosSafe.y());
+		m_DashBoard->m_Overview->m_posGoal.setX(PosGoal.x());
+		m_DashBoard->m_Overview->m_posGoal.setY(PosGoal.y());
+		m_DashBoard->m_Overview->m_angleRobot = AngleSafe;
+		Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
+		Angle_face_Goal = zTool_mod_360f(360-Angle_face_Goal);
 	}else{
 		CalculateSectorDistance();		//计算扇区内障碍物距离
 		JudgeForwardSituation();		//判断前方是否畅通无阻
 		refreshDashboardSector();		//刷新障碍物分布图
-		if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
 		PosByStar1=QPointF(0.00,0.00);
 		PosByStar2=QPointF(0.00,0.00);
 		for (int loop_mark = 0; loop_mark < MARKNUM - 1; loop_mark++){
@@ -601,30 +622,31 @@ void MainGUI::refreshDashboardData(){
 			}
 		}
 		Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
-		QString str;
-		str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
-		m_DashBoard->ui.posStar1->setText(str);
-		str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
-		m_DashBoard->ui.posStar2->setText(str);
-		str.sprintf("(%.2f,%.2f)-(%.2f°)",PosSafe.x(),PosSafe.y(),AngleSafe);
-		m_DashBoard->ui.posSafe->setText(str);
-		str.sprintf("(%.2f,%.2f)-(%.2f°)",PosGoal.x(),PosGoal.y(),Angle_face_Goal);
-		m_DashBoard->ui.posGoal->setText(str);
-		//更新任务显示
-		if(is_project_accomplished == false){
-			str = "任务序号:";str += QString("%2").arg(currentTodoListId + 1);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
-		}else{
-			str = "无";
-		}
-		m_DashBoard->ui.text_CurrentTaskId->setText(str);
-		int i=0;
-		str = "";
-		while(todoList[i] != 0){
-			QString a =QString("%2").arg(todoList[i]);str += a;str += ",";i++;
-		}
-		str.resize(str.length() - 1);		//修剪字符串尾部多余的","
-		m_DashBoard->ui.text_Todolist->setText(str);
 	}
+	QString str;
+	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
+	m_DashBoard->ui.posStar1->setText(str);
+	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar2.x(),PosByStar2.y(),AngleByStar2,m_StarGazer.starID2);
+	m_DashBoard->ui.posStar2->setText(str);
+	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosSafe.x(),PosSafe.y(),AngleSafe);
+	m_DashBoard->ui.posSafe->setText(str);
+	str.sprintf("(%.2f,%.2f)-(%.2f°)",PosGoal.x(),PosGoal.y(),Angle_face_Goal);
+	m_DashBoard->ui.posGoal->setText(str);
+	//更新任务显示
+	if(is_project_accomplished == false){
+		str = "任务序号:";str += QString("%2").arg(currentTodoListId + 1);str +="(代码:";str += QString("%2").arg(todoList[currentTodoListId]);str += ")";
+	}else{
+		str = "无";
+	}
+	m_DashBoard->ui.text_CurrentTaskId->setText(str);
+	int i=0;
+	str = "";
+	while(todoList[i] != 0){
+		QString a =QString("%2").arg(todoList[i]);str += a;str += ",";i++;
+	}
+	str.resize(str.length() - 1);		//修剪字符串尾部多余的","
+	m_DashBoard->ui.text_Todolist->setText(str);
+
 }
 void MainGUI::InitDashBoardData(){
 	PosByStar1=QPointF(0.00,0.00);

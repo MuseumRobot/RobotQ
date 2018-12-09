@@ -24,6 +24,7 @@
 #include <QPainter>
 #include <QPlainTextEdit>
 #include <QString>
+#include <QScrollArea>
 #include <QTime>
 #include "targetver.h"
 #include "common/GBK.h"

@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "ui_DashBoard.h"
+#include "Overview.h"
 
 class DashBoard : public QDialog{
 	Q_OBJECT
@@ -12,6 +13,7 @@ public:
 	DashBoard(QWidget *parent = 0);
 	~DashBoard();
 	Ui::DashBoard ui;
+	Overview* m_Overview;
 	QTime m_time;
 	QDateTime m_day;
 	void AppendMessage(QString strMsg);
