@@ -120,7 +120,7 @@ int MainGUI::OnBtnAutoGuide(){
 int MainGUI::On_MC_BtnForward(){
 	if(is_SimulateMode){
 		PosSafe.setX(PosSafe.x()+10*zTool_cos_angle(AngleSafe));
-		PosSafe.setY(PosSafe.y()-10*zTool_sin_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()+10*zTool_sin_angle(AngleSafe));
 	}
 	m_motor.VectorMove(1000,0);
 	return 0;
@@ -128,7 +128,7 @@ int MainGUI::On_MC_BtnForward(){
 int MainGUI::On_MC_BtnBackward(){
 	if(is_SimulateMode){
 		PosSafe.setX(PosSafe.x()-10*zTool_cos_angle(AngleSafe));
-		PosSafe.setY(PosSafe.y()+10*zTool_sin_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()-10*zTool_sin_angle(AngleSafe));
 	}
 	m_motor.VectorMove(-800,0);
 	return 0;
@@ -144,7 +144,7 @@ int MainGUI::On_Auto_BtnForward(int speedlevel){
 	m_motor.CompromisedVectorMove(inLV,inPS);
 	if(is_SimulateMode){
 		PosSafe.setX(PosSafe.x()+10*zTool_cos_angle(AngleSafe));
-		PosSafe.setY(PosSafe.y()-10*zTool_sin_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()+10*zTool_sin_angle(AngleSafe));
 	}
 	return 0;
 }
@@ -578,13 +578,11 @@ void MainGUI::refreshDashboardSector(){
 void MainGUI::refreshDashboardData(){
 	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
 	if(is_SimulateMode){
-		m_DashBoard->m_Overview->m_posRobot.setX(PosSafe.x());
+		m_DashBoard->m_Overview->m_posRobot.setX(1000-PosSafe.x());
 		m_DashBoard->m_Overview->m_posRobot.setY(PosSafe.y());
-		m_DashBoard->m_Overview->m_posGoal.setX(PosGoal.x());
+		m_DashBoard->m_Overview->m_posGoal.setX(1000-PosGoal.x());
 		m_DashBoard->m_Overview->m_posGoal.setY(PosGoal.y());
 		m_DashBoard->m_Overview->m_angleRobot = AngleSafe;
-		Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
-		Angle_face_Goal = zTool_mod_360f(360-Angle_face_Goal);
 	}else{
 		CalculateSectorDistance();		//计算扇区内障碍物距离
 		JudgeForwardSituation();		//判断前方是否畅通无阻
@@ -621,8 +619,8 @@ void MainGUI::refreshDashboardData(){
 				}
 			}
 		}
-		Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
 	}
+	Angle_face_Goal = zTool_vector_angle(PosGoal - PosSafe);
 	QString str;
 	str.sprintf("(%.2f,%.2f)-(%.2f°)-(%d)",PosByStar1.x(),PosByStar1.y(),AngleByStar1,m_StarGazer.starID);
 	m_DashBoard->ui.posStar1->setText(str);
