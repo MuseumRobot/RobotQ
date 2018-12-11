@@ -8,7 +8,7 @@ bool RobotQ::GLOBAL_CommandValid;
 
 RobotQ::RobotQ(QWidget *parent, Qt::WFlags flags):QDialog(parent, flags){
 	ui.setupUi(this);
-	m_popup_image = new PopupDialog(this);
+	m_popup_image = new PopupDialog(0);
 	connect(ui.btnStart,SIGNAL(clicked()),this,SLOT(OnStartClicked()));
 	connect(ui.btnEnd,SIGNAL(clicked()),this,SLOT(OnEndClicked()));
 	connect(ui.btnQuery,SIGNAL(clicked()),this,SLOT(OnQueryClicked()));
@@ -551,7 +551,7 @@ QString RobotQ::SearchQuery(QString question){
 		answer = "素有“冰城夏都”美誉的历史文化名城哈尔滨，有着众多著名学府，如：哈尔滨工业大学、哈尔滨工程大学、黑龙江大学、东北农业大学、哈尔滨师范大学等。其中，哈尔滨工业大学（简称哈工大），隶属于工业和信息化部，拥有哈尔滨、威海、深圳三个校区，是一所以理工为主，理、工、管、文、经、法、艺等多学科协调发展的国家重点大学。 学校始建于1920年，1951年被确定为全国学习国外高等教育办学模式的两所样板大学之一，1954年进入国家首批重点建设的6所高校行列（京外唯一一所），是新中国第一所本科五年制、研究生三年制、毕业生直接被授予工程师称号的理工科大学，被誉为工程师的摇篮。学校于1996年进入国家“211工程”首批重点建设高校，1999年被确定为国家首批按照世界知名高水平大学目标重点建设的9所大学之一，2017年入选“双一流”建设A类高校名单。";
 	}
 	if(picFlag == 0){
-		ShowGif("Resources/图片/七寸屏幕 .gif");
+		ShowGif("Resources/图片/七寸屏幕.gif");
 	}
 	return answer;
 }

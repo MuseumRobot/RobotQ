@@ -13,12 +13,12 @@
 #define COMM_STAR 4					//星标定位串口
 #define COMM_LASER 5				//激光传感器串口号
 #define PI 3.141592653
-#define MUSEUMMODE 1				//值为1开启博物馆使用界面，值为0则开启开发者界面
+#define MUSEUMMODE 0				//值为1开启博物馆使用界面，值为0则开启开发者界面
 #define MARKNUM	31					//全局星标总数
 #define TODOLISTMAXNUM 99			//任务清单数目的上限
 #define DODGESTEPS 50				//闪避时刻中最低有效步数
 #define INSTRUCTION_CYCLE 200		//指令周期，单位ms
-#define INFOREFRESH_CYCLE 100		//数据刷新周期，单位ms
+#define INFOREFRESH_CYCLE 50		//数据刷新周期，单位ms
 #define OBSTACLE_DISTANCE 400		//近处障碍物探测距离，单位mm，用以判断前方道路是否通畅
 #define FAR_OBSTACLE_DISTANCE 800	//远处障碍物探测距离，单位mm，用以判断前方较远处是否通畅，从而控制前进速度
 #define ERRORANGLE 10.0				//选择角度的误差范围，单位°
@@ -46,7 +46,6 @@ class MainGUI : public QDialog{
 public:
 	MainGUI(QWidget *parent = 0);
 	~MainGUI();
-	PopupDialog* m_popup_secondScreen_image;	//第二显示器弹出窗口
 	QPointF PosByStar1;		//首选星标得到的星标定位器的世界坐标，单位cm
 	QPointF PosByStar2;		//备选星标，单位cm
 	QPointF PosSafe;		//综合考虑电机和星标进而得出可靠的机器人中心点坐标结果，单位cm

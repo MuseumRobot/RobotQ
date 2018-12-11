@@ -19,7 +19,6 @@ MainGUI::MainGUI(QWidget *parent): QDialog(parent){
 	m_ManualControl = new ManualControl(this);
 	m_DashBoard = new DashBoard(this);
 	m_MuseumGUI = new MuseumGUI(this);
-	m_popup_secondScreen_image = new PopupDialog(this);	//初始化第二屏幕弹出窗口
 	m_timer_refresh_task = startTimer(INSTRUCTION_CYCLE);					//计数器查询分配任务
 	m_timer_refresh_dashboard = startTimer(INFOREFRESH_CYCLE);			//计数器查询显示机器状态
 	connect(ui.btnAutoGuide,SIGNAL(clicked()),this,SLOT(OnBtnAutoGuide()));
@@ -119,8 +118,9 @@ int MainGUI::OnBtnAutoGuide(){
 }
 int MainGUI::On_MC_BtnForward(){
 	if(is_SimulateMode){
-		PosSafe.setX(PosSafe.x()+10*zTool_cos_angle(AngleSafe));
-		PosSafe.setY(PosSafe.y()+10*zTool_sin_angle(AngleSafe));
+		int step = 7 + rand()%4;
+		PosSafe.setX(PosSafe.x()+step*zTool_cos_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()+step*zTool_sin_angle(AngleSafe));
 	}
 	m_motor.VectorMove(1000,0);
 	return 0;
@@ -143,8 +143,9 @@ int MainGUI::On_Auto_BtnForward(int speedlevel){
 	}
 	m_motor.CompromisedVectorMove(inLV,inPS);
 	if(is_SimulateMode){
-		PosSafe.setX(PosSafe.x()+10*zTool_cos_angle(AngleSafe));
-		PosSafe.setY(PosSafe.y()+10*zTool_sin_angle(AngleSafe));
+		int step = 7 + rand()%4;
+		PosSafe.setX(PosSafe.x()+step*zTool_cos_angle(AngleSafe));
+		PosSafe.setY(PosSafe.y()+step*zTool_sin_angle(AngleSafe));
 	}
 	return 0;
 }
@@ -161,7 +162,14 @@ int MainGUI::On_Auto_BtnTurnleft(int level){
 	float inPS = factor * speed;
 	m_motor.CompromisedVectorMove(inLV,inPS);
 	if(is_SimulateMode){
-		AngleSafe = zTool_mod_360f(AngleSafe+2);
+		int basicSpeed;
+		switch(level){
+		case 0:basicSpeed = 15;break;
+		case 1:basicSpeed = 30;break;
+		default:basicSpeed = 15;
+		}
+		float step = (basicSpeed + rand()%10)/10.0;
+		AngleSafe = zTool_mod_360f(AngleSafe+step);
 	}
 	return 0;
 }
@@ -178,20 +186,31 @@ int MainGUI::On_Auto_BtnTurnright(int level){
 	float inLV = 0.0f;
 	m_motor.CompromisedVectorMove(inLV,inPS);
 	if(is_SimulateMode){
-		AngleSafe = zTool_mod_360f(AngleSafe-2);
+		int basicSpeed;
+		switch(level){
+		case 0:basicSpeed = 15;break;
+		case 1:basicSpeed = 30;break;
+		default:basicSpeed = 15;
+		}
+		float step = (basicSpeed + rand()%10)/10.0;
+		AngleSafe = zTool_mod_360f(AngleSafe-step);
 	}
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnleft(){
 	if(is_SimulateMode){
-		AngleSafe = zTool_mod_360f(AngleSafe+2);
+		int basicSpeed = 15;
+		float step = (basicSpeed + rand()%10)/10.0;
+		AngleSafe = zTool_mod_360f(AngleSafe+step);
 	}
 	m_motor.VectorMove(0,2);
 	return 0;
 }
 int MainGUI::On_MC_BtnTurnright(){
 	if(is_SimulateMode){
-		AngleSafe = zTool_mod_360f(AngleSafe-2);
+		int basicSpeed = 15;
+		float step = (basicSpeed + rand()%10)/10.0;
+		AngleSafe = zTool_mod_360f(AngleSafe-step);
 	}
 	m_motor.VectorMove(0,-2);
 	return 0;
@@ -577,18 +596,12 @@ void MainGUI::refreshDashboardSector(){
 }
 void MainGUI::refreshDashboardData(){
 	if(is_Comm_URG_Open)m_DashBoard->ui.ck_URG->setChecked(true);	//判断电机是否开启
-	if(is_SimulateMode){
-		m_DashBoard->m_Overview->m_posRobot.setX(1000-PosSafe.x());
-		m_DashBoard->m_Overview->m_posRobot.setY(PosSafe.y());
-		m_DashBoard->m_Overview->m_posGoal.setX(1000-PosGoal.x());
-		m_DashBoard->m_Overview->m_posGoal.setY(PosGoal.y());
-		m_DashBoard->m_Overview->m_angleRobot = AngleSafe;
-	}else{
-		CalculateSectorDistance();		//计算扇区内障碍物距离
-		JudgeForwardSituation();		//判断前方是否畅通无阻
-		refreshDashboardSector();		//刷新障碍物分布图
-		PosByStar1=QPointF(0.00,0.00);
-		PosByStar2=QPointF(0.00,0.00);
+	CalculateSectorDistance();		//计算扇区内障碍物距离
+	JudgeForwardSituation();		//判断前方是否畅通无阻
+	refreshDashboardSector();		//刷新障碍物分布图
+	PosByStar1=QPointF(0.00,0.00);
+	PosByStar2=QPointF(0.00,0.00);
+	if(!is_SimulateMode){
 		for (int loop_mark = 0; loop_mark < MARKNUM - 1; loop_mark++){
 			if (m_MARK[loop_mark].markID == m_StarGazer.starID){
 				//采集原始Star1数据
@@ -644,6 +657,12 @@ void MainGUI::refreshDashboardData(){
 	}
 	str.resize(str.length() - 1);		//修剪字符串尾部多余的","
 	m_DashBoard->ui.text_Todolist->setText(str);
+	//更新模拟器信息
+	m_DashBoard->m_Overview->m_posRobot.setX(1000-PosSafe.x());
+	m_DashBoard->m_Overview->m_posRobot.setY(PosSafe.y());
+	m_DashBoard->m_Overview->m_posGoal.setX(1000-PosGoal.x());
+	m_DashBoard->m_Overview->m_posGoal.setY(PosGoal.y());
+	m_DashBoard->m_Overview->m_angleRobot = AngleSafe;
 
 }
 void MainGUI::InitDashBoardData(){
@@ -789,6 +808,7 @@ void MainGUI::InitAdjustGUI(){
 	if(MUSEUMMODE == 1){
 		OnBtnMuseumGUI();
 		m_MuseumGUI->showFullScreen();
+		ShowAdvertisement();			//播放广告
 	}else{	//进入开发者模式
 		OnBtnDashBoard();				//开启仪表盘面板
 		OnBtnManualControl();			//开启遥控器面板
@@ -1018,24 +1038,10 @@ int MainGUI::OnBtnFastGuideMode(){
 int MainGUI::OnBtnSimualte(){
 	if(is_SimulateMode){
 		m_DashBoard->ui.ck_isSimulateMode->setChecked(false);
-		m_DashBoard->ui.ck_Star->setChecked(false);
-		m_DashBoard->ui.ck_URG->setChecked(false);
-		m_DashBoard->ui.ck_Motor->setChecked(false);
-		InitCommMotorAndStar();
-		InitCommLaser();
 		is_SimulateMode = false;
 		m_ManualControl->ui.btn_MC_Simulate->setText("开启模拟模式");
 	}else{
 		m_DashBoard->ui.ck_isSimulateMode->setChecked(true);
-		//m_StarGazer.Close();
-		//m_motor.Close();
-		//m_cURG.Close();
-		key_laser = false;			//退出激光线程
-		is_Comm_URG_Open = false;	
-		InitDashBoardData();
-		m_DashBoard->ui.ck_Star->setChecked(true);
-		m_DashBoard->ui.ck_URG->setChecked(true);
-		m_DashBoard->ui.ck_Motor->setChecked(true);
 		is_SimulateMode = true;
 		m_ManualControl->ui.btn_MC_Simulate->setText("关闭模拟模式");
 	}
@@ -1044,10 +1050,10 @@ int MainGUI::OnBtnSimualte(){
 void MainGUI::ShowPic(QString str){				//显示图片
 	QDesktopWidget* desktop = QApplication::desktop();
 	int N = desktop->screenCount();
-	m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-	m_popup_secondScreen_image->ui.popup_image->setPixmap(QPixmap(str));
-	m_popup_secondScreen_image->show();
-	m_popup_secondScreen_image->resize(800,600);
+	m_RobotQ->m_popup_image->setGeometry(desktop->screenGeometry(0));
+	m_RobotQ->m_popup_image->ui.popup_image->setPixmap(QPixmap(str));
+	m_RobotQ->m_popup_image->show();
+	m_RobotQ->m_popup_image->resize(800,600);
 	is_advertisement_available=true;
 }
 void MainGUI::ShowPicByTaskID(int taskID){		//显示图片（参数为任务代码）
@@ -1115,11 +1121,11 @@ void MainGUI::ShowAdvertisement(){
 	QDesktopWidget* desktop = QApplication::desktop();
 	int N = desktop->screenCount();
 	if(N>1){
-		QMovie *movie = new QMovie("Resources/图片/七寸屏幕 .gif");
-		m_popup_secondScreen_image->setGeometry(desktop->screenGeometry(0));
-		m_popup_secondScreen_image->ui.popup_image->setMovie(movie);
-		m_popup_secondScreen_image->show();
-		m_popup_secondScreen_image->resize(800,600);
+		QMovie *movie = new QMovie("Resources/图片/七寸屏幕.gif");
+		m_RobotQ->m_popup_image->setGeometry(desktop->screenGeometry(0));
+		m_RobotQ->m_popup_image->ui.popup_image->setMovie(movie);
+		m_RobotQ->m_popup_image->show();
+		m_RobotQ->m_popup_image->resize(800,600);
 		movie->start();
 	}
 }
