@@ -244,16 +244,12 @@ void HCIAPI RobotQ::RecorderRecogFinish(RECORDER_EVENT eRecorderEvent,ASR_RECOG_
 			strMessage+=add;
 			HciExampleComon::FreeConvertResult( pucUTF8 );
 			//cJSON提取有效内容
-			char buf[10000] = {NULL};
-			char result[10000]={NULL};
-			char answer[10000]={NULL};
-			strcpy(buf,strMessage.toStdString().c_str());
-			Json_Explain(buf,result,answer);
-			QString QResult(result);
-			QString QAnswer(answer);
+			QString QResult;
+			QString QAnswer;
+			Json_Explain(strMessage,QResult,QAnswer);
 			if(QResult.contains("黑龙江省博物馆",Qt::CaseInsensitive)){
 				QAnswer = "黑龙江省博物馆是省级综合性博物馆，2012年被评为国家一级博物馆，是黑龙江省收藏历史文物、艺术品和动、植物标本的中心，是地方史和自然生态的研究中心之一，也是宣传地方历史文化和自然资源的重要场所。黑龙江省博物馆主楼始建于1906年，是一座欧洲巴洛克式建筑，为原俄罗斯商场旧址，现为国家一级保护建筑，他就像一位历经沧桑的百岁老人，见证着黑龙江省博物馆的历史变迁。1923年6月12日，东省文物研究会陈列所在现址举行成立典礼并对外开放。此后的30年间，曾历经东省特别区文物研究会博物馆、伪北满特别区文物研究所、伪大陆科学院哈尔滨分院博物馆、哈尔滨工业大学常设运输经济陈列馆、松江省科学博物馆、松江省博物馆等几个阶段。1954年8月，随着松江省并入黑龙江省，松江省博物馆与黑龙江省博物馆筹备处合并，从此，黑龙江省博物馆正式宣告成立。1962年中国科学院院长郭沫若为本馆书写馆名。黑龙江省博物馆馆藏丰富，现有各类藏品62万余件。本馆设有“黑龙江历史文物陈列——以肃慎族系遗存为中心”、“黑龙江俄侨文化文物展”、“自然陈列”、“铁笔翰墨——邓散木艺术专题陈列”、“墨韵冰魂北国情——于志学艺术馆藏精品展”五大基本陈列，以及各种主题和形式的临时陈列。我们对大家的到来表示诚挚的欢迎，希望大家为黑龙江省博物馆多多提出宝贵的意见和建议，谢谢！";
-			}else if(QResult.contains("哈尔滨",Qt::CaseInsensitive)){
+			}else if(QResult.contains("哈尔滨",Qt::CaseInsensitive) && QResult.contains("介",Qt::CaseInsensitive)){
 				QAnswer = "素有“冰城夏都”美誉的历史文化名城哈尔滨，有着众多著名学府，如：哈尔滨工业大学、哈尔滨工程大学、黑龙江大学、东北农业大学、哈尔滨师范大学等。其中，哈尔滨工业大学（简称哈工大），隶属于工业和信息化部，拥有哈尔滨、威海、深圳三个校区，是一所以理工为主，理、工、管、文、经、法、艺等多学科协调发展的国家重点大学。 学校始建于1920年，1951年被确定为全国学习国外高等教育办学模式的两所样板大学之一，1954年进入国家首批重点建设的6所高校行列（京外唯一一所），是新中国第一所本科五年制、研究生三年制、毕业生直接被授予工程师称号的理工科大学，被誉为工程师的摇篮。学校于1996年进入国家“211工程”首批重点建设高校，1999年被确定为国家首批按照世界知名高水平大学目标重点建设的9所大学之一，2017年入选“双一流”建设A类高校名单。";
 			}
 			strMessage="小灵的回答:" + QAnswer  + "\n" + "您的提问:"+ QResult;
@@ -439,26 +435,33 @@ void RobotQ::RobotQSpeak(QString str){
 	QTest::qSleep(100);		//发送stop指令后留有短暂时间以供stop命令执行完成，否则无法start下一句
 	PLAYER_ERR_CODE eRetk = hci_tts_player_start( (const char*)pszUTF8, startConfig.c_str() );
 }
-int RobotQ::Json_Explain (char buf[],char result[],char answer[]){  
-	int n=strlen(buf);
-	if(n>0){
-		for(int i=0;i<n;i++){
-			if(buf[i]=='u'&&buf[i+1]=='l'&&buf[i+2]=='t'){
-				int j=0;
-				while(buf[i+6+j]!='"')
-					result[j++]=buf[i+6+j];
-			}
-			if(buf[i]=='n'&&buf[i+1]=='t'&&buf[i+2]=='"'){
-				int j=0;
-				while(buf[i+13+j]!='"')
-					answer[j++]=buf[i+13+j];
-				break;
-			}
 
-		}
-	}	
-	return 0;  
-}  
+int RobotQ::Json_Explain (QString buf,QString& Qresult,QString& Qanswer){
+	QString domain = Json_SearchKeyword(buf,"domain");
+	if(domain == "weather"){
+		Qanswer = "今天天气：" + Json_SearchKeyword(buf,"description");
+	}else if(domain == "calendar"){
+		Qanswer = "今天是" + Json_SearchKeyword(buf,"date_gongli") + "，" + Json_SearchKeyword(buf,"date_nongli");
+	}else if(domain == "joke" || domain == "story"){
+		Qanswer = Json_SearchKeyword(buf,"content\":{\"content");
+	}else if(domain == "news"){
+		Qanswer = Json_SearchKeyword(buf,"desc");
+	}else{
+		Qanswer = Json_SearchKeyword(buf,"text");
+	}
+	Qresult = Json_SearchKeyword(buf,"result");
+	return 0;
+}
+QString RobotQ::Json_SearchKeyword(QString buf,QString keyword){
+	QString QAnswer;
+	int i=0,j=0,n=3;
+	i=buf.indexOf(keyword);
+	while(buf.at(i+keyword.length()+n+j) != '"'){
+		QAnswer += buf.at(i+keyword.length()+n+j);
+		j++;
+	}
+	return QAnswer;
+}
 QString RobotQ::SearchQuery(QString question){
 	QString answer;
 	int picFlag=0;

@@ -65,7 +65,8 @@ public:
 	void PostRecorderEventAndMsg(RECORDER_EVENT eRecorderEvent, QString strMessage);
 	virtual void timerEvent(QTimerEvent *event);
 	static void RobotQSpeak(QString str);
-	static int Json_Explain (char buf[],char result[],char answer[]);
+	static int Json_Explain (QString buf,QString& Qresult,QString& Qanswer);
+	static QString Json_SearchKeyword(QString buf,QString keyword);
 	QString SearchQuery(QString question);
 	void ShowGif(QString filepath);
 	PopupDialog* m_popup_image;
