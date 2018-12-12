@@ -4,6 +4,8 @@
     <file>Resources/HIT_Robot_ico.ico</file>
   </qresource>
   <qresource prefix="MuseumGUI">
+    <file>Resources/locked.png</file>
+    <file>Resources/unlocked.png</file>
     <file>Resources/exit.png</file>
     <file>Resources/路线4.png</file>
     <file>Resources/博物馆背景.bmp</file>

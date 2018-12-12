@@ -11,7 +11,10 @@ public:
 	MuseumGUI(QWidget *parent = 0);
 	~MuseumGUI();
 	Ui::MuseumGUI ui;
+	bool isLocked;
 	void closeEvent(QCloseEvent *event);
+public slots:
+	void OnBtnLock();
 };
 
 #endif // MUSEUMGUI_H
