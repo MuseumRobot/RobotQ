@@ -57,7 +57,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>小灵机器人语音</string>
+   <string>机器人语音交互系统</string>
   </property>
   <property name="windowIcon">
    <iconset resource="robotq.qrc">
@@ -193,6 +193,11 @@
    <property name="editable">
     <bool>true</bool>
    </property>
+   <item>
+    <property name="text">
+     <string>机器人简介</string>
+    </property>
+   </item>
    <item>
     <property name="text">
      <string>龙博概况</string>
