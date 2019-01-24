@@ -4,7 +4,7 @@
 ######################################################
 
 #应用程序序号
-appKey=e45d546a
+appKey=845d54bd
 
 #开发者密钥
 developerKey=8fbe5da16df50732dbccff4d4bcfef79
